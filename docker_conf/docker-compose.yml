@@ -1,0 +1,30 @@
+services:
+  grupo_7_local_gpu:
+    image: grupo_7_local_gpu
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_grupo_7
+    privileged: true
+    network_mode: host
+    ipc: host
+    profiles:
+      - grupo_7_local_gpu
+    volumes:
+      - ./ros_workspace:/home/laboratorio/ros_workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-0}:/root/.Xauthority
+      - /dev:/dev
+    tmpfs:
+      - /dev/shm:rw
+    environment:
+      - DISPLAY=${DISPLAY:-0}
+      - LD_LIBRARY_PATH=/usr/local/nvidia/lib64
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
