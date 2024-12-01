@@ -74,6 +74,30 @@ Para comprobar que el sistema funciona correctamente, ejecutar en la terminal do
 ```bash
 roslaunch launcher_robots_lab_robotica sim_203.launch
 ```
-- Los contenedores comparten un directorio con el host. Todo cambio que se haga en este desde el contenedor se verá reflejado en el host y viceversa. Este directorio en el contenedor es: `/home/laboratorio/ros_workspace` y en el host depende de donde y cómo se haya creado el contenedor.
-- No confundir el host con el contenedor (estarán en instancias separadas de VSCode).
-- No lanzar docker compose down. Si se lanza, el contenedor se eliminará.
+
+## Subir Archivos al Repositorio
+1. Clonar el repositorio
+```bash
+git clone https://github.com/gonzalo002/robotica_g7_mucsi
+```
+2. Crear una nueva rama
+```bash
+cd cd robotica_g7_mucsi
+```
+```bash
+git checkout -b <Nombre de la rama>
+```
+3. Añade los documentos que quieras importar en el repositorio clonado en tus archivos locales
+Aqui simplemente con meter los documentos que quieras en las carpetas locales sin modificar lo que ya existe vale.
+5. Agregar archivos al indice de Git
+```bash
+git add .
+```
+6. Realizar un commit de los cambios realizados
+```bash
+git commit -m "Mensaje descriptivo de lo que se cambia"
+```
+7. Realizar un push al repositorio original
+```bash
+git push origin <Nombre de la rama>
+```
