@@ -23,7 +23,7 @@ Cuando acabe el proceso ya se dispondrá de la imagen construida en el sistema.
 ### 3. Lanzar el contenedor
 Una vez construida la imagen es posible crear contenedores a partir de ella. En este caso los contenedores están diseñados para utilizarlos como entornos de desarrollo. Se recomienda crear y utilizar un solo contenedor. Para esto ejecutar:
 ```bash
-docker compose --profile grupo_7_local_gpu up
+docker compose --profile grupo_7_local_gpu up -d
 ```
 Una vez lanzado, la terminal se mantendrá ejecutando el contenedor hasta que se pare. Para pararlo basta con enviar una señal de terminación `ctrl`+`c`.
 
