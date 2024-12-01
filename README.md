@@ -75,7 +75,9 @@ Para comprobar que el sistema funciona correctamente, ejecutar en la terminal do
 roslaunch launcher_robots_lab_robotica sim_203.launch
 ```
 
-## **Extra** Subir Archivos al Repositorio
+## Subir Archivos al Repositorio
+>**EXTRA:**
+**<u>Pequeño tutorial de como crear una rama y subir archivos al repositorio.</u>**
 ### 1. Clonar el repositorio
 
 ```bash
