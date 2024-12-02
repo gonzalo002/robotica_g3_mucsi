@@ -27,8 +27,22 @@ class CubeTracker:
     Atributos:
         - frame (numpy array) - Almacena la imagen de entrada que se va a procesar.
     '''
-    def __init__(self) -> None:
+    def __init__(self, aruco_dict=cv2.aruco.DICT_4X4_50, marker_length=0.05, camera_matrix=None, dist_coeffs=None) -> None:
+        '''
+        Inicializa la clase y configura los parámetros de Aruco.
+            @param aruco_dict (int) - Diccionario de Aruco (por defecto, 4x4 con 50 marcadores).
+            @param marker_length (float) - Longitud del lado del marcador en metros.
+            @param camera_matrix (numpy array) - Matriz intrínseca de la cámara.
+            @param dist_coeffs (numpy array) - Coeficientes de distorsión de la cámara.
+        '''
         self.frame = None
+        self.frame = None
+        self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict)
+        self.aruco_params = cv2.aruco.DetectorParameters()
+        self.marker_length = marker_length
+        self.camera_matrix = camera_matrix
+        self.dist_coeffs = dist_coeffs
+        self.marker_position = None
 
     def _aplicar_filtro_grises(self, frame:np.ndarray) -> np.ndarray:
         ''' 
@@ -108,11 +122,24 @@ class CubeTracker:
                     angle = rect[2]
 
                     cv2.circle(resultado, center, 3, (255, 0, 0), -1)
+
+                    if self.marker_position is not None:
+                        # Convertir el centro a coordenadas homogéneas
+                        cubo_pos_camera = np.array([center[0], center[1], 0, 1]).reshape(4, 1)
+                        
+                        # Transformar al sistema del Aruco
+                        cubo_pos_marker = self.marker_position @ cubo_pos_camera
+                        x_marker, y_marker, z_marker = cubo_pos_marker[:3, 0]
+                        
+                        # Reemplazar las coordenadas por las ajustadas
+                        center_transformed = (x_marker, y_marker, z_marker)
+                    else:
+                        center_transformed = center  # Si no hay marcador, usar las coordenadas de la cámara
                     
-                    cv2.putText(resultado, f"Position: ({center[0]}, {center[1]})", 
-                                (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+                    cv2.putText(resultado, f"Position: {center_transformed}", 
+                            (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
                     cv2.putText(resultado, f"Angle: {angle:.2f}", 
-                                (center[0] + 20, center[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+                            (center[0] + 20, center[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
 
                     mask = np.zeros_like(gray)
                     cv2.drawContours(mask, [cnt], -1, 255, -1)
@@ -125,7 +152,7 @@ class CubeTracker:
                             break
 
                     # Creamos diccionario con las características de la pieza
-                    dicionario_resultado.append({"Posicion": center, "Angulo": angle, "Color": color_map[color]})
+                    dicionario_resultado.append({"Posicion": center_transformed, "Angulo": angle, "Color": color_map[color]})
                     
                     cv2.putText(resultado, color, (center[0] + 20, center[1] + 20), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 255), 1)
@@ -133,7 +160,27 @@ class CubeTracker:
         self.imagen_analizada = resultado
         
         return dicionario_resultado
+    
+    def _detectar_aruco(self, frame: np.ndarray) -> None:
+        '''
+        Detecta un marcador Aruco en la imagen y calcula su posición y orientación.
+            @param frame (numpy array) - Imagen en formato escala de grises.
+        '''
+        corners, ids, _ = cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
+        
+        if ids is not None:
+            frame = cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+            
+            # Estimar pose del marcador
+            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_length, self.camera_matrix, self.dist_coeffs)
+            # Guardar la posición del primer marcador detectado
+            self.marker_position = tvecs[0]
+            frame = cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvecs[0], tvecs[0], 0.1)
 
+        cv2.imshow('Contoured Image', frame)
+
+        if cv2.waitKey(0) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
 
     def analizar_imagen(self, frame:np.ndarray, area_size:int=1000, mostrar:bool = False) -> list:
         ''' 
@@ -143,7 +190,11 @@ class CubeTracker:
             @param mostrar (bool) - Si es True, muestra la imagen procesada. Por defecto, False.
             @return resultado (list) - Imagen procesada con cubos identificados y etiquetados.
         '''
+        # Realizar copia del frame
         self.frame = deepcopy(frame)
+
+        # Detectar Aruco
+        self._detectar_aruco(frame)
             
         gray = self._aplicar_filtro_grises(frame)
         hsv_frame = self._aplicar_filtro_hsv(frame)
@@ -167,5 +218,5 @@ class CubeTracker:
 
 if __name__ == "__main__":
     camara = CubeTracker()
-    frame = cv2.imread('ProyectoFinal/Imagenes/Imagen_11.png')
+    frame = cv2.imread('ProyectoFinal/Cubos_Exparcidos/Aruco_1.png')
     resultado = camara.analizar_imagen(frame,mostrar=True)
