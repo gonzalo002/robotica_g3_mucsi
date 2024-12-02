@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from copy import deepcopy
 
-class LocalizadorCubos:
+class CubeTracker:
     ''' 
     Clase que procesa imágenes para detectar cubos y asignarles un color en función de su forma y tonalidad en el espacio de color HSV.
     
@@ -166,6 +166,6 @@ class LocalizadorCubos:
     
 
 if __name__ == "__main__":
-    camara = LocalizadorCubos()
+    camara = CubeTracker()
     frame = cv2.imread('ProyectoFinal/Imagenes/Imagen_11.png')
     resultado = camara.analizar_imagen(frame,mostrar=True)
