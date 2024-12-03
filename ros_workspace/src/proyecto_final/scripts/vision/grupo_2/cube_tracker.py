@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from copy import deepcopy
+import yaml
 
 class CubeTracker:
     ''' 
@@ -27,7 +28,7 @@ class CubeTracker:
     Atributos:
         - frame (numpy array) - Almacena la imagen de entrada que se va a procesar.
     '''
-    def __init__(self, aruco_dict=cv2.aruco.DICT_4X4_50, marker_length=0.05, camera_matrix=None, dist_coeffs=None) -> None:
+    def __init__(self, path:str, aruco_dict=cv2.aruco.DICT_4X4_50, marker_length=0.05) -> None:
         '''
         Inicializa la clase y configura los parámetros de Aruco.
             @param aruco_dict (int) - Diccionario de Aruco (por defecto, 4x4 con 50 marcadores).
@@ -39,10 +40,19 @@ class CubeTracker:
         self.frame = None
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict)
         self.aruco_params = cv2.aruco.DetectorParameters()
+
+        self._get_camara_calibration(path)
+
         self.marker_length = marker_length
-        self.camera_matrix = camera_matrix
-        self.dist_coeffs = dist_coeffs
         self.marker_position = None
+
+    def _get_camara_calibration(self, path:str)->None:
+        with open(path, '+r') as f:
+            fichero =  yaml.load(f, yaml.Loader)
+
+        self.camera_matrix = np.array(fichero["camera_matrix"]["data"]).reshape(fichero["camera_matrix"]["rows"], fichero["camera_matrix"]["cols"])
+        self.dist_coeffs = np.array(fichero["distortion_coefficients"]["data"])
+        
 
     def _aplicar_filtro_grises(self, frame:np.ndarray) -> np.ndarray:
         ''' 
@@ -102,14 +112,17 @@ class CubeTracker:
         color_ranges = {
             "Red": [(0, 100, 100), (15, 255, 255)],
             "Green": [(40, 50, 50), (80, 255, 255)],
-            "Blue": [(100, 100, 100), (130, 255, 255)],
+            "Blue": [(100, 50, 50), (130, 255, 255)],
             "Yellow": [(20, 100, 100), (30, 255, 255)]
         }
         color_map = {"Red": 0, "Green": 1, "Blue": 2, "Yellow": 3, "Unknown":-1}
         resultado = frame.copy()
+        area_size = [cv2.contourArea(cnt) for cnt in contours]
+        mode_cubes = np.median(area_size)
+
         dicionario_resultado = []
-        for cnt in contours:
-            if cv2.contourArea(cnt) > area_size:
+        for i,cnt in enumerate(contours):
+            if (area_size[i] > mode_cubes-300) and (area_size[i] < mode_cubes+300):
                 approx = cv2.approxPolyDP(cnt, 0.04 * cv2.arcLength(cnt, True), True)
                 
                 if len(approx) == 4:
@@ -122,21 +135,8 @@ class CubeTracker:
                     angle = rect[2]
 
                     cv2.circle(resultado, center, 3, (255, 0, 0), -1)
-
-                    if self.marker_position is not None:
-                        # Convertir el centro a coordenadas homogéneas
-                        cubo_pos_camera = np.array([center[0], center[1], 0, 1]).reshape(4, 1)
-                        
-                        # Transformar al sistema del Aruco
-                        cubo_pos_marker = self.marker_position @ cubo_pos_camera
-                        x_marker, y_marker, z_marker = cubo_pos_marker[:3, 0]
-                        
-                        # Reemplazar las coordenadas por las ajustadas
-                        center_transformed = (x_marker, y_marker, z_marker)
-                    else:
-                        center_transformed = center  # Si no hay marcador, usar las coordenadas de la cámara
                     
-                    cv2.putText(resultado, f"Position: {center_transformed}", 
+                    cv2.putText(resultado, f"Position: {center}", 
                             (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
                     cv2.putText(resultado, f"Angle: {angle:.2f}", 
                             (center[0] + 20, center[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
@@ -152,7 +152,7 @@ class CubeTracker:
                             break
 
                     # Creamos diccionario con las características de la pieza
-                    dicionario_resultado.append({"Posicion": center_transformed, "Angulo": angle, "Color": color_map[color]})
+                    dicionario_resultado.append({"Posicion": center, "Angulo": angle, "Color": color_map[color]})
                     
                     cv2.putText(resultado, color, (center[0] + 20, center[1] + 20), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 255), 1)
@@ -177,10 +177,6 @@ class CubeTracker:
             self.marker_position = tvecs[0]
             frame = cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvecs[0], tvecs[0], 0.1)
 
-        cv2.imshow('Contoured Image', frame)
-
-        if cv2.waitKey(0) & 0xFF == ord('q'):
-            cv2.destroyAllWindows()
 
     def analizar_imagen(self, frame:np.ndarray, area_size:int=1000, mostrar:bool = False) -> list:
         ''' 
@@ -212,11 +208,13 @@ class CubeTracker:
 
         return resultado
 
-
-    
-    
-
 if __name__ == "__main__":
-    camara = CubeTracker()
-    frame = cv2.imread('ProyectoFinal/Cubos_Exparcidos/Aruco_1.png')
-    resultado = camara.analizar_imagen(frame,mostrar=True)
+    cam = cv2.VideoCapture(0)
+    camara = CubeTracker(path="src/proyecto_final/data/camera_data/ost.yaml")
+    if cam.isOpened():
+        _, frame = cam.read()
+    # frame = cv2.imread('ProyectoFinal/Cubos_Exparcidos/Aruco_1.png')
+        resultado = camara.analizar_imagen(frame,area_size=800,mostrar=True)
+        cam.release()
+    else:
+        print("ERROR")

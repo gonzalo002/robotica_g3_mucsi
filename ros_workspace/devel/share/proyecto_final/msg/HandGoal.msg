@@ -1,0 +1,1 @@
+/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg

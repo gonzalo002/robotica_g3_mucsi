@@ -1,0 +1,1 @@
+/home/laboratorio/ros_workspace/devel/.private/proyecto_final/lib/pkgconfig/proyecto_final.pc
