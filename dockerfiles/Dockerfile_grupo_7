@@ -12,6 +12,7 @@ RUN apt update && apt install -y rviz \
          ros-noetic-robot-state-publisher \
          ros-noetic-joint-state-publisher \
          ros-noetic-rqt \
+	 ros-noetic-tf-conversions \
          git \
          ros-noetic-usb-cam \
          ros-noetic-camera-calibration \
