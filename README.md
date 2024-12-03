@@ -13,24 +13,31 @@ cd robotica_g7_mucsi
 ```
 
 ### 2. Construir la imagen de los contenedores
-Actualmente solo esta preparado para local_gpu, por lo que se solo tienes una opción.
+Actualmente tienes opción de **grupo_7_desktop** y **grupo_7_local_gpu**, el primero funcionando en cualquier sistema operativo con interfaz en web, y el segundo trabajando unicamente en Linux haciendo uso de GPU.
 
 Una vez elegido el contenedor ejecutar:
 ```bash
-docker compose --profile grupo_7_local_gpu build
+docker compose --profile <Perfil Seleccionado> build
 ```
 Cuando acabe el proceso ya se dispondrá de la imagen construida en el sistema.
 ### 3. Lanzar el contenedor
 Una vez construida la imagen es posible crear contenedores a partir de ella. En este caso los contenedores están diseñados para utilizarlos como entornos de desarrollo. Se recomienda crear y utilizar un solo contenedor. Para esto ejecutar:
 ```bash
-docker compose --profile grupo_7_local_gpu up -d
+docker compose --profile <Perfil Seleccionado> up -d
 ```
 Una vez lanzado, la terminal se mantendrá ejecutando el contenedor hasta que se pare. Para pararlo basta con enviar una señal de terminación `ctrl`+`c`.
 
 Es posible y recomendable gestionar el lanzamiento y parada de los contenedores desde la extensión remote de VSCode. Para gestionar la parada y lanzamiento de los contenedores ya creados desde VSCode:
 
 ### 4. Acceso al contenedor
+Es posible acceder al contenedor creado de varias maneras:
+- Si el contenedor utilizado es el `desktop`, desde cualquier navegador se puede acceder a él en [esta dirección](http://localhost:6081). **La contraseña es laboratorio**. En esta dirección se sirve un escritorio funcional completo.
 - Para todos los contenedores se recomienda asociar una instancia de VSCode al contenedor utilizando la extension "remote explorer". Esto permite desarrollar en VSCode como si se trabajara en local, pero ejecutando todo en el contenedor.
+
+Incluso si se utiliza el contenedor `desktop` se recomienda desarrollar y lanzar todo desde VSCode y utilizar el escritorio para ver la salida gráfica del sistema. Para conectarse al contenedor desde VSCode:
+<p align="center">
+    <img src="pictures/conectarse_contenedor_vscode.gif" alt="Conectarse">
+</p>
 
 ### 5. Primeros pasos en ROS
 Dentro de los contenedores se incluye un espacio de trabajo de ROS con todos los elementos necesarios para poder trabajar con los robots del laboratorio.
