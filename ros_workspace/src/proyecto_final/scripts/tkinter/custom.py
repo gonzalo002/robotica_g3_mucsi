@@ -1,4 +1,5 @@
 import ttkbootstrap as ttk
+import tkinter as tk
 from ttkbootstrap.constants import *
 from tkinter.font import Font
 from tkinter import filedialog, IntVar
@@ -12,23 +13,30 @@ from PIL.ImageTk import PhotoImage
 from image_processor_top import ImageProcessor_Top
 from image_processor_front import ImageProcessor_Front
 from cube_tracker import CubeTracker
-from TKINTER.camera_controller import CameraController
+#from TKINTER.camera_controller import CameraController
 
 class DynamicTabsApp:
     def __init__(self):
+
         self.root = ttk.Window(title="Reconstrucción Cubos", themename="vision")
         self.root.resizable(True, True)  # Permitir redimensionar la ventana
-        self.root.state('zoomed')
+        self.root.attributes('-zoomed', True) 
+        self.root.attributes('-zoomed', True) 
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        self.root.geometry(f"{screen_width}x{screen_height}")
         self.camera_mode = IntVar(value=0)
 
         #Definicion clases
         self.ImageProcessorFrontal = ImageProcessor_Front()
         self.ImageProcessorPlanta = ImageProcessor_Top()
-        self.CubeLocalizator = CubeTracker()
+        self.CubeLocalizator = CubeTracker("src/proyecto_final/data/camera_data/ost.yaml")
 
 
         #Definicion camara
-        self.camera_controller = CameraController
+        #self.camera_controller = CameraController
+        self.cap_1 = cv2.VideoCapture(0)
+        self.cap_2 = None
 
         #Definicion geometria
         self.plant_matrix = np.full((5,5), -1)
@@ -238,11 +246,11 @@ class DynamicTabsApp:
             {'x': 15, 'y': 10, 'color': 3}, # Cubo amarillo en (15, 10)
             {'x': 20, 'y': 15},             # Cubo gris por defecto en (20, 15)
         ]
-        fig_2d = self.draw_2d_space_tkinter(cube_data)
+        #fig_2d = self.draw_2d_space_tkinter(cube_data)
 
         # Convertir la figura en un widget de Tkinter
-        canvas_2d = FigureCanvasTkAgg(fig_2d, self.geometry_2d_frame)
-        canvas_2d.get_tk_widget().pack(pady=10)
+        #canvas_2d = FigureCanvasTkAgg(fig_2d, self.geometry_2d_frame)
+        #canvas_2d.get_tk_widget().pack(pady=10)
 
         # Subpestaña: Detección de Cubos
         self._update_images()
@@ -274,6 +282,7 @@ class DynamicTabsApp:
     def start_camera(self):
         """Inicia el feed de la cámara en un hilo separado."""
         self.camera_active = True
+        #self.cap_1 = cv2.VideoCapture(0)  # Abre la cámara 2
         self.cap_2 = cv2.VideoCapture(1)  # Abre la cámara 2
         self.update_camera_feed_1()
         self.update_camera_feed_2()
@@ -370,7 +379,7 @@ class DynamicTabsApp:
     def create_file_inputs(self):
         """Crea los campos de entrada y botones para cargar imágenes"""
         # Campo y botón para la primera imagen
-        self.file_entry1 = ttk.Entry(self.image1_frame, width=25, font=("Montserrat", 10))
+        self.file_entry1 = tk.Entry(self.image1_frame, width=25, font=("Montserrat", 10))
         self.file_entry1.grid(row=2, column=0, columnspan=2, pady=10, sticky="WN")
 
         self.browse_button1 = ttk.Button(
@@ -528,7 +537,7 @@ class DynamicTabsApp:
         draw.text(position, text, font=font, fill=text_color)
         
         # Convertir la imagen a un formato compatible con tkinter
-        tk_image = PhotoImage(image)
+        tk_image = PhotoImage(image, master=self.root)
         
         return tk_image
 
