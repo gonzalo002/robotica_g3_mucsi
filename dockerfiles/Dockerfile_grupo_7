@@ -43,7 +43,7 @@ RUN pip install --upgrade pip \
                 opencv-contrib-python \
                 mediapipe \
                 ttkbootstrap \
-    		Pillow<10.0
+    		Pillow==9.2.0
 
 # Copiar el archivo user.py a la carpeta themes de ttkbootstrap
 COPY themes/user.py /usr/local/lib/python3.8/dist-packages/ttkbootstrap/themes/user.py
