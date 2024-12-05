@@ -1,30 +1,65 @@
-import cv2
+#!/usr/bin/python3
+
+import sys, os, cv2
+#export OPENCV_LOG_LEVEL=FATAL
+#export OPENCV_LOG_LEVEL=WARNING
+colores = {
+    "rojo": "\033[31m",      # Rojo
+    "verde": "\033[32m",     # Verde
+    "amarillo": "\033[33m",  # Amarillo
+    "azul": "\033[34m",      # Azul
+    "magenta": "\033[35m",   # Magenta
+    "cian": "\033[36m",      # Cian
+    "blanco": "\033[37m",    # Blanco
+    "reset": "\033[0m"       # Restablecer al color predeterminado
+}
+
 
 class CameraController:
-    def __init__(self):
-        self.cap_1 = None
-        self.cap_2 = None
-        self.cap_3 = None
+    def __init__(self, max_cameras:int):
+        self.cameras = []
+        self.cameras_index = []
+        self.camera_names = []
+        self.start(max_cameras)
 
-    def start(self):
-        self.cap_1 = cv2.VideoCapture(0)
-        self.cap_2 = cv2.VideoCapture(1)
-        self.cap_3 = cv2.VideoCapture(1)
-
-    def stop(self):
-        if self.cap_1:
-            self.cap_1.release()
-
-        if self.cap_2:
-            self.cap_2.release()
+    def start(self, max_cameras:int):
+        for index in range(max_cameras):
+            cap = cv2.VideoCapture(index)
+            if cap.isOpened():
+                self.cameras.append(cap)
+                self.cameras_index.append(index)
+                self.camera_names.append(f"Cámara {index}")
+                print(f"{colores['verde']} --- CAMARA {index} DISPONIBLE ---{colores['reset']}")
+            else:
+                cap.release()
         
-        if self.cap_3:
-            self.cap_2.release()
+        if self.cameras is None:
+            print(f"{colores['rojo']} --- NINGUNA CÁMARA DISPONIBLE ---{colores['reset']}")
+            
+    def stop(self):
+        for cap in self.cameras:
+            cap.release()
+        
+        self.cameras = []
+        self.cameras_index = []
+        self.camera_names = []
 
     def get_frame(self, camera_index):
-        if camera_index == 1:
-            return self.cap_1.read()
-        elif camera_index == 2:
-            return self.cap_2.read()
+        
+        if 0 <= camera_index < len(self.cameras):
+            ret, frame = self.cameras[camera_index].read()
+            if ret:
+                return frame
+            else:
+                print(f"{colores['rojo']}[ERROR] Failed to read camera{colores['reset']}")
+                return None
         else:
-            return self.cap_3.read()
+            print(f"{colores['rojo']}[ERROR] Camera index out of range{colores['reset']}")
+            return None
+
+
+if __name__ in "__main__":
+    controlador = CameraController(10)
+    
+    controlador.get_frame(0)
+    sys.stderr = sys.__stderr__
