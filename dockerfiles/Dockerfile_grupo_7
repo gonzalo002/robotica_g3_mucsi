@@ -12,17 +12,17 @@ RUN apt update && apt install -y rviz \
          ros-noetic-robot-state-publisher \
          ros-noetic-joint-state-publisher \
          ros-noetic-rqt \
-	 ros-noetic-tf-conversions \
+         ros-noetic-tf-conversions \
          git \
          ros-noetic-usb-cam \
          ros-noetic-camera-calibration \
          htop \
          sudo \
          libxmlrpc-core-c3-dev \
-	 wget \
-	 fontconfig \
-	 unzip \
-         python3-tk 
+         wget \
+         fontconfig \
+         unzip \
+         python3-tk  # Aquí se instala tkinter
 
 # Descargar la familia Montserrat desde Google Fonts
 RUN wget -q -O montserrat.zip https://fonts.google.com/download?family=Montserrat && \
@@ -39,16 +39,19 @@ RUN pip install --upgrade pip \
                 numpy --upgrade \
                 scipy \
                 opencv-contrib-python \
-                mediapipe \ 
+                mediapipe \
                 ttkbootstrap \
-    		pillow==9.2.0
+    		Pillow<10.0
+
+# Copiar el archivo user.py a la carpeta themes de ttkbootstrap
+COPY themes/user.py /usr/local/lib/python3.8/dist-packages/ttkbootstrap/themes/user.py
 
 RUN rm -rf /var/lib/apt/lists/* && \
     groupadd -g 1000 laboratorio && \
     useradd -ms /bin/bash laboratorio -u 1000 -g 1000 && \
     echo "laboratorio ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     echo "source /opt/ros/noetic/setup.bash" >> /home/laboratorio/.bashrc && \
-    RUN echo 'laboratorio:laboratorio' | chpasswd && \
+    echo 'laboratorio:laboratorio' | chpasswd && \
     chown laboratorio:laboratorio /home/laboratorio && \
     mkdir -p /var/run/laboratorio/1000 && \
     chown laboratorio:laboratorio /var/run/laboratorio/1000
