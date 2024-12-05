@@ -64,7 +64,8 @@ RUN apt-get install --no-install-recommends -y \
         xinit \
         xfonts-base \
         libxrandr-dev \
-        xvfb
+        xvfb \
+	fontconfig
 
 ENV XDG_CURRENT_DESKTOP=KDE
 ENV KWIN_COMPOSE=N
@@ -140,6 +141,11 @@ RUN pip install --upgrade pip \
                 opencv-contrib-python \
                 mediapipe \ 
                 tk
+
+RUN wget -q -O montserrat.zip https://fonts.google.com/download?family=Montserrat && \
+    unzip montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
+    rm montserrat.zip && \
+    fc-cache -f -v
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
                 sudo && \
