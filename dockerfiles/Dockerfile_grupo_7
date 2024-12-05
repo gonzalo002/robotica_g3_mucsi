@@ -24,10 +24,12 @@ RUN apt update && apt install -y rviz \
          unzip \
          python3-tk  # Aquí se instala tkinter
 
-# Descargar la familia Montserrat desde Google Fonts
-RUN wget -q -O montserrat.zip https://fonts.google.com/download?family=Montserrat && \
-    unzip montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
-    rm montserrat.zip && \
+# Copiar el archivo local de Montserrat desde el repositorio al contenedor
+COPY fonts/montserrat.zip /tmp/montserrat.zip
+
+# Descomprimir y configurar las fuentes
+RUN unzip /tmp/montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
+    rm /tmp/montserrat.zip && \
     fc-cache -f -v
 
 RUN pip install --upgrade pip \
