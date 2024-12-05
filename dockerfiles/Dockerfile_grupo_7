@@ -18,7 +18,15 @@ RUN apt update && apt install -y rviz \
          ros-noetic-camera-calibration \
          htop \
          sudo \
-         libxmlrpc-core-c3-dev
+         libxmlrpc-core-c3-dev \
+	 wget \
+	 fontconfig
+
+# Descargar la familia Montserrat desde Google Fonts
+RUN wget -q -O montserrat.zip https://fonts.google.com/download?family=Montserrat && \
+    unzip montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
+    rm montserrat.zip && \
+    fc-cache -f -v
 
 RUN pip install --upgrade pip \
 		catkin_tools \
@@ -30,7 +38,8 @@ RUN pip install --upgrade pip \
                 scipy \
                 opencv-contrib-python \
                 mediapipe \ 
-                tk
+                ttkbootstrap \
+    		Pillow<10.0
 
 RUN rm -rf /var/lib/apt/lists/* && \
     groupadd -g 1000 laboratorio && \
