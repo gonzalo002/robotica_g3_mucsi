@@ -20,7 +20,8 @@ RUN apt update && apt install -y rviz \
          sudo \
          libxmlrpc-core-c3-dev \
 	 wget \
-	 fontconfig
+	 fontconfig \
+	 unzip
 
 # Descargar la familia Montserrat desde Google Fonts
 RUN wget -q -O montserrat.zip https://fonts.google.com/download?family=Montserrat && \
