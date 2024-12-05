@@ -65,7 +65,8 @@ RUN apt-get install --no-install-recommends -y \
         xfonts-base \
         libxrandr-dev \
         xvfb \
-	fontconfig
+	fontconfig \
+	unzip
 
 ENV XDG_CURRENT_DESKTOP=KDE
 ENV KWIN_COMPOSE=N
