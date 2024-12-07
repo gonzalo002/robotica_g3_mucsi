@@ -1,13 +1,11 @@
 #!/usr/bin/python3
 
 import os
-
 # Configurar la variable de entorno para que no aparezcan mensajes de error de index de camara
 os.environ["OPENCV_LOG_LEVEL"] = "FATAL"
 
 import cv2
-#export OPENCV_LOG_LEVEL=FATAL
-#export OPENCV_LOG_LEVEL=WARNING
+
 colores = {
     "rojo": "\033[31m",      # Rojo
     "verde": "\033[32m",     # Verde
