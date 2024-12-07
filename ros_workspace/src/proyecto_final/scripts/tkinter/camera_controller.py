@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 
-import sys, os, cv2
+import os
+
+# Configurar la variable de entorno para que no aparezcan mensajes de error de index de camara
+os.environ["OPENCV_LOG_LEVEL"] = "FATAL"
+
+import cv2
 #export OPENCV_LOG_LEVEL=FATAL
 #export OPENCV_LOG_LEVEL=WARNING
 colores = {
@@ -21,6 +26,9 @@ class CameraController:
         self.cameras_index = []
         self.camera_names = []
         self._start(max_cameras)
+
+        #Para silenciar los mensajes de OpenCV
+
 
     def _start(self, max_cameras:int):
         for index in range(max_cameras):
@@ -58,6 +66,4 @@ class CameraController:
 
 if __name__ in "__main__":
     controlador = CameraController(10)
-    
-    controlador.get_frame(0)
-    sys.stderr = sys.__stderr__
+    #controlador.get_frame(0)
