@@ -44,6 +44,7 @@ Incluso si se utiliza el contenedor `desktop` se recomienda desarrollar y lanzar
 <p align="center">
     <img src="pictures/conectarse_contenedor_vscode.gif" alt="Conectarse">
 </p>
+
 ### 5. Primeros pasos en ROS
 Dentro de los contenedores se incluye un espacio de trabajo de ROS con todos los elementos necesarios para poder trabajar con los robots del laboratorio.
 
