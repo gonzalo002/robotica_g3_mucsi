@@ -15,13 +15,13 @@ cd robotica_g7_mucsi
 ### 2. Construir la imagen de los contenedores
 Actualmente tienes opción de **grupo_7_desktop** y **grupo_7_local_gpu**, el primero funcionando en cualquier sistema operativo con interfaz en web, y el segundo trabajando unicamente en Linux haciendo uso de GPU.
 
-Desktop
+**Desktop:**
 ```bash
 docker compose --profile grupo_7_desktop build
 ```
 
 
-Local GPU:
+**Local GPU:**
 ```bash
 docker compose --profile grupo_7_local_gpu build
 ```
@@ -44,7 +44,6 @@ Incluso si se utiliza el contenedor `desktop` se recomienda desarrollar y lanzar
 <p align="center">
     <img src="pictures/conectarse_contenedor_vscode.gif" alt="Conectarse">
 </p>
-
 ### 5. Primeros pasos en ROS
 Dentro de los contenedores se incluye un espacio de trabajo de ROS con todos los elementos necesarios para poder trabajar con los robots del laboratorio.
 
