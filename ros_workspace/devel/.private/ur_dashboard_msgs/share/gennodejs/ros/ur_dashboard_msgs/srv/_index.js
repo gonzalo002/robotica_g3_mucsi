@@ -1,28 +1,28 @@
 
 "use strict";
 
-let GetSafetyMode = require('./GetSafetyMode.js')
-let AddToLog = require('./AddToLog.js')
-let IsInRemoteControl = require('./IsInRemoteControl.js')
-let Load = require('./Load.js')
-let GetLoadedProgram = require('./GetLoadedProgram.js')
-let IsProgramSaved = require('./IsProgramSaved.js')
 let GetRobotMode = require('./GetRobotMode.js')
-let Popup = require('./Popup.js')
+let IsInRemoteControl = require('./IsInRemoteControl.js')
 let IsProgramRunning = require('./IsProgramRunning.js')
 let RawRequest = require('./RawRequest.js')
 let GetProgramState = require('./GetProgramState.js')
+let GetSafetyMode = require('./GetSafetyMode.js')
+let GetLoadedProgram = require('./GetLoadedProgram.js')
+let Popup = require('./Popup.js')
+let IsProgramSaved = require('./IsProgramSaved.js')
+let Load = require('./Load.js')
+let AddToLog = require('./AddToLog.js')
 
 module.exports = {
-  GetSafetyMode: GetSafetyMode,
-  AddToLog: AddToLog,
-  IsInRemoteControl: IsInRemoteControl,
-  Load: Load,
-  GetLoadedProgram: GetLoadedProgram,
-  IsProgramSaved: IsProgramSaved,
   GetRobotMode: GetRobotMode,
-  Popup: Popup,
+  IsInRemoteControl: IsInRemoteControl,
   IsProgramRunning: IsProgramRunning,
   RawRequest: RawRequest,
   GetProgramState: GetProgramState,
+  GetSafetyMode: GetSafetyMode,
+  GetLoadedProgram: GetLoadedProgram,
+  Popup: Popup,
+  IsProgramSaved: IsProgramSaved,
+  Load: Load,
+  AddToLog: AddToLog,
 };

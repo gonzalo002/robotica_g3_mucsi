@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+
 import rospy
-from mi_robot_pkg.msg import HandData
+from proyecto_final.msg import HandData
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2
@@ -75,7 +76,7 @@ def hand_detector():
                     else:
                         hand_data.is_open = True
 
-                break  # Solo procesamos la primera mano detectada
+                break  # Solo procesamos la primera xmano detectada
 
         # Mostrar video en la ventana
         cv2.imshow("Video", frame)

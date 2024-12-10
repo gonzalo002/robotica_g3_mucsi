@@ -7,7 +7,7 @@ from std_msgs.msg import Int32
 from typing import List
 from geometry_msgs.msg import Pose, PoseStamped
 from moveit_commander import RobotCommander, MoveGroupCommander, PlanningSceneInterface
-from mi_robot_pkg.msg import HandData
+from proyecto_final.msg import HandData
 
 class ControlRobot:
     def __init__(self) -> None:
@@ -139,16 +139,37 @@ def hand_data_callback(msg, control_robot):
         robot_x = x * 0.001  # Escalamiento ejemplo
         robot_y = y * 0.001
 
-        current_pose = control_robot.get_pose()
-        new_pose = copy.deepcopy(current_pose)
-        new_pose.position.x += robot_x
-        new_pose.position.y += robot_y
+        limitesx = [0.23207591013811013, -0.19061986164757674]
+        limitesy = [0.44488890481150184, 0.23159845770381593]
+        rango_x_cam = 640
+        rango_y_cam = 480
+        rango_x_robot = limitesx[0] - limitesx[1]
+        rango_y_robot = limitesy[0] - limitesy[1]
 
-        success = control_robot.move_to_pose(new_pose)
-        if success:
-            rospy.loginfo("El robot se ha movido basado en la posición de la mano.")
+
+
+        current_pose = control_robot.get_pose()
+
+        #if (current_pose.position.x + robot_x) > limitesx[0] or (current_pose.position.x + robot_x) < limitesx[1]:
+        #    print('Posicion x fuera de limites', robot_x , robot_y)
+        #elif (current_pose.position.y + robot_y) > limitesy[0] or (current_pose.position.y + robot_y) < limitesy[1]:
+        #    print('Posicion y fuera de limites', robot_x, robot_y)
+
+        if (current_pose.position.x + x * rango_x_robot/rango_x_cam) > limitesx[0] or (current_pose.position.x + x * rango_x_robot/rango_x_cam) < limitesx[1]:
+            print('Posicion x fuera de limites', x * rango_x_robot/rango_x_cam , y * rango_x_robot/rango_y_cam)
+        elif (current_pose.position.y + y * rango_y_robot/rango_y_cam) > limitesy[0] or (current_pose.position.y + y * rango_y_robot/rango_y_cam) < limitesy[1]:
+            print('Posicion y fuera de limites', x * rango_y_robot/rango_x_cam , y * rango_y_robot/rango_y_cam)
+        
         else:
-            rospy.loginfo("No se pudo mover el robot a la nueva posición.")
+            new_pose = copy.deepcopy(current_pose)
+            new_pose.position.x += x * rango_x_robot/rango_x_cam
+            new_pose.position.y += y * rango_x_robot/rango_y_cam
+
+            success = control_robot.move_to_pose(new_pose)
+            if success:
+                rospy.loginfo("El robot se ha movido basado en la posición de la mano.")
+            else:
+                rospy.loginfo("No se pudo mover el robot a la nueva posición.")
     else:
         rospy.loginfo("Mano cerrada; el robot no se mueve.")
 
@@ -160,4 +181,8 @@ def listener():
     rospy.spin()
 
 if __name__ == '__main__':
+    #control = ControlRobot()
+    #while True:
+        #print(control.get_pose())
+        #input('Holi')
     listener()

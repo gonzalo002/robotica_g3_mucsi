@@ -10,6 +10,6 @@
 export CMAKE_PREFIX_PATH="/home/laboratorio/ros_workspace/devel/.private/ur_kinematics:$CMAKE_PREFIX_PATH"
 export LD_LIBRARY_PATH="/home/laboratorio/ros_workspace/devel/.private/ur_kinematics/lib:$LD_LIBRARY_PATH"
 export PWD='/home/laboratorio/ros_workspace/build/ur_kinematics'
-export PYTHONPATH="/home/laboratorio/ros_workspace/devel/.private/ur_kinematics/lib/python3/dist-packages:/home/laboratorio/ros_workspace/devel/lib/python3/dist-packages:$PYTHONPATH"
+export PYTHONPATH="/home/laboratorio/ros_workspace/devel/.private/ur_kinematics/lib/python3/dist-packages:$PYTHONPATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/laboratorio/ros_workspace/devel/.private/ur_kinematics/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
 export ROS_PACKAGE_PATH="/home/laboratorio/ros_workspace/src/universal_robot/ur_kinematics:$ROS_PACKAGE_PATH"

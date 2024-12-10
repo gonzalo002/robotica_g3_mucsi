@@ -1,26 +1,26 @@
 
 "use strict";
 
-let ProgramState = require('./ProgramState.js');
 let SafetyMode = require('./SafetyMode.js');
+let ProgramState = require('./ProgramState.js');
 let RobotMode = require('./RobotMode.js');
-let SetModeActionFeedback = require('./SetModeActionFeedback.js');
-let SetModeActionGoal = require('./SetModeActionGoal.js');
 let SetModeAction = require('./SetModeAction.js');
 let SetModeActionResult = require('./SetModeActionResult.js');
-let SetModeFeedback = require('./SetModeFeedback.js');
 let SetModeGoal = require('./SetModeGoal.js');
+let SetModeFeedback = require('./SetModeFeedback.js');
+let SetModeActionFeedback = require('./SetModeActionFeedback.js');
 let SetModeResult = require('./SetModeResult.js');
+let SetModeActionGoal = require('./SetModeActionGoal.js');
 
 module.exports = {
-  ProgramState: ProgramState,
   SafetyMode: SafetyMode,
+  ProgramState: ProgramState,
   RobotMode: RobotMode,
-  SetModeActionFeedback: SetModeActionFeedback,
-  SetModeActionGoal: SetModeActionGoal,
   SetModeAction: SetModeAction,
   SetModeActionResult: SetModeActionResult,
-  SetModeFeedback: SetModeFeedback,
   SetModeGoal: SetModeGoal,
+  SetModeFeedback: SetModeFeedback,
+  SetModeActionFeedback: SetModeActionFeedback,
   SetModeResult: SetModeResult,
+  SetModeActionGoal: SetModeActionGoal,
 };
