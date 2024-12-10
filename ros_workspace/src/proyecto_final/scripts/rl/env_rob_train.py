@@ -10,6 +10,7 @@ import gymnasium as gym
 import numpy as np
 from stable_baselines3.common.utils import set_random_seed
 from tf.transformations import quaternion_from_euler
+import yaml
 
 # Librerias de ROS
 from geometry_msgs.msg import Pose, Point, Quaternion
@@ -20,7 +21,7 @@ from control_robot import ControlRobot
 
 
 class ROSEnv(gym.Env):
-    def __init__(self, num_cubos_max: int, seed: int = None, visualization:bool = False):
+    def __init__(self, num_cubos_max: int, seed: int = None, visualization:bool = False, save_data:bool = False, verbose:bool = False):
         """
         Inicializa el entorno ROS para manipulación de cubos.
         
@@ -33,7 +34,7 @@ class ROSEnv(gym.Env):
         super(ROSEnv, self).__init__()
         self.control_robot = ControlRobot("robot")
 
-        rospy.init_node("entorno_robot", anonymous=True)
+        # rospy.init_node("entorno_robot", anonymous=True)
 
         self.num_cubos_max = num_cubos_max
         self.seed = seed
@@ -47,15 +48,20 @@ class ROSEnv(gym.Env):
             dtype=np.float64
         )
 
-        self.robot_workspace_values = {"max_x": 0.32, "min_x": -0.32, "max_y": 0.48, "min_y": 0.12, "max_alpha": pi/2, "min_alpha": 0}
+        self.robot_workspace_values = {"max_x": 0.32, "min_x": -0.32, "max_y": 0.48, "min_y": 0.17, "max_alpha": pi/4, "min_alpha": -pi/4}
         self.pose_cubos = []
         self.pseudo_rands_cubos = []
         self.step_count = 0
+        self.flag_save_data = save_data
+        self.verbose = verbose
+        self.failed_cubes = 0
 
 
         self.observation = np.array([-1.0] * 8 * self.num_cubos_max)
         self.reward = 0.0
-        self.info = {}
+        self.info = {'Steps': self.step_count,
+                    'Failed cubes' : self.failed_cubes,
+                    'Fail_percentage' : self.failed_cubes / (self.step_count * 200)}
         self.terminated = False
         self.truncated = False
 
@@ -106,7 +112,7 @@ class ROSEnv(gym.Env):
             pseudo_rands[1] = np.interp(pseudo_rands[1], [0, 1], [min_y, max_y])
             pseudo_rands[2] = np.interp(pseudo_rands[2], [0, 1], [min_alpha, max_alpha])
 
-            if (pseudo_rands[0] ** 2) + (pseudo_rands[1] ** 2) <= 0.5:
+            if (pseudo_rands[0] ** 2) + (pseudo_rands[1] ** 2) <= 0.48:
                 if self.pseudo_rands_cubos != []:
                      # Verificar que el nuevo cubo esté a una distancia mínima de 0.03 metros de los cubos existentes
                     success = True
@@ -126,6 +132,10 @@ class ROSEnv(gym.Env):
 
     def __añadir_cubos_a_planificacion(self, cubos: List[np.ndarray]) -> None:
         for i, cubo in enumerate(cubos):
+            # if cubo[0] < 0 and cubo[2] < 0:
+            #     cubo[2] += pi
+            # elif cubo[0] > 0 and cubo[2] > 0:
+            #     cubo[2] -= pi
             pose_cubo = Pose(position=Point(x=cubo[0], y=cubo[1], z=0.01), 
                              orientation=Quaternion(*quaternion_from_euler(pi, 0, cubo[2], 'sxyz')))
             self.pose_cubos.append(pose_cubo)
@@ -135,20 +145,33 @@ class ROSEnv(gym.Env):
     def step(self, action: List[int]) -> Tuple[np.ndarray, float, bool, bool, dict]:
         self.reward = 0.0
         if np.unique(action).size != len(action):
-            self.reward -= 10.0 * abs(np.unique(action).size - len(action))
+            self.reward -= 15.0 * abs(np.unique(action).size + 1 - len(action))
 
         total_time = 0  # Total time taken for all actions
 
         for act in action:
             selected_pose = self.pose_cubos[act]
-            selected_pose.position.z += 0.3
+            selected_pose.position.z = 0.32
 
-            try:
-                trayectory_tuple = self.control_robot.plan_pose_target(selected_pose)
-                if trayectory_tuple[0] != True: 
-                    self.reward -= 5.0  # Penaliza por fallar en la planificación
-                    continue  # No continuar con esta acción si la planificación falla
-
+            trayectory_tuple = self.control_robot.plan_pose_target(selected_pose)
+            if trayectory_tuple[0] != True: 
+                self.reward -= 10.0  # Penaliza por fallar en la planificación
+                self.failed_cubes += 1
+                if self.flag_save_data:
+                    save_data = {'step' : self.step_count,
+                                    'Pose' : {
+                                    'pose_position_x' : float(selected_pose.position.x),
+                                    'pose_position_y' : float(selected_pose.position.y),
+                                    'pose_position_z' : float(selected_pose.position.z),
+                                    'pose_orientation_x' : float(selected_pose.orientation.x),
+                                    'pose_orientation_y' : float(selected_pose.orientation.y),
+                                    'pose_orientation_z' : float(selected_pose.orientation.z),
+                                    'pose_orientation_w' : float(selected_pose.orientation.w)},
+                                    'action' : str(action),
+                                    'selected_action' : int(act)}
+                    with open('src/proyecto_final/scripts/rl/yaml_logs/cubos_fallidos', '+a') as f:
+                        yaml.dump(save_data, f, default_flow_style=False, sort_keys=False)
+            else:
                 tiempo = trayectory_tuple[1].joint_trajectory.points[-1].time_from_start
                 tiempo_seg = tiempo.to_sec()
 
@@ -159,10 +182,6 @@ class ROSEnv(gym.Env):
 
                 total_time += tiempo_seg  # Acumula el tiempo total
 
-            except Exception as e:
-                print(f"Error al planificar la trayectoria: {e}")
-                self.reward -= 10.0  # Penaliza severamente en caso de error
-
         self.reward -= total_time
         avg_time = total_time / len(action) if len(action) > 0 else 4
         self.reward += (4 - avg_time)  # La recompensa aumenta cuando el tiempo promedio es cercano a 4 segundos
@@ -171,7 +190,8 @@ class ROSEnv(gym.Env):
 
         self.step_count += 1
 
-        print(f'Step {self.step_count} Completado con Recompensa {self.reward}')
+        if self.verbose:
+            print(f'\nStep {self.step_count} - Completado con Recompensa {self.reward} - Accion {str(action)}')
         
         return self.observation, self.reward, self.terminated, self.truncated, self.info
 
@@ -201,6 +221,7 @@ if __name__ == '__main__':
     # Probamos a ejecutar con 2 cubos
     env = ROSEnv(num_cubos_max=2, visualization=True)
 
-    for i in range(5):
+    for i in range(50):
         accion = env.action_space.sample()
         observation, reward, terminated, truncated, info = env.step(accion)
+        env.reset()

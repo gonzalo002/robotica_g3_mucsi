@@ -64,7 +64,9 @@ RUN apt-get install --no-install-recommends -y \
         xinit \
         xfonts-base \
         libxrandr-dev \
-        xvfb
+        xvfb \
+	fontconfig \
+	unzip
 
 ENV XDG_CURRENT_DESKTOP=KDE
 ENV KWIN_COMPOSE=N
@@ -127,7 +129,16 @@ RUN apt update && apt install -y rviz \
          ros-noetic-camera-calibration \
          ros-noetic-usb-cam \
          htop \
-         libxmlrpc-core-c3-dev
+         libxmlrpc-core-c3-dev \
+	python3-tk
+
+# Copiar el archivo local de Montserrat desde el repositorio al contenedor
+COPY fonts/montserrat.zip /tmp/montserrat.zip
+
+# Descomprimir y configurar las fuentes
+RUN unzip /tmp/montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
+    rm /tmp/montserrat.zip && \
+    fc-cache -f -v
 
 RUN pip install --upgrade pip \
 		catkin_tools \
@@ -139,7 +150,11 @@ RUN pip install --upgrade pip \
                 scipy \
                 opencv-contrib-python \
                 mediapipe \ 
-                tk
+                ttkbootstrap \
+    		Pillow==9.2.0
+
+# Copiar el archivo user.py a la carpeta themes de ttkbootstrap
+COPY themes/user.py /usr/local/lib/python3.8/dist-packages/ttkbootstrap/themes/user.py
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
                 sudo && \
