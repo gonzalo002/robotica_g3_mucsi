@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import rospy
 import math
 from geometry_msgs.msg import Pose
@@ -5,10 +6,10 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from copy import deepcopy
 import actionlib
-from proyecto_final.msg import RLAction
 import sys
-sys.path.append("/home/laboratorio/ros_workspace/src/proyecto_final/scripts/vision")
-from src.proyecto_final.msg import IdCubos
+sys.path.append("/home/laboratorio/ros_workspace/src/")
+from proyecto_final.msg import RLAction
+from proyecto_final.msg import IdCubos
 
 
 class CubeTrackerActionServer(object):
@@ -24,7 +25,7 @@ class CubeTrackerActionServer(object):
         self._as.start()
     
 
-    def execute_cb(self, goal:RLAction().action_goal):
+    def execute_cb(self, goal):
         
         # Realizar listas por colores
         red_cube = []
