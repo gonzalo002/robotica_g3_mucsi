@@ -36,11 +36,7 @@ class DynamicTabsApp:
         #Definicion clases
         self.ImageProcessorFrontal = ImageProcessor_Front()
         self.ImageProcessorPlanta = ImageProcessor_Top()
-<<<<<<< HEAD
         self.CubeLocalizator = CubeTracker("/home/laboratorio/ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
-=======
-        self.CubeLocalizator = CubeTracker("ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
->>>>>>> 02145a90b86fc69c9843b05f653d880b56d5cde1
         self.FigureGenerator = FigureGenerator()
 
 
@@ -53,14 +49,17 @@ class DynamicTabsApp:
         self.width = 320
         
 
-        #Definicion imagenes
+        #Definicion imagenes y varibles
         self.img_front = None
         self.img_plant = None
         self.img_mesa_trabajo = None
+        self.camera_entry1 = None
+        self.camera_entry2 = None
 
         #Definicion estados del boton
         self.state_procesar = True
-
+        
+        #Al finalizar
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
 
         # Crear un notebook (pestañas)
@@ -172,11 +171,13 @@ class DynamicTabsApp:
         self.frame_vision.grid_columnconfigure(0, weight=2)
         self.frame_vision.grid_columnconfigure(1, weight=1)
         self.frame_vision.grid_columnconfigure(2, weight=4)
+        
 
         
 
         
         # --- CHECK BUTTON ---
+ 
         self.camera_check_var = ttk.IntVar()  # Variable para el estado del Checkbutton
         self.camera_check = ttk.Checkbutton(
             self.frame_vision,
@@ -185,7 +186,16 @@ class DynamicTabsApp:
             
             command=self.toggle_mode,  # Función para manejar el cambio
         )
-        self.camera_check.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+        self.camera_check.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        
+        self.update_camera_button = ttk.Button(
+            self.frame_vision,
+            text="ACTUALIZAR CÁMARAS",
+            command=self.update_cameras,  # Función para procesar las imágenes
+            bootstyle="warning",  # Estilo del botón
+            padding = [20,5]
+        )
+        self.update_camera_button.grid(row=0, column=0, columnspan=2, padx=[200,0], pady=10, sticky="nw")
 
         # --- IMAGE LABEL FRAME ---
         self.label_frame = ttk.LabelFrame(self.frame_vision, text="Imágenes")
@@ -253,13 +263,7 @@ class DynamicTabsApp:
         if len(self.camera_controller.cameras) > 0:
             self.camera_entry3.set(self.camera_controller.camera_names[0])
             
-        self.update_camera_button = ttk.Button(
-            self.label_frame_2,
-            text="Actualizar camaras",
-            command=self.update_cameras,  # Función para procesar las imágenes
-            bootstyle="warning",  # Estilo del botón
-        )
-        self.update_camera_button.grid(row=9, column=5, columnspan=2, padx=[10,0], pady=10, sticky="nsew")
+
 
         # --- GEOMETRY LABEL FRAME ---
         self.geometry_2d_frame = ttk.LabelFrame(self.frame_vision, text="Espacio")
@@ -387,7 +391,7 @@ class DynamicTabsApp:
             imgtk, frame = self._update_camera(index, (480, 360))
 
         else:
-            imgtk = self._create_image_with_text("Cámara NO encontrada")
+            imgtk = self._create_image_with_text("Cámara NO encontrada",(480, 360))
             frame = None
 
         self.img_ws = frame
@@ -399,6 +403,9 @@ class DynamicTabsApp:
 
     def create_file_inputs(self):
         """Crea los campos de entrada y botones para cargar imágenes"""
+        if self.camera_entry1 and self.camera_entry2:
+            for widget in [self.camera_entry1, self.camera_entry2]:
+                widget.grid_forget()
         # Campo y botón para la primera imagen
         self.file_entry1 = ttk.Entry(self.image1_frame, width=25, font=("Montserrat", 10))
         self.file_entry1.grid(row=2, column=0, columnspan=2, pady=10, sticky="WN")
@@ -485,7 +492,7 @@ class DynamicTabsApp:
             self.lbl_vision_figure2.config(image=photo2)
             self.lbl_vision_figure2.image = photo2
 
-            fig_3d = self.FigureGenerator.generate_figure_from_matrix(plant_matrix, front_matrix)
+            fig_3d = self.FigureGenerator.generate_figure_from_matrix(plant_matrix, front_matrix, True)
 
              # Actualizar canvas_3d
             if hasattr(self, "canvas_3d") and self.canvas_3d is not None:
@@ -507,7 +514,7 @@ class DynamicTabsApp:
         self.state_procesar = True
 
         # --- VACIAR MATRIZ ---
-        fig_3d = self.FigureGenerator.generate_figure_from_matrix(self.plant_matrix, self.side_matrix)
+        fig_3d = self.FigureGenerator.generate_figure_from_matrix(self.plant_matrix, self.side_matrix, True)
 
         if hasattr(self, "canvas_3d") and self.canvas_3d is not None:
                 # Eliminar canvas previo si existe
@@ -574,13 +581,6 @@ class DynamicTabsApp:
         
         return tk_image
 
-<<<<<<< HEAD
-=======
-    def _draw_pyramid_from_matrices(self, plant_matrix, side_matrix):
-        return self.FigureGenerator._draw_pyramid_from_matrices(plant_matrix, side_matrix, True)
-
->>>>>>> 02145a90b86fc69c9843b05f653d880b56d5cde1
-    
 
     def draw_2d_space_tkinter(self, cube_data):
         """

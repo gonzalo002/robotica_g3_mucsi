@@ -47,6 +47,7 @@ class ImageProcessor_Top:
         self.matrix = np.full((self.matrix_size, self.matrix_size), -1)
         self.contour_img = None
         self.frame = None
+        self.debug = False
 
         
     
@@ -59,16 +60,29 @@ class ImageProcessor_Top:
             - Aplica operaciones morfológicas para limpiar ruido.
             @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
         """
-        gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+        # Definir el factor de contraste (alpha) y el ajuste de brillo (beta)
+        alpha = 1  # Contraste (1.0 es el valor original, > 1 aumenta el contraste)
+        beta = 0     # Brillo (0 no cambia el brillo)
+
+        # Aplicar la transformación
+        adjusted_image = cv2.convertScaleAbs(self.frame, alpha=alpha, beta=beta)
+
+        cropped_gray = self._get_cubes_location()
+
+        cropped_frame = self._get_cubes_location(colored=True)
+
+        contrast_img = self.pruebas(cropped_frame)
+
+        edges_0 = cv2.Canny(contrast_img, 50, 255)
 
         # Aplicar el filtro Canny para una detección de bordes más refinada
-        edges = cv2.Canny(gray, 10, 150)
-        new_gray = gray - edges
+        edges = cv2.Canny(cropped_gray, 10, 150)
+        new_gray = cropped_gray - edges
 
         # Aplicar el filtro Canny para una detección de bordes más refinada
         edges = cv2.Canny(new_gray, 50, 255)
 
-        cv2.imshow('Canny Filter', edges)
+        edges = cv2.bitwise_or(edges, edges_0)
 
         # Operaciones morfológicas para limpiar el ruido
         kernel = np.ones((1, 1), np.uint8)
@@ -77,8 +91,125 @@ class ImageProcessor_Top:
         # Operaciones morfológicas para limpiar el ruido
         kernel = np.ones((5, 5), np.uint8)
         morph_clean = cv2.morphologyEx(morph_clean, cv2.MORPH_CLOSE, kernel)
+
+        if self.debug:
+            cv2.imshow('Imagen_contraste', adjusted_image)
+            cv2.imshow('Cropped_Gray', cropped_gray)
+            cv2.imshow('Canny', edges)
+            cv2.imshow('Morph_Clean', morph_clean)
         
         return morph_clean
+    
+    def pruebas(self, frame:np.ndarray = None):
+        try:
+            frame == None
+        except:
+            frame = self.frame
+        # Convertir la imagen de BGR a HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Definir el rango de valores para el color verde en el espacio HSV
+        # Rango de verdes: Hue entre 35 y 85, Saturación y Valor más altos
+        lower_green = np.array([30, 50, 50])   # Mínimo verde
+        upper_green = np.array([110, 255, 255]) # Máximo verde
+
+        # Crear una máscara que contenga solo los píxeles verdes
+        mask = cv2.inRange(hsv, lower_green, upper_green)
+
+        # Aplicar la máscara para mantener solo las áreas verdes
+        green_only = cv2.bitwise_and(frame, frame, mask=mask)
+
+        # Opcional: Realzar la saturación y el valor en las áreas verdes
+        # Aumentar la saturación y el valor de la imagen verde para hacerla más vibrante
+        hsv_green = cv2.cvtColor(green_only, cv2.COLOR_BGR2HSV)
+        hsv_green[:, :, 1] = cv2.add(hsv_green[:, :, 1], 50)  # Aumentar la saturación
+        hsv_green[:, :, 2] = cv2.add(hsv_green[:, :, 2], 50)  # Aumentar el valor
+
+        # Convertir de nuevo a BGR para mostrar la imagen final
+        high_green = cv2.cvtColor(hsv_green, cv2.COLOR_HSV2BGR)
+        green = cv2.cvtColor(high_green, cv2.COLOR_BGR2GRAY)
+
+        _, red = cv2.threshold(frame[:,:,2], 130, 255, cv2.THRESH_BINARY)
+        _, blue = cv2.threshold(frame[:,:,0], 130, 255, cv2.THRESH_BINARY)
+        _, green = cv2.threshold(green, 50, 255, cv2.THRESH_BINARY)
+
+        # Encontrar los píxeles blancos comunes en ambas imágenes
+        rg = cv2.bitwise_or(red, green)
+        rgb = cv2.bitwise_or(rg, blue)
+
+        if self.debug:
+            cv2.imshow('Verde', green)
+            cv2.imshow('Azul', blue)
+            cv2.imshow('Rojo', red)
+            
+            
+
+        # Crear una imagen donde los píxeles comunes son blancos y el resto es negro
+        result = np.zeros_like(frame)  # Crear una imagen de igual tamaño, pero negra (0)
+        result[rgb >= 230] = 255  # Asignar 255 (blanco) donde hay intersección
+
+        return result    
+
+    def _get_cubes_location(self, colored:bool = False) -> np.ndarray:
+        ''' 
+        Aplica un umbral de Otsu para binarizar la imagen y encuentra el bounding box del contorno más grande.
+            @param gray (numpy array) - Imagen en escala de grises.
+            @return morph_clean (numpy array) - Imagen binarizada tras el umbral de Otsu.
+        '''
+
+        gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+        
+        # Binarizar la imagen utilizando un umbral fijo
+        _, binary_image = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY)
+        
+        # Operación de cierre para limpiar la imagen
+        kernel = np.ones((5, 5), np.uint8)
+        morph_clean = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, kernel, iterations=1)
+        
+        # Encontrar los contornos en la imagen binarizada
+        contours, _ = cv2.findContours(morph_clean, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Asegurarse de que se haya encontrado al menos un contorno
+        if contours:
+            # Encontrar el contorno más grande
+            contour = max(contours, key=cv2.contourArea)
+
+            # Obtener el bounding box del contorno más grande
+            x, y, w, h = cv2.boundingRect(contour)
+
+            # Ampliar el bounding box en un rango (por ejemplo, 10% más grande en cada lado)
+            expand_factor = 0.1  # Porcentaje de expansión
+            x -= int(w * expand_factor)
+            y -= int(h * expand_factor)
+            w += int(w * expand_factor * 2)  # Expandir a ambos lados
+            h += int(h * expand_factor * 2)  # Expandir arriba y abajo
+            
+            # Dibujar el bounding box alrededor del contorno más grande
+            # cv2.rectangle(copy, (x, y), (x + w, y + h), (0, 255, 0), 2) 
+
+            # Crear una máscara del tamaño de la imagen completa, con todos los valores a 0 (negro)
+            mask = np.zeros_like(gray)
+            
+            # Dibujar un rectángulo blanco (255) en la máscara en el área del bounding box
+            mask[y:y+h, x:x+w] = 255
+            
+            # Aplicar la máscara a la imagen original
+            # result = cv2.bitwise_and(gray, mask)
+
+            
+            if colored:
+                result = self.frame
+                result[:,:,0] = cv2.bitwise_and(self.frame[:,:,0], morph_clean)
+                result[:,:,1] = cv2.bitwise_and(self.frame[:,:,1], morph_clean)
+                result[:,:,2] = cv2.bitwise_and(self.frame[:,:,2], morph_clean)
+            else:
+                result = cv2.bitwise_and(gray, morph_clean)
+    
+            if self.debug:
+                cv2.imshow('image_cropped', result)
+                
+        return result
+    
 
     def _find_external_contours(self, morph_clean:np.ndarray) -> tuple:
         '''
@@ -87,7 +218,7 @@ class ImageProcessor_Top:
             @return filtered_contours (list) - Lista de contornos externos filtrados.
             @return contours (list) - Lista completa de contornos detectados.
         '''
-        contours, hierarchy = cv2.findContours(morph_clean, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(morph_clean, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         
         # Filtrar los contornos externos que tienen un padre
         filtered_contours = []
@@ -97,18 +228,66 @@ class ImageProcessor_Top:
         
         return filtered_contours, contours
 
-    def _filter_contours_by_size(self, filtered_contours:list, area_size:int = 2000) -> list:
-        ''' 
-        Filtra los contornos según su tamaño, eliminando aquellos con un área menor a un umbral.
-            @param filtered_contours (list) - Lista de contornos externos filtrados.
-            @param area_size (int) - Umbral mínimo de área para considerar un contorno como válido. Por defecto, 2000.
-            @return large_contours (list) - Lista de contornos con área mayor al umbral.
-        '''
+    def divide_rectangle(self, contour, axis):
+        # Extraemos las coordenadas de los 4 vértices
+        x, y, w, h = cv2.boundingRect(contour)
+
+        # Dividir el rectángulo en dos partes
+        if axis == "vertical":
+            # Dividir verticalmente (a lo largo del eje X)
+            mid_x = x + w // 2
+            rect1 = np.array([[x, y], [mid_x, y], [mid_x, y+h], [x, y+h]], dtype=np.int32)
+            rect2 = np.array([[mid_x, y], [x+w, y], [x+w, y+h], [mid_x, y+h]], dtype=np.int32)
+        elif axis == "horizontal":
+            # Dividir horizontalmente (a lo largo del eje Y)
+            mid_y = y + h // 2
+            rect1 = np.array([[x, y], [x+w, y], [x+w, mid_y], [x, mid_y]], dtype=np.int32)
+            rect2 = np.array([[x, mid_y], [x+w, mid_y], [x+w, y+h], [x, y+h]], dtype=np.int32)
+        
+        return rect1, rect2
+
+    def _separate_cubes(self, contours:list):
         large_contours = []
-        for contour in filtered_contours:
-            area = cv2.contourArea(contour)
-            if area > area_size:  # Filtrar contornos muy pequeños
+
+        area_size = []
+        for cnt in contours:
+            area_size.append(cv2.contourArea(cnt))
+
+        mode_cubes = np.median(area_size)  
+
+        for i,contour in enumerate(contours):
+            if area_size[i] < mode_cubes*0.2:
+                pass
+            elif area_size[i] > mode_cubes*1.7:
+                approx = cv2.approxPolyDP(contour, 0.04 * cv2.arcLength(contour, True), True)
+                if len(approx) == 4:
+                    # Calcular los lados del cuadrilátero
+                    side_lengths = []
+                    for i in range(2):
+                        p1 = approx[i]
+                        p2 = approx[(i + 1) % 4]  # El siguiente punto, tomando el primero cuando lleguemos al último
+                        side_length = np.linalg.norm(p2 - p1)  # Distancia Euclidiana entre los puntos
+                        side_lengths.append(side_length)
+                    
+                    # Calcular la diferencia entre los lados
+                    if side_lengths[0] > side_lengths[1]:
+                        rect1, rect2 = self.divide_rectangle(contour,"vertical")
+                        large_contours.append(rect1)
+                        large_contours.append(rect2)
+
+                    else:
+                        rect1, rect2 = self.divide_rectangle(contour, "horizontal")
+                        large_contours.append(rect1)
+                        large_contours.append(rect2)
+                    
+            else:
                 large_contours.append(contour)
+
+        if self.debug:
+            print('mode_cubes = ' + str(mode_cubes))
+            print('area_size = ' + str(area_size))
+            print('len_contours = ' + str(len(contours)))
+            print('len large_contours = ' + str(len(large_contours)))
         
         return large_contours
 
@@ -239,7 +418,7 @@ class ImageProcessor_Top:
                         color, thickness)
         
 
-    def process_image(self, frame:np.ndarray, area_size:int = 2000, mostrar:bool=False )->tuple:
+    def process_image(self, frame:np.ndarray, area_size:int = 2000, mostrar:bool=False, debug:bool = False )->tuple:
         ''' 
         Ejecuta el flujo completo de procesamiento de una imagen para detectar colores y posiciones de cubos.
             - Almacena la imagen original y una copia para dibujar contornos.
@@ -249,22 +428,26 @@ class ImageProcessor_Top:
             - Dibuja contornos y anotaciones sobre la imagen de salida.
             @param frame (numpy array) - Imagen de entrada en formato BGR.
             @param area_size (int) - Umbral mínimo de área para considerar un contorno como válido. Por defecto, 2000.
-            @param mostrar (bool) - Si es True, muestra la imagen procesada.
+            @param mostrar (bool) - Si es True, muestra la imagen resultante.
+            @param debug (bool) - Si es True, muestra imagenes intermedias del procesamiento.
             @return (tuple) - Una tupla con:
                 - matrix (numpy array) - Matriz 5x5 que representa la cuadrícula con los colores detectados.
                 - contour_img (numpy array) - Imagen con los contornos y anotaciones dibujados.
         '''
         self.frame = deepcopy(frame)
         self.contour_img = deepcopy(self.frame)
+        self.debug = debug
 
         # Preprocesamiento de la imagen
         morph_clean = self._preprocess_image()
         
         # Encontrar contornos externos
-        filtered_contours, _ = self._find_external_contours(morph_clean)
+        filtered_contours, contours = self._find_external_contours(morph_clean)
+
+        large_contours = self._separate_cubes(filtered_contours)
         
         # Filtrar los contornos por tamaño
-        large_contours = self._filter_contours_by_size(filtered_contours, area_size)
+        # large_contours = self._filter_contours_by_size(filtered_contours, area_size)
 
         # Lista de los centros de los cubos
         centers = []
@@ -302,14 +485,19 @@ class ImageProcessor_Top:
 
 # Ejecutar el programa
 if __name__ == "__main__":
-    # Crear instancia de ImageProcessor con la ruta de la imagen
-    figura = 7
-    ruta = f'ProyectoFinal\Figuras_Superior\Figura{figura}_S.png'
-    processor = ImageProcessor_Top()
-    frame = cv2.imread(ruta)
-    matriz, imagen = processor.process_image(frame,area_size=800, mostrar = True)
-<<<<<<< HEAD
-    print(matriz)
-=======
-    print(matriz)
->>>>>>> 02145a90b86fc69c9843b05f653d880b56d5cde1
+    use_cam = True
+    cube_tracker = ImageProcessor_Top()
+
+    if use_cam:
+        cam = cv2.VideoCapture(0)
+        if cam.isOpened():
+            _, frame = cam.read()
+    else:
+        num = 1
+        ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Cubos_Exparcidos/Cubos_Exparcidos_{num}.png'
+        frame = cv2.imread(ruta)
+
+    resultado = cube_tracker.process_image(frame, mostrar=True, debug=True)
+    print(resultado)
+    if use_cam:
+        cam.release()
