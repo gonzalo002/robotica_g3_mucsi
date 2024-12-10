@@ -34,7 +34,7 @@ class ImageProcessor_Top:
         - frame (numpy array) - Imagen de entrada que se va a procesar.
     '''
         
-    def __init__(self, matrix_size:int=5) -> None:
+    def __init__(self, matrix_size:int=5, aruco_dict=cv2.aruco.DICT_4X4_50,) -> None:
         ''' 
         Inicializa los atributos de la clase.
         - matrix_size: Tamaño de la matriz cuadrada que representa la cuadrícula de colores (por defecto, 5x5).
@@ -46,6 +46,8 @@ class ImageProcessor_Top:
         self.matrix_size = matrix_size
         self.matrix = np.full((self.matrix_size, self.matrix_size), -1)
         self.contour_img = None
+        self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict)
+        self.aruco_params = cv2.aruco.DetectorParameters()
         self.frame = None
         self.debug = False
 
@@ -60,30 +62,38 @@ class ImageProcessor_Top:
             - Aplica operaciones morfológicas para limpiar ruido.
             @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
         """
-        # Definir el factor de contraste (alpha) y el ajuste de brillo (beta)
-        alpha = 1  # Contraste (1.0 es el valor original, > 1 aumenta el contraste)
-        beta = 0     # Brillo (0 no cambia el brillo)
-
-        # Aplicar la transformación
-        adjusted_image = cv2.convertScaleAbs(self.frame, alpha=alpha, beta=beta)
 
         cropped_gray = self._get_cubes_location()
+        
+        clahe = cv2.createCLAHE(clipLimit=0.5, tileGridSize=(4, 4))
+        clahe_image = clahe.apply(cropped_gray)
 
         cropped_frame = self._get_cubes_location(colored=True)
-
+        
         contrast_img = self.pruebas(cropped_frame)
 
-        edges_0 = cv2.Canny(contrast_img, 50, 255)
+        edges_0 = self.canny_lock(frame=cropped_frame)
+
+        edges_1 = cv2.Canny(contrast_img, 50, 255)
 
         # Aplicar el filtro Canny para una detección de bordes más refinada
-        edges = cv2.Canny(cropped_gray, 10, 150)
-        new_gray = cropped_gray - edges
+        edges = cv2.Canny(clahe_image, 10, 150)
+        new_gray = clahe_image - edges_0
 
         # Aplicar el filtro Canny para una detección de bordes más refinada
         edges = cv2.Canny(new_gray, 50, 255)
 
-        edges = cv2.bitwise_or(edges, edges_0)
-
+        edges_xor = cv2.bitwise_xor(edges, edges_0)
+        
+        edges_1 = cv2.bitwise_xor(edges_0, edges_xor)
+        edges_2 = cv2.bitwise_xor(edges, edges_xor)
+        
+        edges = cv2.bitwise_and(edges_1, edges_2)
+        
+        new_gray = new_gray - edges
+        
+        edges = cv2.Canny(new_gray, 50, 255)
+        
         # Operaciones morfológicas para limpiar el ruido
         kernel = np.ones((1, 1), np.uint8)
         morph_clean = cv2.morphologyEx(edges, cv2.MORPH_ERODE, kernel)
@@ -93,10 +103,10 @@ class ImageProcessor_Top:
         morph_clean = cv2.morphologyEx(morph_clean, cv2.MORPH_CLOSE, kernel)
 
         if self.debug:
-            cv2.imshow('Imagen_contraste', adjusted_image)
             cv2.imshow('Cropped_Gray', cropped_gray)
             cv2.imshow('Canny', edges)
             cv2.imshow('Morph_Clean', morph_clean)
+            cv2.imshow('CLAHE_image', clahe_image)
         
         return morph_clean
     
@@ -130,21 +140,140 @@ class ImageProcessor_Top:
         green = cv2.cvtColor(high_green, cv2.COLOR_BGR2GRAY)
 
         _, red = cv2.threshold(frame[:,:,2], 130, 255, cv2.THRESH_BINARY)
-        _, blue = cv2.threshold(frame[:,:,0], 130, 255, cv2.THRESH_BINARY)
+        _, blue = cv2.threshold(frame[:,:,0], 90, 255, cv2.THRESH_BINARY)
         _, green = cv2.threshold(green, 50, 255, cv2.THRESH_BINARY)
 
         # Encontrar los píxeles blancos comunes en ambas imágenes
         rg = cv2.bitwise_or(red, green)
         rgb = cv2.bitwise_or(rg, blue)
 
-        cv2.imshow('a', green)
-
+        if self.debug:
+            cv2.imshow('Verde', green)
+            cv2.imshow('Azul', blue)
+            cv2.imshow('Rojo', red)
+            
         # Crear una imagen donde los píxeles comunes son blancos y el resto es negro
         result = np.zeros_like(frame)  # Crear una imagen de igual tamaño, pero negra (0)
         result[rgb >= 230] = 255  # Asignar 255 (blanco) donde hay intersección
 
-        return result    
+        return result
+    
+    def canny_lock(self, frame:np.ndarray = None) -> np.ndarray:
+        try:
+            frame == None
+        except:
+            frame = self.frame
+        # Convertir la imagen de BGR a HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+        # Definir el rango de valores para el color verde en el espacio HSV
+        # Rango de verdes: Hue entre 35 y 85, Saturación y Valor más altos
+        lower_green = np.array([30, 50, 50])   # Mínimo verde
+        upper_green = np.array([110, 255, 255]) # Máximo verde
+
+        # Crear una máscara que contenga solo los píxeles verdes
+        mask = cv2.inRange(hsv, lower_green, upper_green)
+
+        # Aplicar la máscara para mantener solo las áreas verdes
+        green_only = cv2.bitwise_and(frame, frame, mask=mask)
+
+        # Opcional: Realzar la saturación y el valor en las áreas verdes
+        # Aumentar la saturación y el valor de la imagen verde para hacerla más vibrante
+        hsv_green = cv2.cvtColor(green_only, cv2.COLOR_BGR2HSV)
+        hsv_green[:, :, 1] = cv2.add(hsv_green[:, :, 1], 50)  # Aumentar la saturación
+        hsv_green[:, :, 2] = cv2.add(hsv_green[:, :, 2], 50)  # Aumentar el valor
+
+        # Convertir de nuevo a BGR para mostrar la imagen final
+        high_green = cv2.cvtColor(hsv_green, cv2.COLOR_HSV2BGR)
+        green = cv2.cvtColor(high_green, cv2.COLOR_BGR2GRAY)
+        
+        _, red = cv2.threshold(frame[:,:,2], 130, 255, cv2.THRESH_BINARY)
+        _, blue = cv2.threshold(frame[:,:,0], 110, 255, cv2.THRESH_BINARY)
+        _, green = cv2.threshold(green, 50, 255, cv2.THRESH_BINARY)
+        
+        kernel = np.ones((5, 5), np.uint8)
+        red_clean = cv2.morphologyEx(red, cv2.MORPH_CLOSE, kernel)
+        blue_clean = cv2.morphologyEx(blue, cv2.MORPH_CLOSE, kernel)
+        green_clean = cv2.morphologyEx(green, cv2.MORPH_CLOSE, kernel)
+        
+
+        red = cv2.Canny(red_clean, 100, 255)
+        blue = cv2.Canny(blue_clean, 70, 255) 
+        green = cv2.Canny(green_clean, 30, 255)
+        
+        rg = cv2.bitwise_or(red, blue)
+        rgb = cv2.bitwise_or(rg, green)
+        
+        kernel = np.ones((1, 1), np.uint8)
+        rgb_clean = cv2.morphologyEx(rgb, cv2.MORPH_ERODE, kernel)
+        
+        if self.debug:
+            cv2.imshow('Verde', green)
+            cv2.imshow('Azul', blue)
+            cv2.imshow('Rojo', red)
+            cv2.imshow('combined', rgb)
+            cv2.imshow('combined_clean', rgb_clean)
+            
+        return rgb_clean
+
+    def _detectar_aruco(self, frame: np.ndarray) -> None:
+        '''
+        Detecta un marcador Aruco en la imagen y calcula su posición y orientación.
+            @param frame (numpy array) - Imagen en formato escala de grises.
+        '''
+        corners, ids, _ = cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
+        
+        aruco_frame = frame.copy()
+        
+        if ids is not None:
+            mask = np.ones(aruco_frame.shape, dtype=np.uint8) * 255  # Empezamos con una máscara blanca (255)
+
+            expanded_corners = self._expand_corners(corners[0], 1.5)
+            # Convertir las coordenadas de las esquinas a un formato adecuado
+            for corner in expanded_corners:
+                cv2.fillPoly(mask, [corner], (0, 0, 0))
+
+            # Mostrar la máscara generada
+            if self.debug:
+                cv2.imshow("Mask", mask)
+
+            # Crear la imagen final aplicando la máscara a la imagen original
+            frame_with_mask = cv2.bitwise_and(frame, mask)
+            
+            return frame_with_mask
+
+    def _expand_corners(self, corners, factor=1.2):
+        """
+        Expande las esquinas del marcador ArUco aumentando su tamaño.
+        :param corners: Esquinas de los marcadores detectados (forma de (1, 4, 2)).
+        :param factor: Factor de escala para aumentar o reducir el tamaño del marcador.
+        :return: Nuevas coordenadas de las esquinas ajustadas.
+        """
+        expanded_corners = []
+
+        for corner in corners:
+            # corner es un array de 4 puntos del marcador, por ejemplo: [[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
+            
+            # Calcular el centro del marcador como el promedio de las 4 esquinas
+            centro = np.mean(corner, axis=0)  # El centro es el promedio de los puntos
+
+            # Crear una lista para las nuevas coordenadas ajustadas
+            new_corners = []
+
+            # Ajustar las esquinas en función del factor
+            for point in corner:
+                # Calcular el vector desde el centro hacia la esquina
+                vector = point - centro
+                # Ajustar el tamaño del vector con el factor
+                new_point = centro + vector * factor  # Escalar el vector para aumentar el tamaño
+                # Añadir el nuevo punto a la lista de esquinas ajustadas
+                new_corners.append(new_point)
+
+            # Convertir a tipo entero (por si acaso) y agregar el marcador ajustado a la lista final
+            expanded_corners.append(np.array(new_corners, dtype=np.int32))
+
+        return expanded_corners
+    
     def _get_cubes_location(self, colored:bool = False) -> np.ndarray:
         ''' 
         Aplica un umbral de Otsu para binarizar la imagen y encuentra el bounding box del contorno más grande.
@@ -154,8 +283,9 @@ class ImageProcessor_Top:
 
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         
+        aruco_frame = self._detectar_aruco(gray)
         # Binarizar la imagen utilizando un umbral fijo
-        _, binary_image = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+        _, binary_image = cv2.threshold(aruco_frame, 60, 255, cv2.THRESH_BINARY)
         
         # Operación de cierre para limpiar la imagen
         kernel = np.ones((5, 5), np.uint8)
@@ -191,8 +321,6 @@ class ImageProcessor_Top:
             # Aplicar la máscara a la imagen original
             # result = cv2.bitwise_and(gray, mask)
 
-            if self.debug:
-                cv2.imshow('image_cropped', result)
             
             if colored:
                 result = self.frame
@@ -200,8 +328,19 @@ class ImageProcessor_Top:
                 result[:,:,1] = cv2.bitwise_and(self.frame[:,:,1], morph_clean)
                 result[:,:,2] = cv2.bitwise_and(self.frame[:,:,2], morph_clean)
             else:
-                result = cv2.bitwise_and(gray, morph_clean)
+                # Definir el factor de contraste (alpha) y el ajuste de brillo (beta)
+                alpha = 1.5  # Contraste (1.0 es el valor original, > 1 aumenta el contraste)
+                beta = 0     # Brillo (0 no cambia el brillo)
+
+                # Aplicar la transformación
+                adjusted_image = cv2.convertScaleAbs(gray, alpha=alpha, beta=beta)
+                result = cv2.bitwise_and(adjusted_image, morph_clean)
+                if self.debug:
+                    cv2.imshow('Contrast_Image', adjusted_image)
     
+            if self.debug:
+                cv2.imshow('image_cropped', result)
+                
         return result
     
 
@@ -216,8 +355,8 @@ class ImageProcessor_Top:
         
         # Filtrar los contornos externos que tienen un padre
         filtered_contours = []
-        for i, (_, _, child, parent) in enumerate(hierarchy[0]):
-            if child == -1 and parent != -1:  # Contorno exterior con padre
+        for i, (first, _, child, parent) in enumerate(hierarchy[0]):
+            if parent != -1 and child == -1:  # Contorno exterior con padre
                 filtered_contours.append(contours[i])
         
         return filtered_contours, contours
@@ -247,10 +386,10 @@ class ImageProcessor_Top:
         for cnt in contours:
             area_size.append(cv2.contourArea(cnt))
 
-        mode_cubes = np.median(area_size)  
+        mode_cubes = np.mean(area_size)  
 
         for i,contour in enumerate(contours):
-            if area_size[i] < mode_cubes*0.2:
+            if area_size[i] < mode_cubes*0.5:
                 pass
             elif area_size[i] > mode_cubes*1.7:
                 approx = cv2.approxPolyDP(contour, 0.04 * cv2.arcLength(contour, True), True)
@@ -263,16 +402,16 @@ class ImageProcessor_Top:
                         side_length = np.linalg.norm(p2 - p1)  # Distancia Euclidiana entre los puntos
                         side_lengths.append(side_length)
                     
-                    # Calcular la diferencia entre los lados
-                    if side_lengths[0] > side_lengths[1]:
-                        rect1, rect2 = self.divide_rectangle(contour,"vertical")
-                        large_contours.append(rect1)
-                        large_contours.append(rect2)
+                    # # Calcular la diferencia entre los lados
+                    # if side_lengths[0] > side_lengths[1]:
+                    #     rect1, rect2 = self.divide_rectangle(contour,"vertical")
+                    #     large_contours.append(rect1)
+                    #     large_contours.append(rect2)
 
-                    else:
-                        rect1, rect2 = self.divide_rectangle(contour, "horizontal")
-                        large_contours.append(rect1)
-                        large_contours.append(rect2)
+                    # else:
+                    #     rect1, rect2 = self.divide_rectangle(contour, "horizontal")
+                    #     large_contours.append(rect1)
+                    #     large_contours.append(rect2)
                     
             else:
                 large_contours.append(contour)
@@ -479,18 +618,19 @@ class ImageProcessor_Top:
 
 # Ejecutar el programa
 if __name__ == "__main__":
-    cam = cv2.VideoCapture(0)
-    cam.release()
-    # Crear instancia de ImageProcessor con la ruta de la imagen
-    figura = 20
-    cam = cv2.VideoCapture(0)
+    use_cam = True
+    cube_tracker = ImageProcessor_Top()
 
-    if cam.isOpened():
-        _, frame = cam.read()
-    # ruta = f'src/proyecto_final/data/example_img/Figuras_Superior/Figura_{figura}_S.png'
-    processor = ImageProcessor_Top()
-    # frame = cv2.imread(ruta)
-    # matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True, debug = True)
-    matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True)
-    #print(np.array2string(matriz, separator=', ', formatter={'all': lambda x: f'{int(x)}'}))
-    print(np.array(matriz))
+    if use_cam:
+        cam = cv2.VideoCapture(0)
+        if cam.isOpened():
+            _, frame = cam.read()
+    else:
+        num = 1
+        ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Cubos_Exparcidos/Cubos_Exparcidos_{num}.png'
+        frame = cv2.imread(ruta)
+
+    resultado = cube_tracker.process_image(frame, mostrar=True, debug=True)
+    print(resultado)
+    if use_cam:
+        cam.release()
