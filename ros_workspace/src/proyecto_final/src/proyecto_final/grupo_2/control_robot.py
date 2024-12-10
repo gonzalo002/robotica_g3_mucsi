@@ -1,17 +1,19 @@
 #!/usr/bin/python3
 
 import sys
-import copy
+from copy import deepcopy
 import rospy
 from moveit_commander import MoveGroupCommander, RobotCommander, roscpp_initialize, PlanningSceneInterface
-import moveit_msgs.msg
-import geometry_msgs.msg
+from control_msgs.msg import GripperCommandAction, GripperCommandGoal, GripperCommandResult
 from math import pi, tau, dist, fabs, cosh
 from std_msgs.msg import String, Float32
 from moveit_commander.conversions import pose_to_list
-from geometry_msgs.msg import Pose, PoseStamped, PoseArray
+from geometry_msgs.msg import Pose, PoseStamped, Point, Quaternion
+from sensor_msgs.msg import JointState
 import yaml
-import time
+from time import time
+from actionlib import SimpleActionClient
+
 class ControlRobot:
     def __init__(self, group_name:str = 'robot') -> None:
         roscpp_initialize(sys.argv)
@@ -20,7 +22,12 @@ class ControlRobot:
         self.scene = PlanningSceneInterface()
         self.group_name = group_name
         self.move_group = MoveGroupCommander(self.group_name)
-        self.add_floor()
+        self.gripper_action_client = SimpleActionClient("rg2_action_server", GripperCommandAction)
+        self.gripper = rospy.Subscriber("/rg2/joint_states", JointState, self.gripper_callback)
+        self.get_gripper_data = False
+        self.gripper_states = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.clear_planning_scene()
+
     
     def get_joint_angles(self) -> list:
         return self.move_group.get_current_joint_values()
@@ -81,14 +88,20 @@ class ControlRobot:
     def clear_planning_scene(self) -> None:
         # Optionally: clear the octomap (which stores obstacles in the environment)
         self.scene.clear()
-        self.add_floor()
+        self.__generate_scene()
 
         rospy.loginfo("Planning scene cleared!")
 
-    def add_floor(self) -> None:
+    def __generate_scene(self) -> None:
         pose_suelo = Pose()
         pose_suelo.position.z -= .03
+        pose_vertical_support = Pose(Point(x=0,y=-0.1,z=0.5),
+                                     Quaternion(x=0,y=0,z=0,w=1))
+        pose_camera_support = Pose(Point(x=0.0,y=0.0,z=0.85),
+                                     Quaternion(x=0,y=0,z=0,w=1))
         self.set_box_obstacle('floor', pose_suelo, (2,2,.05))
+        self.set_box_obstacle('vertical_support', pose_vertical_support, (0.05,0.05,1.0))
+        self.set_box_obstacle('camera_support', pose_camera_support, (0.1,1.0,.05))
 
     def create_pose(self, pos_list:list, ori_list) -> Pose:
         if len(pos_list) != 3 or len(ori_list) != 4: return False
@@ -113,8 +126,32 @@ class ControlRobot:
             configuraciones =  yaml.load(f, yaml.Loader)
 
         return configuraciones[key_name]
+    
+    def gripper_callback(self, data:JointState) -> list:
+        if self.get_gripper_data:
+            self.gripper_states = data.position
+            self.get_gripper_data = False
+    
+    def mover_pinza(self, anchura_dedos: float, fuerza: float) -> bool:
+        goal = GripperCommandGoal()
+        goal.command.position = anchura_dedos
+        goal.command.max_effort = fuerza
+        self.gripper_action_client.send_goal(goal)
+        self.gripper_action_client.wait_for_result()
+        result = self.gripper_action_client.get_result()
+        
+        return result.reached_goal
+    
+    def get_pinza_state(self) -> list:
+        gripper_state = deepcopy(self.gripper_states)
+        self.get_gripper_data = True
+        init_time = time()
 
-
+        while gripper_state == self.gripper_states:
+            if (time() - init_time) > 5:
+                rospy.logwarn('TIMEOUT: Unable to get gripper state')
+                return self.gripper_states
+        return self.gripper_states
 
 
 if __name__ == '__main__':
@@ -132,9 +169,9 @@ if __name__ == '__main__':
     #         i+=1
     #     elif tecla == "q":
     #         break
-
-    print(control.get_pose())
-
+    while True:
+        input('Gonzalo Pesado !!!')
+        print(control.get_pose())
 
     #trayectoria=[]
     #punto = control.get_pose()
