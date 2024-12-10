@@ -39,7 +39,6 @@ class FigureGenerator:
         self.matriz3D = np.full((anchura, altura, profundidad), -1)
         matriz3D_positiva = np.full((anchura, altura, profundidad), -1)
         matriz3D_inversa = np.full((anchura, altura, profundidad), -1)
-        front_matrix_recortada_inv = deepcopy(front_matrix_recortada)
         # Usamos plt.subplots() para crear la figura y los ejes
         fig, ax = plt.subplots(figsize=(8, 4), dpi=100, subplot_kw={'projection': '3d'})
 
@@ -49,59 +48,56 @@ class FigureGenerator:
         # Definir el tamaño de cada cubo
         size = 0.2
 
-        for columna_planta in range(0, profundidad, 1):
-            columna_planta_inversa = profundidad - 1 - columna_planta
+        for columna_planta_inversa in range(0, profundidad, 1):
+            columna_planta = profundidad - 1 - columna_planta_inversa
             for fila_planta in range(anchura-1, -1, -1):
-                if plant_matrix_recortada[fila_planta][columna_planta] != -1:
-                    color_cubo = plant_matrix_recortada[fila_planta][columna_planta]
-                    cube_found = False
+                if plant_matrix_recortada[fila_planta][columna_planta] != -1 or plant_matrix_recortada[fila_planta][columna_planta_inversa] != -1:
+                    color_cubo_pos = plant_matrix_recortada[fila_planta][columna_planta]
+                    color_cubo_inv = plant_matrix_recortada[fila_planta][columna_planta_inversa]
+                    cube_found_pos = False
+                    cube_found_inv = False
                     for fila_lateral in range(0, altura, 1):
-                        columna_lateral = anchura - fila_planta - 1
-                        x = columna_lateral
-                        y = profundidad - columna_planta - 1
+                        x = columna_lateral = anchura - fila_planta - 1
+                        y_pos = profundidad - columna_planta - 1
+                        y_inv = profundidad - columna_planta_inversa - 1
                         z = altura -1 - fila_lateral
+                        front_color = front_matrix_recortada[fila_lateral][columna_lateral]
                         # Delante hacia atras = Positiva
                         if plant_matrix_recortada[fila_planta][columna_planta] == front_matrix_recortada[fila_lateral][columna_lateral]:
-                            matriz3D_positiva[x][z][y] = color_cubo
+                            matriz3D_positiva[x][z][y_pos] = color_cubo_pos
                             front_matrix_recortada[fila_lateral][columna_lateral] = -1
-                            cube_found = True
+                            cube_found_pos = True
 
-                        elif cube_found and front_matrix_recortada[fila_lateral][columna_lateral] == -1:
-                            matriz3D_positiva[x][z][y] = 4
-
-                        elif cube_found and front_matrix_recortada[fila_lateral][columna_lateral] != -1:
-                            matriz3D_positiva[x][z][y] = front_matrix_recortada[fila_lateral][columna_lateral]
+                        elif cube_found_pos and front_matrix_recortada[fila_lateral][columna_lateral] != -1:
+                            matriz3D_positiva[x][z][y_pos] = front_matrix_recortada[fila_lateral][columna_lateral]
                             front_matrix_recortada[fila_lateral][columna_lateral] = -1
-
-                    if not cube_found:
-                        z= 0
-                        matriz3D_positiva[x][z][y] = color_cubo
-                
-                # Atras hacia adelante = Inversa
-                if plant_matrix_recortada[fila_planta][columna_planta_inversa] != -1:
-                    color_cubo = plant_matrix_recortada[fila_planta][columna_planta_inversa]
-                    cube_found = False
-                    for fila_lateral in range(0, altura, 1):
-                        columna_lateral = anchura - fila_planta - 1
-                        x = columna_lateral
-                        y = profundidad - columna_planta_inversa - 1
-                        z = altura -1 - fila_lateral
+                        
+                        elif cube_found_pos:
+                            matriz3D_positiva[x][z][y_pos] = 4
+                        
+                        
                         # Atras hacia delante = Inversa
-                        if plant_matrix_recortada[fila_planta][columna_planta_inversa] == front_matrix_recortada_inv[fila_lateral][columna_lateral]:
-                            matriz3D_inversa[x][z][y] = color_cubo
-                            front_matrix_recortada_inv[fila_lateral][columna_lateral] = -1
-                            cube_found = True
+                        if plant_matrix_recortada[fila_planta][columna_planta_inversa] == front_color:
+                            matriz3D_inversa[x][z][y_inv] = color_cubo_inv
+                            front_color = -1
+                            cube_found_inv = True
 
-                        elif cube_found and front_matrix_recortada_inv[fila_lateral][columna_lateral] == -1:
-                            matriz3D_inversa[x][z][y] = 4
+                        elif cube_found_inv and front_color != -1:
+                            matriz3D_inversa[x][z][y_inv] = front_color
 
-                        elif cube_found and front_matrix_recortada_inv[fila_lateral][columna_lateral] != -1:
-                            matriz3D_inversa[x][z][y] = front_matrix_recortada_inv[fila_lateral][columna_lateral]
-                            front_matrix_recortada_inv[fila_lateral][columna_lateral] = -1
+                        elif cube_found_inv:
+                            matriz3D_inversa[x][z][y_inv] = 4
 
-                    if not cube_found:
+
+                    if not cube_found_pos:
                         z= 0
-                        matriz3D_inversa[x][z][y] = color_cubo
+                        matriz3D_positiva[x][z][y_pos] = color_cubo_pos
+
+                    if not cube_found_inv:
+                        z= 0
+                        matriz3D_inversa[x][z][y_inv] = color_cubo_inv
+                        
+                
 
         self.compare_matrix(matriz3D_positiva, matriz3D_inversa)
         ax = self.paint_matrix(self.matriz3D, ax, size, colors)

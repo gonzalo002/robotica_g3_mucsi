@@ -12,17 +12,17 @@ def detectar_camaras():
 
 def main():
     # detectar_camaras()
-    cam_lateral = cv2.VideoCapture(0)
-    cam_top = cv2.VideoCapture(5)
+    cam_lateral = cv2.VideoCapture(4)
+    cam_top = cv2.VideoCapture(0)
     
     if not cam_lateral.isOpened():
         print("Error: No se pudo abrir el vídeo.")
         return
     
-    if os.listdir('src/proyecto_final/data/example_img/Figuras_Lateral') == []:
+    if os.listdir('/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Lateral') == []:
         i = 0
     else:
-        i = len(os.listdir('src/proyecto_final/data/example_img/Figuras_Lateral'))+1
+        i = len(os.listdir('/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Lateral'))+1
         
     
     while True:
@@ -33,8 +33,8 @@ def main():
         cv2.imshow('camara_planta', frame_top)
         
         if cv2.waitKey(1) & 0xFF == ord('s'):
-            cv2.imwrite(f'src/proyecto_final/data/example_img/Figuras_Lateral/Figura_{i}_L.png', frame_lateral)
-            cv2.imwrite(f'src/proyecto_final/data/example_img/Figuras_Superior/Figura_{i}_S.png', frame_top)
+            cv2.imwrite(f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Lateral/Figura_{i}_L.png', frame_lateral)
+            cv2.imwrite(f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Superior/Figura_{i}_S.png', frame_top)
             i += 1 
             
         if cv2.waitKey(1) & 0xFF == ord('q'):
