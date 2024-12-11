@@ -128,3 +128,9 @@ git commit -m "Mensaje descriptivo de lo que se cambia"
 ```bash
 git push origin <Nombre de la rama>
 ```
+
+
+### 8. Camra calibration
+```bash
+rosrun camera_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/usb_cam/image_raw camera:=/usb_cam
+```
