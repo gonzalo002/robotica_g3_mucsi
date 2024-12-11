@@ -58,7 +58,7 @@ class HandResult {
 
   static getMessageSize(object) {
     let length = 0;
-    length += 9 * object.hand_data.length;
+    length += 17 * object.hand_data.length;
     return length + 4;
   }
 
@@ -69,7 +69,7 @@ class HandResult {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '9243de325cfd71fbaa56d0501414b27f';
+    return '2780ed3d510972b1ad13ff43244bdd9c';
   }
 
   static messageDefinition() {
@@ -83,7 +83,13 @@ class HandResult {
     MSG: proyecto_final/HandData
     float32 x
     float32 y
+    float32 z
     bool is_open
+    bool is_peace
+    bool hand_detected
+    bool is_dino
+    bool is_dislike
+    
     `;
   }
 

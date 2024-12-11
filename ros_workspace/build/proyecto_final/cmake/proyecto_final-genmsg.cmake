@@ -19,7 +19,7 @@ add_custom_target(proyecto_final_generate_messages ALL)
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg" "geometry_msgs/Pose:geometry_msgs/Quaternion:geometry_msgs/Point"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg" "geometry_msgs/Quaternion:geometry_msgs/Pose:geometry_msgs/Point"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg" NAME_WE)
@@ -29,7 +29,7 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg" "proyecto_final/CubosActionResult:geometry_msgs/Quaternion:proyecto_final/CubosActionFeedback:proyecto_final/IdCubos:std_msgs/Header:geometry_msgs/Pose:proyecto_final/CubosActionGoal:proyecto_final/CubosGoal:proyecto_final/CubosFeedback:actionlib_msgs/GoalStatus:geometry_msgs/Point:proyecto_final/CubosResult:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg" "proyecto_final/CubosActionFeedback:geometry_msgs/Pose:proyecto_final/IdCubos:proyecto_final/CubosActionResult:geometry_msgs/Point:proyecto_final/CubosFeedback:actionlib_msgs/GoalID:std_msgs/Header:proyecto_final/CubosResult:proyecto_final/CubosGoal:proyecto_final/CubosActionGoal:geometry_msgs/Quaternion:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg" NAME_WE)
@@ -39,12 +39,12 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg" "geometry_msgs/Quaternion:proyecto_final/IdCubos:std_msgs/Header:geometry_msgs/Pose:actionlib_msgs/GoalStatus:geometry_msgs/Point:proyecto_final/CubosResult:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg" "geometry_msgs/Pose:proyecto_final/IdCubos:geometry_msgs/Point:actionlib_msgs/GoalID:std_msgs/Header:proyecto_final/CubosResult:geometry_msgs/Quaternion:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg" "std_msgs/Header:actionlib_msgs/GoalStatus:proyecto_final/CubosFeedback:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg" "std_msgs/Header:proyecto_final/CubosFeedback:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg" NAME_WE)
@@ -54,7 +54,7 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg" "geometry_msgs/Pose:geometry_msgs/Quaternion:proyecto_final/IdCubos:geometry_msgs/Point"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg" "geometry_msgs/Quaternion:geometry_msgs/Pose:proyecto_final/IdCubos:geometry_msgs/Point"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg" NAME_WE)
@@ -64,22 +64,22 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg" "proyecto_final/FigurasResult:proyecto_final/FigurasActionGoal:std_msgs/Header:proyecto_final/FigurasActionResult:proyecto_final/FigurasActionFeedback:actionlib_msgs/GoalStatus:proyecto_final/FigurasGoal:actionlib_msgs/GoalID:proyecto_final/FigurasFeedback"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg" "proyecto_final/FigurasResult:actionlib_msgs/GoalID:proyecto_final/FigurasActionResult:std_msgs/Header:proyecto_final/FigurasFeedback:proyecto_final/FigurasGoal:proyecto_final/FigurasActionFeedback:proyecto_final/FigurasActionGoal:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg" "std_msgs/Header:proyecto_final/FigurasGoal:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg" "std_msgs/Header:actionlib_msgs/GoalID:proyecto_final/FigurasGoal"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg" "std_msgs/Header:proyecto_final/FigurasResult:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg" "std_msgs/Header:actionlib_msgs/GoalID:proyecto_final/FigurasResult:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg" "std_msgs/Header:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:proyecto_final/FigurasFeedback"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg" "std_msgs/Header:proyecto_final/FigurasFeedback:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg" NAME_WE)
@@ -99,22 +99,22 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg" "proyecto_final/HandActionGoal:proyecto_final/HandResult:std_msgs/Header:proyecto_final/HandFeedback:proyecto_final/HandGoal:actionlib_msgs/GoalStatus:proyecto_final/HandData:proyecto_final/HandActionResult:proyecto_final/HandActionFeedback:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg" "proyecto_final/HandGoal:actionlib_msgs/GoalID:proyecto_final/HandActionResult:std_msgs/Header:proyecto_final/HandActionFeedback:proyecto_final/HandActionGoal:proyecto_final/HandData:proyecto_final/HandFeedback:proyecto_final/HandResult:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg" "std_msgs/Header:actionlib_msgs/GoalID:proyecto_final/HandGoal"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg" "std_msgs/Header:proyecto_final/HandGoal:actionlib_msgs/GoalID"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg" "proyecto_final/HandResult:std_msgs/Header:actionlib_msgs/GoalStatus:proyecto_final/HandData:actionlib_msgs/GoalID"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg" "actionlib_msgs/GoalID:std_msgs/Header:proyecto_final/HandData:proyecto_final/HandResult:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg" NAME_WE)
 add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg" "std_msgs/Header:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:proyecto_final/HandFeedback"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "proyecto_final" "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg" "std_msgs/Header:proyecto_final/HandFeedback:actionlib_msgs/GoalID:actionlib_msgs/GoalStatus"
 )
 
 get_filename_component(_filename "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg" NAME_WE)
@@ -141,7 +141,7 @@ add_custom_target(_proyecto_final_generate_messages_check_deps_${_filename}
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -153,7 +153,7 @@ _generate_msg_cpp(proyecto_final
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -165,13 +165,13 @@ _generate_msg_cpp(proyecto_final
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -183,7 +183,7 @@ _generate_msg_cpp(proyecto_final
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -195,25 +195,25 @@ _generate_msg_cpp(proyecto_final
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -237,25 +237,25 @@ _generate_msg_cpp(proyecto_final
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_cpp(proyecto_final
@@ -350,7 +350,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS proyecto_final_generate_messages_cp
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -362,7 +362,7 @@ _generate_msg_eus(proyecto_final
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -374,13 +374,13 @@ _generate_msg_eus(proyecto_final
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -392,7 +392,7 @@ _generate_msg_eus(proyecto_final
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -404,25 +404,25 @@ _generate_msg_eus(proyecto_final
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -446,25 +446,25 @@ _generate_msg_eus(proyecto_final
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_eus(proyecto_final
@@ -559,7 +559,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS proyecto_final_generate_messages_eu
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -571,7 +571,7 @@ _generate_msg_lisp(proyecto_final
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -583,13 +583,13 @@ _generate_msg_lisp(proyecto_final
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -601,7 +601,7 @@ _generate_msg_lisp(proyecto_final
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -613,25 +613,25 @@ _generate_msg_lisp(proyecto_final
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -655,25 +655,25 @@ _generate_msg_lisp(proyecto_final
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_lisp(proyecto_final
@@ -768,7 +768,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS proyecto_final_generate_messages_li
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -780,7 +780,7 @@ _generate_msg_nodejs(proyecto_final
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -792,13 +792,13 @@ _generate_msg_nodejs(proyecto_final
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -810,7 +810,7 @@ _generate_msg_nodejs(proyecto_final
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -822,25 +822,25 @@ _generate_msg_nodejs(proyecto_final
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -864,25 +864,25 @@ _generate_msg_nodejs(proyecto_final
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_nodejs(proyecto_final
@@ -977,7 +977,7 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS proyecto_final_generate_messages_no
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
@@ -989,7 +989,7 @@ _generate_msg_py(proyecto_final
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionGoal.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
@@ -1001,13 +1001,13 @@ _generate_msg_py(proyecto_final
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
@@ -1019,7 +1019,7 @@ _generate_msg_py(proyecto_final
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/CubosResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  "/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Pose.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg;/opt/ros/noetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
@@ -1031,25 +1031,25 @@ _generate_msg_py(proyecto_final
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasGoal.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/FigurasFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
@@ -1073,25 +1073,25 @@ _generate_msg_py(proyecto_final
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final
   "/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg"
+  "/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/proyecto_final/msg/HandFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/proyecto_final
 )
 _generate_msg_py(proyecto_final

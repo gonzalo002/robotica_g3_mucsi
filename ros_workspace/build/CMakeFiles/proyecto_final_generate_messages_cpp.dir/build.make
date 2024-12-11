@@ -95,27 +95,27 @@ devel/include/proyecto_final/HandData.h: /opt/ros/noetic/share/gencpp/msg.h.temp
 
 devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosAction.msg
-devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosActionGoal.msg
-devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosGoal.msg
-devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/include/proyecto_final/CubosAction.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
-devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosResult.msg
 devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosActionResult.msg
+devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosGoal.msg
+devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosResult.msg
 devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosFeedback.msg
+devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosActionFeedback.msg
-devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosFeedback.msg
+devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosActionGoal.msg
+devel/include/proyecto_final/CubosAction.h: devel/share/proyecto_final/msg/CubosActionResult.msg
+devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/include/proyecto_final/CubosAction.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
+devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/CubosAction.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating C++ code from proyecto_final/CubosAction.msg"
 	cd /home/laboratorio/ros_workspace/src/proyecto_final && /home/laboratorio/ros_workspace/build/catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/include/proyecto_final -e /opt/ros/noetic/share/gencpp/cmake/..
 
 devel/include/proyecto_final/CubosActionGoal.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/CubosActionGoal.h: devel/share/proyecto_final/msg/CubosActionGoal.msg
-devel/include/proyecto_final/CubosActionGoal.h: devel/share/proyecto_final/msg/CubosGoal.msg
 devel/include/proyecto_final/CubosActionGoal.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/CubosActionGoal.h: devel/share/proyecto_final/msg/CubosGoal.msg
 devel/include/proyecto_final/CubosActionGoal.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/include/proyecto_final/CubosActionGoal.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating C++ code from proyecto_final/CubosActionGoal.msg"
@@ -123,23 +123,23 @@ devel/include/proyecto_final/CubosActionGoal.h: /opt/ros/noetic/share/gencpp/msg
 
 devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/CubosActionResult.h: devel/share/proyecto_final/msg/CubosActionResult.msg
-devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
+devel/include/proyecto_final/CubosActionResult.h: devel/share/proyecto_final/msg/CubosResult.msg
+devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
+devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/include/proyecto_final/CubosActionResult.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
-devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/include/proyecto_final/CubosActionResult.h: devel/share/proyecto_final/msg/CubosResult.msg
-devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
-devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/CubosActionResult.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating C++ code from proyecto_final/CubosActionResult.msg"
 	cd /home/laboratorio/ros_workspace/src/proyecto_final && /home/laboratorio/ros_workspace/build/catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionResult.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/include/proyecto_final -e /opt/ros/noetic/share/gencpp/cmake/..
 
 devel/include/proyecto_final/CubosActionFeedback.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/CubosActionFeedback.h: devel/share/proyecto_final/msg/CubosActionFeedback.msg
-devel/include/proyecto_final/CubosActionFeedback.h: devel/share/proyecto_final/msg/CubosFeedback.msg
 devel/include/proyecto_final/CubosActionFeedback.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/include/proyecto_final/CubosActionFeedback.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/CubosActionFeedback.h: devel/share/proyecto_final/msg/CubosFeedback.msg
 devel/include/proyecto_final/CubosActionFeedback.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/include/proyecto_final/CubosActionFeedback.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Generating C++ code from proyecto_final/CubosActionFeedback.msg"
@@ -153,9 +153,9 @@ devel/include/proyecto_final/CubosGoal.h: /opt/ros/noetic/share/gencpp/msg.h.tem
 
 devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/CubosResult.h: devel/share/proyecto_final/msg/CubosResult.msg
-devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 devel/include/proyecto_final/CubosResult.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
 devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 devel/include/proyecto_final/CubosResult.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Generating C++ code from proyecto_final/CubosResult.msg"
@@ -169,15 +169,15 @@ devel/include/proyecto_final/CubosFeedback.h: /opt/ros/noetic/share/gencpp/msg.h
 
 devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasAction.msg
-devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasResult.msg
-devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
 devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasActionGoal.msg
+devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
 devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasActionResult.msg
+devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasResult.msg
 devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasGoal.msg
+devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasFeedback.msg
+devel/include/proyecto_final/FigurasAction.h: devel/share/proyecto_final/msg/FigurasActionResult.msg
 devel/include/proyecto_final/FigurasAction.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Generating C++ code from proyecto_final/FigurasAction.msg"
 	cd /home/laboratorio/ros_workspace/src/proyecto_final && /home/laboratorio/ros_workspace/build/catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/FigurasAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/include/proyecto_final -e /opt/ros/noetic/share/gencpp/cmake/..
@@ -203,9 +203,9 @@ devel/include/proyecto_final/FigurasActionResult.h: /opt/ros/noetic/share/gencpp
 
 devel/include/proyecto_final/FigurasActionFeedback.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/FigurasActionFeedback.h: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
-devel/include/proyecto_final/FigurasActionFeedback.h: devel/share/proyecto_final/msg/FigurasFeedback.msg
 devel/include/proyecto_final/FigurasActionFeedback.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/include/proyecto_final/FigurasActionFeedback.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/FigurasActionFeedback.h: devel/share/proyecto_final/msg/FigurasFeedback.msg
 devel/include/proyecto_final/FigurasActionFeedback.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/include/proyecto_final/FigurasActionFeedback.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Generating C++ code from proyecto_final/FigurasActionFeedback.msg"
@@ -231,24 +231,24 @@ devel/include/proyecto_final/FigurasFeedback.h: /opt/ros/noetic/share/gencpp/msg
 
 devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandAction.msg
+devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionGoal.msg
 devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandFeedback.msg
-devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
+devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionResult.msg
+devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionFeedback.msg
+devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandResult.msg
 devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandGoal.msg
 devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionFeedback.msg
+devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/HandAction.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
-devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionGoal.msg
-devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandActionResult.msg
-devel/include/proyecto_final/HandAction.h: devel/share/proyecto_final/msg/HandResult.msg
 devel/include/proyecto_final/HandAction.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Generating C++ code from proyecto_final/HandAction.msg"
 	cd /home/laboratorio/ros_workspace/src/proyecto_final && /home/laboratorio/ros_workspace/build/catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/HandAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/include/proyecto_final -e /opt/ros/noetic/share/gencpp/cmake/..
 
 devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/HandActionGoal.h: devel/share/proyecto_final/msg/HandActionGoal.msg
-devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/HandActionGoal.h: devel/share/proyecto_final/msg/HandGoal.msg
+devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Generating C++ code from proyecto_final/HandActionGoal.msg"
@@ -256,11 +256,11 @@ devel/include/proyecto_final/HandActionGoal.h: /opt/ros/noetic/share/gencpp/msg.
 
 devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/lib/gencpp/gen_cpp.py
 devel/include/proyecto_final/HandActionResult.h: devel/share/proyecto_final/msg/HandActionResult.msg
-devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/include/proyecto_final/HandActionResult.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
 devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/include/proyecto_final/HandActionResult.h: devel/share/proyecto_final/msg/HandResult.msg
+devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/include/proyecto_final/HandActionResult.h: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
 devel/include/proyecto_final/HandActionResult.h: /opt/ros/noetic/share/gencpp/msg.h.template
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Generating C++ code from proyecto_final/HandActionResult.msg"
 	cd /home/laboratorio/ros_workspace/src/proyecto_final && /home/laboratorio/ros_workspace/build/catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/gencpp/cmake/../../../lib/gencpp/gen_cpp.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/HandActionResult.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/include/proyecto_final -e /opt/ros/noetic/share/gencpp/cmake/..

@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/laboratorio/ros_workspace/build
 include CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosResult.dir/progress.make
 
 CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosResult:
-	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosResult.msg geometry_msgs/Point:proyecto_final/IdCubos:geometry_msgs/Quaternion:geometry_msgs/Pose
+	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosResult.msg proyecto_final/IdCubos:geometry_msgs/Quaternion:geometry_msgs/Point:geometry_msgs/Pose
 
 _proyecto_final_generate_messages_check_deps_CubosResult: CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosResult
 _proyecto_final_generate_messages_check_deps_CubosResult: CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosResult.dir/build.make

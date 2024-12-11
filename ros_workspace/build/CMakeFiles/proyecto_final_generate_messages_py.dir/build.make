@@ -94,48 +94,48 @@ devel/lib/python3/dist-packages/proyecto_final/msg/_HandData.py: /home/laborator
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosAction.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosActionGoal.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosGoal.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosResult.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosActionResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosGoal.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosResult.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosFeedback.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosActionFeedback.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosFeedback.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosActionGoal.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: devel/share/proyecto_final/msg/CubosActionResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating Python from MSG proyecto_final/CubosAction"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: devel/share/proyecto_final/msg/CubosActionGoal.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: devel/share/proyecto_final/msg/CubosGoal.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: devel/share/proyecto_final/msg/CubosGoal.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionGoal.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating Python from MSG proyecto_final/CubosActionGoal"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionGoal.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: devel/share/proyecto_final/msg/CubosActionResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: devel/share/proyecto_final/msg/CubosResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: devel/share/proyecto_final/msg/CubosResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionResult.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Generating Python from MSG proyecto_final/CubosActionResult"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionResult.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: devel/share/proyecto_final/msg/CubosActionFeedback.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: devel/share/proyecto_final/msg/CubosFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: devel/share/proyecto_final/msg/CubosFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosActionFeedback.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Generating Python from MSG proyecto_final/CubosActionFeedback"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionFeedback.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
@@ -147,9 +147,9 @@ devel/lib/python3/dist-packages/proyecto_final/msg/_CubosGoal.py: devel/share/pr
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: devel/share/proyecto_final/msg/CubosResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/IdCubos.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Quaternion.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Point.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_CubosResult.py: /opt/ros/noetic/share/geometry_msgs/msg/Pose.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Generating Python from MSG proyecto_final/CubosResult"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosResult.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
@@ -161,15 +161,15 @@ devel/lib/python3/dist-packages/proyecto_final/msg/_CubosFeedback.py: devel/shar
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasAction.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasActionGoal.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasActionResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasResult.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasGoal.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasFeedback.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasAction.py: devel/share/proyecto_final/msg/FigurasActionResult.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Generating Python from MSG proyecto_final/FigurasAction"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/FigurasAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
@@ -192,9 +192,9 @@ devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionResult.py: /opt
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: devel/share/proyecto_final/msg/FigurasActionFeedback.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: devel/share/proyecto_final/msg/FigurasFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: devel/share/proyecto_final/msg/FigurasFeedback.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasActionFeedback.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Generating Python from MSG proyecto_final/FigurasActionFeedback"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/FigurasActionFeedback.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
@@ -216,34 +216,34 @@ devel/lib/python3/dist-packages/proyecto_final/msg/_FigurasFeedback.py: devel/sh
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandAction.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionGoal.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandFeedback.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionFeedback.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandResult.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandGoal.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionFeedback.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionGoal.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandActionResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandAction.py: devel/share/proyecto_final/msg/HandResult.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Generating Python from MSG proyecto_final/HandAction"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/HandAction.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: devel/share/proyecto_final/msg/HandActionGoal.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: devel/share/proyecto_final/msg/HandGoal.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionGoal.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Generating Python from MSG proyecto_final/HandActionGoal"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/HandActionGoal.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/lib/genpy/genmsg_py.py
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: devel/share/proyecto_final/msg/HandActionResult.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
-devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalStatus.msg
 devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: devel/share/proyecto_final/msg/HandResult.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/share/actionlib_msgs/msg/GoalID.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /opt/ros/noetic/share/std_msgs/msg/Header.msg
+devel/lib/python3/dist-packages/proyecto_final/msg/_HandActionResult.py: /home/laboratorio/ros_workspace/src/proyecto_final/msg/HandData.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/laboratorio/ros_workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Generating Python from MSG proyecto_final/HandActionResult"
 	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/HandActionResult.msg -Iproyecto_final:/home/laboratorio/ros_workspace/src/proyecto_final/msg -Iproyecto_final:/home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg -Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg -Igeometry_msgs:/opt/ros/noetic/share/geometry_msgs/cmake/../msg -Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg -p proyecto_final -o /home/laboratorio/ros_workspace/build/devel/lib/python3/dist-packages/proyecto_final/msg
 

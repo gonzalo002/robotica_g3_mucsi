@@ -12,8 +12,8 @@ const _arrayDeserializer = _deserializer.Array;
 const _finder = _ros_msg_utils.Find;
 const _getByteLength = _ros_msg_utils.getByteLength;
 let HandResult = require('./HandResult.js');
-let std_msgs = _finder('std_msgs');
 let actionlib_msgs = _finder('actionlib_msgs');
+let std_msgs = _finder('std_msgs');
 
 //-----------------------------------------------------------
 
@@ -86,7 +86,7 @@ class HandActionResult {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'd814112be551dfb64289fc520ebb51df';
+    return 'e5eb7fa694095afd0055440446dd2f5c';
   }
 
   static messageDefinition() {
@@ -163,7 +163,13 @@ class HandActionResult {
     MSG: proyecto_final/HandData
     float32 x
     float32 y
+    float32 z
     bool is_open
+    bool is_peace
+    bool hand_detected
+    bool is_dino
+    bool is_dislike
+    
     `;
   }
 

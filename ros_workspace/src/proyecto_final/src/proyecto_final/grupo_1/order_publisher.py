@@ -14,21 +14,22 @@ def order_publisher():
         print("4: Mover el extremo del robot por una trayectoria dada")
         print("5: Activar control por detección de manos")
         print("6: Desactivar control por detección de manos")
-        print("Ingrese el código de acción (1-6), o 'q' para salir:")
+        print("7: Mostrar pose actual del robot")
+        print("Ingrese el código de acción (1-7), o 'q' para salir:")
         input_str = input()
         if input_str.lower() == 'q':
             break
         try:
             action_code = int(input_str)
-            if action_code < 1 or action_code > 6:
-                print("Código de acción inválido. Ingrese un número entre 1 y 6.")
+            if action_code < 1 or action_code > 7:
+                print("Código de acción inválido. Ingrese un número entre 1 y 7.")
                 continue
             msg = Int32()
             msg.data = action_code
             pub.publish(msg)
             print(f"Se ha publicado el código de acción {action_code} en /consignas.")
         except ValueError:
-            print("Entrada inválida. Ingrese un número entre 1 y 6.")
+            print("Entrada inválida. Ingrese un número entre 1 y 7.")
         rate.sleep()
 
 if __name__ == '__main__':

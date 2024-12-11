@@ -8,6 +8,9 @@
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/laboratorio/ros_workspace/devel/.private/ur_dashboard_msgs:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/laboratorio/ros_workspace/devel/.private/ur_dashboard_msgs/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/laboratorio/ros_workspace/devel/.private/ur_dashboard_msgs/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/laboratorio/ros_workspace/build/ur_dashboard_msgs'
+export PYTHONPATH="/home/laboratorio/ros_workspace/devel/.private/ur_dashboard_msgs/lib/python3/dist-packages:$PYTHONPATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/laboratorio/ros_workspace/devel/.private/ur_dashboard_msgs/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
 export ROS_PACKAGE_PATH="/home/laboratorio/ros_workspace/src/Universal_Robots_ROS_Driver/ur_dashboard_msgs:$ROS_PACKAGE_PATH"
