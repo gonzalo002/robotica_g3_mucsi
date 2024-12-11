@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from copy import deepcopy
 import yaml
+from math import pi
 
 class CubeTracker:
     ''' 
@@ -42,8 +43,8 @@ class CubeTracker:
 
         self._get_camara_calibration(cam_calib_path)
 
-        self.marker_length = marker_length
-        self.marker_position = None
+        self.aruco_length = marker_length
+        self.aruco_corner_pos = None
         self.debug = False
 
     def _get_camara_calibration(self, path:str)->None:
@@ -154,7 +155,7 @@ class CubeTracker:
                 angle = rect[2]
                 
                 cv2.putText(resultado, f"{i}", (center[0]-5, center[1]+5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
-                cv2.circle(resultado, self.corner_center, 5, (0, 0, 0), -1)
+                cv2.circle(resultado, self.aruco_corner_pos, 5, (0, 0, 0), -1)
                 
                 # Dibujar el centro y el texto con el ángulo
                 
@@ -166,14 +167,14 @@ class CubeTracker:
                 
                 # Añadir la información al diccionario de resultados
                 dicionario_resultado.append({
-                    "Position": self._distancia_xy(self.corner_center, center),
-                    "Angel": angle,
+                    "Position": self._distancia_xy(self.aruco_corner_pos, center),
+                    "Angle": angle*pi/180,
                     "Color": color  # Usar el índice de color directamente
                 })
                 
                 if mostrar:
                     cv2.putText(resultado, f"Position: {dicionario_resultado[i]['Position']}", (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
-                    cv2.putText(resultado, f"Angle: {angle:.2f}", (center[0] + 20, center[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
+                    cv2.putText(resultado, f"Angle: {dicionario_resultado[i]['Angle']}", (center[0] + 20, center[1] + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
                 i+=1
                 
 
@@ -235,19 +236,12 @@ class CubeTracker:
         '''
         corners, ids, _ = cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
         
-        corner_copy = deepcopy(corners)
         aruco_frame = frame.copy()
         
         if ids is not None:
+            corner_copy = deepcopy(corners)
             frame = cv2.aruco.drawDetectedMarkers(aruco_frame, corners, ids)
-            
-            # Estimar pose del marcador
-            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_length, self.camera_matrix, self.dist_coeffs)
-            # Guardar la posición del primer marcador detectado
-            self.rvecs = rvecs[0]
-            self.tvecs = tvecs[0]
-            print(self.rvecs)
-            frame = cv2.drawFrameAxes(aruco_frame, self.camera_matrix, self.dist_coeffs, rvecs[0], tvecs[0], 0.1)
+    
             
             mask = np.ones(aruco_frame.shape, dtype=np.uint8) * 255  # Empezamos con una máscara blanca (255)
 
@@ -265,11 +259,11 @@ class CubeTracker:
             
             # Calcular el lado 
             self.side_lengths_px = self._calcular_lados(corner_copy[0])
-            self.corner_center = np.array(corner_copy[0][0][0], dtype=int)
-            print(self.corner_center)
+            self.aruco_corner_pos = np.array(corner_copy[0][0][0], dtype=int)
             
             return frame_with_mask, aruco_frame
-
+        else:
+            return False, False
     
     def _calcular_lados(self, corners):
         '''
@@ -310,8 +304,10 @@ class CubeTracker:
         :param p2: Segundo punto (x2, y2).
         :return: Distancia entre los dos puntos.
         '''
+        x = (-1)*((p_aruco[0] - p_cubo[0])*self.aruco_length/self.side_lengths_px)
+        y = (p_aruco[1] - p_cubo[1])*self.aruco_length/self.side_lengths_px
         
-        return ((-1)*((p_aruco[0] - p_cubo[0])*self.marker_length/self.side_lengths_px), ((p_aruco[1] - p_cubo[1])*self.marker_length/self.side_lengths_px))
+        return (round(x,2), round(y,2))
     
     def _expand_corners(self, corners, factor=1.2):
         """
@@ -345,7 +341,7 @@ class CubeTracker:
 
         return expanded_corners
 
-    def analizar_imagen(self, frame:np.ndarray, area_size:int=1000, mostrar:bool = False, debug:bool = False) -> list:
+    def process_image(self, frame:np.ndarray, area_size:int=1000, mostrar:bool = False, debug:bool = False) -> list:
         ''' 
         Procesa una imagen para detectar cubos y sus colores, y muestra los resultados.
             @param frame (numpy array) - Imagen de entrada en formato BGR.
@@ -358,8 +354,11 @@ class CubeTracker:
         self.frame = deepcopy(frame)
 
         # Detectar Aruco
+        
         mask_frame, aruco_frame = self._detectar_aruco(frame)
-            
+        if mask_frame is False:
+            print(f"[ERROR] El Aruco no está en la mesa")
+            return False, False
         gray = self._aplicar_filtro_grises(mask_frame)
         hsv_frame = self._aplicar_filtro_hsv(mask_frame)
         morph_clean = self._procesar_umbral_otsu(gray)
@@ -381,7 +380,7 @@ if __name__ == "__main__":
     cube_tracker = CubeTracker(cam_calib_path="/home/laboratorio/ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
 
     if use_cam:
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(1)
         if cam.isOpened():
             _, frame = cam.read()
             cv2.imshow("hola", frame)
@@ -390,7 +389,7 @@ if __name__ == "__main__":
         ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Cubos_Exparcidos/Cubos_Exparcidos_{num}.png'
         frame = cv2.imread(ruta)
 
-    resultado = cube_tracker.analizar_imagen(frame, area_size=1000, mostrar=True, debug=True)
+    frame, resultado = cube_tracker.process_image(frame, area_size=1000, mostrar=True, debug=True)
     print(resultado)
     if use_cam:
         cam.release()
