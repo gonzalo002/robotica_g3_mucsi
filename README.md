@@ -130,7 +130,15 @@ git push origin <Nombre de la rama>
 ```
 
 
-### 8. Camra calibration
+## COMANDOS IMPORTANTES
+
+### Camera calibration
 ```bash
 rosrun camera_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/usb_cam/image_raw camera:=/usb_cam
 ```
+### Conectar al master (de ordenador a ordenador)
+```bash
+export ROS_MASTER_URI=http://<IP_PC_MASTER>:11311/
+```
+
+
