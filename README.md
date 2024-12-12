@@ -140,5 +140,7 @@ rosrun camera_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/u
 ```bash
 export ROS_MASTER_URI=http://<IP_PC_MASTER>:11311/
 ```
-
+```bash
+export ROS_IP=<IP_PC_ACTUAL>
+```
 
