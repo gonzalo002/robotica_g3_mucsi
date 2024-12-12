@@ -1,15 +1,64 @@
+#!/usr/bin/python3
 
-class RoboticaTab:
-    def __init__(self, tab, tab_active) -> None:
+import os
+# Configurar la variable de entorno para que no aparezcan mensajes de error de index de camara
+os.environ["OPENCV_LOG_LEVEL"] = "FATAL"
+
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+from tkinter.font import Font
+from tkinter import filedialog, IntVar
+from PIL import Image, ImageTk, Image, ImageDraw, ImageFont
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL.ImageTk import PhotoImage
+import cv2
+
+from proyecto_final.vision.grupo_2.image_processor_top import ImageProcessor_Top
+from proyecto_final.vision.grupo_2.image_processor_front import ImageProcessor_Front
+from proyecto_final.vision.grupo_2.cube_tracker import CubeTracker
+from camera_controller import CameraController
+from geometry import FigureGenerator
+from geometry2D import Geometry2D
+from robotica_tab import RoboticaTab
+
+class VisionTab:
+    def __init__(self, root, tab, tab_active) -> None:
+        self.root = root
         self.tab = tab
         self.tab_active = tab_active
-        pass
+        
+        # Definición de clases
+        self.ImageProcessorFrontal = ImageProcessor_Front()
+        self.ImageProcessorPlanta = ImageProcessor_Top()
+        self.CubeLocalizator = CubeTracker("/home/laboratorio/ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
+        self.FigureGenerator = FigureGenerator()
+        self.Geometry2D = Geometry2D()
+        self.camera_controller = CameraController(10)
+        
+        #Definicion imagenes y varibles
+        self.img_front = None
+        self.img_plant = None
+        self.img_mesa_trabajo = None
+        self.camera_entry1 = None
+        self.camera_entry2 = None
+        #Definicion geometria
+        self.plant_matrix = np.full((5,5), -1)
+        self.side_matrix = np.full((5,5), -1)
+        self.width = 320
+        self.aruco_pose = [0,0]
+        self.cube_data = []
+        
+        #Definicion estados del boton
+        self.state_procesar = True
+        self.state_procesar_xy = True
+        
+        self.vision_tab()
     
     def vision_tab(self):
-        #self.create_notebook_2()
-
         # Crear un Frame para organizar los elementos dentro de la pestaña "Procesado de Figura"
-        self.frame_vision = ttk.Frame(self.tab_vision, borderwidth=0)
+        self.frame_vision = ttk.Frame(self.tab, borderwidth=0)
         self.frame_vision.pack(fill="both", expand=True)
 
         #Configuración grid
@@ -17,30 +66,7 @@ class RoboticaTab:
         self.frame_vision.grid_columnconfigure(1, weight=1)
         self.frame_vision.grid_columnconfigure(2, weight=4)
         
-
-        
-
-        
-        # --- CHECK BUTTON ---
- 
-        self.camera_check_var = ttk.IntVar()  # Variable para el estado del Checkbutton
-        self.camera_check = ttk.Checkbutton(
-            self.frame_vision,
-            text="Usar Cámara",
-            variable=self.camera_check_var,
-            
-            command=self.toggle_mode,  # Función para manejar el cambio
-        )
-        self.camera_check.grid(row=0, column=0, sticky="w", padx=10, pady=10)
-        
-        self.update_camera_button = ttk.Button(
-            self.frame_vision,
-            text="ACTUALIZAR CÁMARAS",
-            command=self.update_cameras,  # Función para procesar las imágenes
-            bootstyle="warning",  # Estilo del botón
-            padding = [20,5]
-        )
-        self.update_camera_button.grid(row=0, column=0, columnspan=2, padx=[200,0], pady=10, sticky="nw")
+        self.primera_fila()
 
         # --- IMAGE LABEL FRAME ---
         self.label_frame = ttk.LabelFrame(self.frame_vision, text="Imágenes")
@@ -106,6 +132,7 @@ class RoboticaTab:
         
         self.camera_entry3 = ttk.Combobox(self.label_frame_2,values=self.camera_controller.camera_names,  font=("Montserrat", 10))
         self.camera_entry3.grid(row=0, column=5, columnspan=2, padx=[10,0], pady=10, sticky="nsew")
+        
         if len(self.camera_controller.cameras) > 0:
             self.camera_entry3.set(self.camera_controller.camera_names[0])
 
@@ -132,7 +159,7 @@ class RoboticaTab:
         self.geometry_2d_frame.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
 
         
-        fig_2d = self.Geometry2D.draw_2d_space([], [], True)
+        fig_2d = self.Geometry2D.draw_2d_space([], True)
 
         # Mostrar la figura 3D en el canvas
         self.canvas_2d = FigureCanvasTkAgg(fig_2d, self.geometry_2d_frame)
@@ -145,6 +172,26 @@ class RoboticaTab:
         self.toggle_mode()
 
 
+    def primera_fila(self):
+         
+        self.camera_check_var = ttk.IntVar()  # Variable para el estado del Checkbutton
+        self.camera_check = ttk.Checkbutton(
+            self.frame_vision,
+            text="Usar Cámara",
+            variable=self.camera_check_var,
+            
+            command=self.toggle_mode,  # Función para manejar el cambio
+        )
+        self.camera_check.grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        
+        self.update_camera_button = ttk.Button(
+            self.frame_vision,
+            text="ACTUALIZAR CÁMARAS",
+            command=self.update_cameras,  # Función para procesar las imágenes
+            bootstyle="warning",  # Estilo del botón
+            padding = [20,5]
+        )
+        self.update_camera_button.grid(row=0, column=0, columnspan=2, padx=[200,0], pady=10, sticky="nw")
 
     def toggle_mode(self):
         """Maneja el cambio de estado del Checkbutton"""
@@ -349,7 +396,7 @@ class RoboticaTab:
 
 
 
-            fig_2d = self.Geometry2D.draw_2d_space(self.aruco_pose, coordenadas, True)
+            fig_2d = self.Geometry2D.draw_2d_space(coordenadas, True)
 
             # Actualizar canvas_3d
             if hasattr(self, "canvas_2d") and self.canvas_2d is not None:
@@ -458,7 +505,7 @@ class RoboticaTab:
         self.state_procesar_xy = True
 
         # --- VACIAR MATRIZ ---
-        fig_2d = self.Geometry2D.draw_2d_space([], [], True)
+        fig_2d = self.Geometry2D.draw_2d_space([], True)
 
             # Actualizar canvas_3d
         if hasattr(self, "canvas_2d") and self.canvas_2d is not None:
@@ -524,3 +571,19 @@ class RoboticaTab:
         tk_image = PhotoImage(image, master=self.root)
         
         return tk_image
+
+    
+    def _adjust_tab_titles(self, fuente):
+        
+        # Obtener el ancho disponible para las pestañas
+        font = Font(font=fuente)
+        total_width = self.notebook.winfo_screenwidth()
+        tab_count = len(self.tabs)
+        tab_width = total_width // tab_count
+
+        # Ajustar el texto de cada pestaña
+        for index, tab in enumerate(self.tabs):
+            # Calcular el número de espacios necesarios
+            spaces_needed = (tab_width - len(tab) * 8) // 2  # Aproximadamente 8 píxeles por carácter
+            spaces = " " * max(spaces_needed // font.measure(" "), 0)  # Dividir espacios entre ambos lados
+            self.tabs[index] = f"{spaces}{tab}{spaces}"
