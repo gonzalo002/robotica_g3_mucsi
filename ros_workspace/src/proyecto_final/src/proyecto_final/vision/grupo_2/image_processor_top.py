@@ -60,91 +60,166 @@ class ImageProcessor_Top:
             - Aplica operaciones morfológicas para limpiar ruido.
             @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
         """
-        # Definir el factor de contraste (alpha) y el ajuste de brillo (beta)
-        alpha = 1  # Contraste (1.0 es el valor original, > 1 aumenta el contraste)
-        beta = 0     # Brillo (0 no cambia el brillo)
 
         # Aplicar la transformación
-        adjusted_image = cv2.convertScaleAbs(self.frame, alpha=alpha, beta=beta)
-
         cropped_gray = self._get_cubes_location()
 
         cropped_frame = self._get_cubes_location(colored=True)
 
-        contrast_img = self.pruebas(cropped_frame)
+        contrast_img = self._get_contrast_img(cropped_frame)
 
-        edges_0 = cv2.Canny(contrast_img, 50, 255)
+        cropped_gray = cv2.GaussianBlur(cropped_gray, ksize=(5,5), sigmaX=0)
+
+        sobelx = cv2.Sobel(cropped_gray, cv2.CV_64F, 1, 0, ksize=1)
+        sobely = cv2.Sobel(cropped_gray, cv2.CV_64F, 0, 1, ksize=1)
+
+        sobel_combined = cv2.magnitude(sobelx, sobely)
+        sobel_combined = np.uint8(sobel_combined)
+
+        sobelx_contr = cv2.Sobel(contrast_img, cv2.CV_64F, 1, 0, ksize=1)
+        sobely_contr = cv2.Sobel(contrast_img, cv2.CV_64F, 0, 1, ksize=1)
+
+        sobel_combined_contr = cv2.magnitude(sobelx_contr, sobely_contr)
+        sobel_combined_contr = np.uint8(sobel_combined_contr)
+
+        _, sobel_combined_contr_umbralized = cv2.threshold(sobel_combined_contr, 80, 255, cv2.THRESH_BINARY)
+
+        edges_0 = cv2.Canny(sobel_combined_contr_umbralized, 100, 255)
 
         # Aplicar el filtro Canny para una detección de bordes más refinada
         edges = cv2.Canny(cropped_gray, 10, 150)
         new_gray = cropped_gray - edges
 
+        sobelx = cv2.Sobel(new_gray, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(new_gray, cv2.CV_64F, 0, 1, ksize=3)
+
+        sobel_combined = cv2.magnitude(sobelx, sobely)
+        sobel_combined = np.uint8(sobel_combined)
+
+        sobel_combined_umbralized = self._procesar_umbral_otsu(sobel_combined)
+
         # Aplicar el filtro Canny para una detección de bordes más refinada
-        edges = cv2.Canny(new_gray, 50, 255)
+        edges = cv2.Canny(sobel_combined_umbralized, 50, 255)
 
         edges = cv2.bitwise_or(edges, edges_0)
-
-        # Operaciones morfológicas para limpiar el ruido
-        kernel = np.ones((1, 1), np.uint8)
-        morph_clean = cv2.morphologyEx(edges, cv2.MORPH_ERODE, kernel)
         
         # Operaciones morfológicas para limpiar el ruido
-        kernel = np.ones((5, 5), np.uint8)
-        morph_clean = cv2.morphologyEx(morph_clean, cv2.MORPH_CLOSE, kernel)
+        kernel = np.ones((3, 3), np.uint8)
+        morph_clean = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
 
         if self.debug:
-            cv2.imshow('Imagen_contraste', adjusted_image)
-            cv2.imshow('Cropped_Gray', cropped_gray)
+            cv2.imshow('Canny_Sobel', sobel_combined_umbralized)
             cv2.imshow('Canny', edges)
             cv2.imshow('Morph_Clean', morph_clean)
         
         return morph_clean
     
-    def pruebas(self, frame:np.ndarray = None):
-        try:
-            frame == None
-        except:
-            frame = self.frame
-        # Convertir la imagen de BGR a HSV
+    def _procesar_umbral_dinamico(self, gray: np.ndarray) -> np.ndarray:
+        # Umbral dinámico basado en la media local (adaptive thresholding)
+        adapt_thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        if self.debug:
+            cv2.imshow("Umbral Dinámico", adapt_thresh)
+        kernel = np.ones((3, 3), np.uint8)
+        return cv2.morphologyEx(adapt_thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
+    
+    def _procesar_umbral_otsu(self, gray:np.ndarray) -> np.ndarray:
+        ''' 
+        Aplica un umbral de Otsu para binarizar la imagen.
+            @param gray (numpy array) - Imagen en escala de grises.
+            @return otsu_thresh (numpy array) - Imagen binarizada tras el umbral de Otsu.
+        '''
+        _, otsu_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
+        #_, otsu_thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        if self.debug:
+            cv2.imshow("Otsu", otsu_thresh)
+        kernel = np.ones((3, 3), np.uint8)
+        return cv2.morphologyEx(otsu_thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
+    
+    def _get_contrast_img(self, frame:np.ndarray):
+
+        # Convertir la imagen a HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+   
 
-        # Definir el rango de valores para el color verde en el espacio HSV
-        # Rango de verdes: Hue entre 35 y 85, Saturación y Valor más altos
-        lower_green = np.array([30, 50, 50])   # Mínimo verde
-        upper_green = np.array([110, 255, 255]) # Máximo verde
+        # Definir los rangos de colores en HSV
 
-        # Crear una máscara que contenga solo los píxeles verdes
-        mask = cv2.inRange(hsv, lower_green, upper_green)
+        # Verde: Hue entre 35 y 85, Saturación y Valor altos
+        lower_green = np.array([30, 50, 50], np.uint8)   # Mínimo verde
+        upper_green = np.array([110, 255, 255], np.uint8) # Máximo verde
 
-        # Aplicar la máscara para mantener solo las áreas verdes
-        green_only = cv2.bitwise_and(frame, frame, mask=mask)
+        # Rojo: Hue entre 0 y 10, o entre 170 y 180, Saturación y Valor altos
+        lower_red1 = np.array([0, 100, 100], np.uint8)    # Rojo (primer rango) (0, 100, 100), (15, 255, 255)
+        upper_red1 = np.array([20, 255, 255], np.uint8)  # Rojo (primer rango)
 
-        # Opcional: Realzar la saturación y el valor en las áreas verdes
-        # Aumentar la saturación y el valor de la imagen verde para hacerla más vibrante
-        hsv_green = cv2.cvtColor(green_only, cv2.COLOR_BGR2HSV)
-        hsv_green[:, :, 1] = cv2.add(hsv_green[:, :, 1], 50)  # Aumentar la saturación
-        hsv_green[:, :, 2] = cv2.add(hsv_green[:, :, 2], 50)  # Aumentar el valor
+        # Azul: Hue entre 100 y 140, Saturación y Valor altos
+        lower_blue = np.array([100, 50, 50], np.uint8)   # Mínimo azul
+        upper_blue = np.array([140, 255, 255], np.uint8) # Máximo azul
 
-        # Convertir de nuevo a BGR para mostrar la imagen final
-        high_green = cv2.cvtColor(hsv_green, cv2.COLOR_HSV2BGR)
-        green = cv2.cvtColor(high_green, cv2.COLOR_BGR2GRAY)
+        # Amarillo: Hue entre 20 y 40, Saturación y Valor altos
+        lower_yellow = np.array([20, 30, 30], np.uint8)  # Mínimo amarillo
+        upper_yellow = np.array([40, 255, 255], np.uint8)# Máximo amarillo
 
-        _, red = cv2.threshold(frame[:,:,2], 130, 255, cv2.THRESH_BINARY)
-        _, blue = cv2.threshold(frame[:,:,0], 130, 255, cv2.THRESH_BINARY)
-        _, green = cv2.threshold(green, 50, 255, cv2.THRESH_BINARY)
-
-        # Encontrar los píxeles blancos comunes en ambas imágenes
-        rg = cv2.bitwise_or(red, green)
-        rgb = cv2.bitwise_or(rg, blue)
-
+        lower_values = [lower_red1, lower_green, lower_blue, lower_yellow]
+        upper_values = [upper_red1, upper_green, upper_blue, upper_yellow]
+        filtered_images:list = []
         
-        cv2.imshow('a', green)
+        for i in range(len(lower_values)):
+            # Aplicar un umbral de valor mínimo para eliminar el fondo negro (valor bajo)
+            mask = cv2.inRange(hsv, lower_values[i], upper_values[i]) 
+            value_threshold = 100  # Umbral mínimo de valor (a partir de este valor consideramos los colores)
+            value_mask = hsv[:, :, 2] > value_threshold  # Solo seleccionamos los píxeles con valor mayor que el umbral
+            value_mask = np.uint8(value_mask) * 255
+            mask = cv2.bitwise_and(mask, mask, mask=value_mask)
 
-        # Crear una imagen donde los píxeles comunes son blancos y el resto es negro
-        result = np.zeros_like(frame)  # Crear una imagen de igual tamaño, pero negra (0)
-        result[rgb >= 230] = 255  # Asignar 255 (blanco) donde hay intersección
+            filtered_image = (cv2.bitwise_and(frame, frame, mask=mask))
+            filtered_images.append(filtered_image)
 
-        return result    
+        contrast_images = []
+        kernel = np.ones((5, 5), np.uint8)
+        for i in range(len(filtered_images)):
+            alpha = 1.3
+            beta = 1
+
+            contrast_img = cv2.convertScaleAbs(filtered_images[i], alpha=alpha, beta=beta) 
+            # _, h_thresh = cv2.threshold(contrast_img[:,:,0], 20, 255, cv2.THRESH_BINARY)
+            # _, s_thresh = cv2.threshold(contrast_img[:,:,1], 20, 255, cv2.THRESH_BINARY)
+            # _, v_thresh = cv2.threshold(contrast_img[:,:,2], 20, 255, cv2.THRESH_BINARY)
+
+            # mask = cv2.bitwise_and(h_thresh, s_thresh)
+            # mask = cv2.bitwise_and(mask, v_thresh)
+            
+            # Aplicar la máscara a la imagen original para conservar solo las áreas dentro del rango de umbral
+            # contrast_img = cv2.bitwise_and(contrast_img, contrast_img, mask=mask)
+
+            # Operaciones morfológicas para limpiar el ruido
+            contrast_img = cv2.morphologyEx(contrast_img, cv2.MORPH_CLOSE, kernel)
+            contrast_images.append(contrast_img)
+
+        # Combinar todas las imágenes extraídas en una sola
+        combined_image = cv2.add(contrast_images[0], contrast_images[1])  # Combinar verde y rojo
+        combined_image = cv2.add(combined_image, contrast_images[2])  # Agregar azul
+        combined_image = cv2.add(combined_image, contrast_images[3])  # Agregar amarillo
+
+        if self.debug:
+             cv2.imshow('Red_Only', contrast_images[0])
+             cv2.imshow('Green Only', contrast_images[1])
+             cv2.imshow('Green Only', contrast_images[2])
+             cv2.imshow('Green Only', contrast_images[3])
+             cv2.imshow('Contrast Image', combined_image)
+
+        return combined_image
+
+    # Función para extraer y realzar los colores
+    def _extract_color(self, hsv, lower_color, upper_color):
+        mask = cv2.inRange(hsv, lower_color, upper_color)  # Crear máscara
+        color_only = cv2.bitwise_and(frame, frame, mask=mask)  # Aplicar máscara
+
+        # Realzar la saturación y el valor para hacer el color más vibrante
+        hsv_color = cv2.cvtColor(color_only, cv2.COLOR_BGR2HSV)
+        hsv_color[:, :, 1] = cv2.add(hsv_color[:, :, 1], 50)  # Aumentar la saturación
+        hsv_color[:, :, 2] = cv2.add(hsv_color[:, :, 2], 50)  # Aumentar el valor
+
+        return cv2.cvtColor(hsv_color, cv2.COLOR_HSV2BGR)  # Convertir de nuevo a BGR
 
     def _get_cubes_location(self, colored:bool = False) -> np.ndarray:
         ''' 
@@ -156,7 +231,8 @@ class ImageProcessor_Top:
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         
         # Binarizar la imagen utilizando un umbral fijo
-        _, binary_image = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+        # _, binary_image = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+        binary_image = self._procesar_umbral_otsu(gray)
         
         # Operación de cierre para limpiar la imagen
         kernel = np.ones((5, 5), np.uint8)
@@ -192,8 +268,6 @@ class ImageProcessor_Top:
             # Aplicar la máscara a la imagen original
             # result = cv2.bitwise_and(gray, mask)
 
-            if self.debug:
-                cv2.imshow('image_cropped', result)
             
             if colored:
                 result = self.frame
@@ -202,6 +276,9 @@ class ImageProcessor_Top:
                 result[:,:,2] = cv2.bitwise_and(self.frame[:,:,2], morph_clean)
             else:
                 result = cv2.bitwise_and(gray, morph_clean)
+
+            if self.debug:
+                cv2.imshow('image_cropped', result)
     
         return result
     
@@ -213,15 +290,80 @@ class ImageProcessor_Top:
             @return filtered_contours (list) - Lista de contornos externos filtrados.
             @return contours (list) - Lista completa de contornos detectados.
         '''
-        contours, hierarchy = cv2.findContours(morph_clean, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(morph_clean, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         
         # Filtrar los contornos externos que tienen un padre
+        filtered_contours = []
+        area_size = []
+        for i, (first, last, child, parent) in enumerate(hierarchy[0]):
+            area = cv2.contourArea(contours[i])
+            if area > 150:  # Contorno exterior con padre
+                area_size.append(area)
+                filtered_contours.append(contours[i])
+
+        mean_area = np.median(area_size)
+        small_areas = []
+        for i, area in enumerate(area_size):
+            if area < (mean_area*0.85):
+                small_areas.append(i)
+            if len(small_areas) == 2:
+                filtered_contours.append(np.concatenate((filtered_contours[small_areas[0]], filtered_contours[small_areas[1]]), axis=0))
+                filtered_contours.pop(small_areas[0])
+                filtered_contours.pop(small_areas[1]-1)
+                small_areas = []
+
+
+        if self.debug:
+            img = deepcopy(self.frame)
+            img_2 = deepcopy(self.frame)
+            for cnt in filtered_contours:
+                img = cv2.drawContours(img, contours=cnt, color=(0,255,0), contourIdx=-1)
+                cv2.imshow('Todos los contornos', img)
+            img_2 = cv2.drawContours(img_2, contours=filtered_contours, color=(0,0,255), contourIdx=-1)
+            cv2.imshow('Contornos Filtradps', img_2)
+
+        
+        return filtered_contours, contours
+    
+    def filter_parents(self, large_contours:list):
+        height, width = frame.shape[:2]
+        black_mask = np.zeros((height, width), dtype=np.uint8)
+
+        for cnt in large_contours:
+            self._draw_contours(black_mask, cnt, color=255)
+        
+        contours, hierarchy = cv2.findContours(black_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
         filtered_contours = []
         for i, (_, _, child, parent) in enumerate(hierarchy[0]):
             if child == -1 and parent != -1:  # Contorno exterior con padre
                 filtered_contours.append(contours[i])
         
-        return filtered_contours, contours
+        # Lista de los centros de los cubos
+        centers = []
+        colors = []
+        areas = []
+        colores = {0: (0,0,255), 1: (0,255,0), 2: (255,0,0), 3: (0, 255, 255)}
+
+        for contour in filtered_contours:
+            # Obtener el centro del contorno y el color predominante
+            rect = cv2.minAreaRect(contour)
+            center = (int(rect[0][0]), int(rect[0][1]))
+            centers.append(center)
+            color = self._get_dominant_color(contour)
+            colors.append(color)
+            areas.append(cv2.contourArea(contour))
+
+            self._draw_contours(self.contour_img, contour, color=colores.get(color))
+
+            # Visualizar el contorno y el color en la imagen
+            cv2.circle(self.contour_img, center, 5, (0, 0, 0), -1)
+            cv2.putText(self.contour_img, str(color), (center[0], center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+        if self.debug:
+            cv2.imshow('black_mask', black_mask)
+
+        return centers, colors, areas
 
     def divide_rectangle(self, contour, axis):
         # Extraemos las coordenadas de los 4 vértices
@@ -265,15 +407,15 @@ class ImageProcessor_Top:
                         side_lengths.append(side_length)
                     
                     # Calcular la diferencia entre los lados
-                    if side_lengths[0] > side_lengths[1]:
-                        rect1, rect2 = self.divide_rectangle(contour,"vertical")
-                        large_contours.append(rect1)
-                        large_contours.append(rect2)
+                    # if side_lengths[0] > side_lengths[1]:
+                    #     rect1, rect2 = self.divide_rectangle(contour,"vertical")
+                    #     large_contours.append(rect1)
+                    #     large_contours.append(rect2)
 
-                    else:
-                        rect1, rect2 = self.divide_rectangle(contour, "horizontal")
-                        large_contours.append(rect1)
-                        large_contours.append(rect2)
+                    # else:
+                    #     rect1, rect2 = self.divide_rectangle(contour, "horizontal")
+                    #     large_contours.append(rect1)
+                    #     large_contours.append(rect2)
                     
             else:
                 large_contours.append(contour)
@@ -392,7 +534,49 @@ class ImageProcessor_Top:
         
         return matrix
 
+    def _filter_contours_by_size(self, filtered_contours:list, area_size:int = 2000) -> list:
+        ''' 
+        Filtra los contornos según su tamaño, eliminando aquellos con un área menor a un umbral.
+            @param filtered_contours (list) - Lista de contornos externos filtrados.
+            @param area_size (int) - Umbral mínimo de área para considerar un contorno como válido. Por defecto, 2000.
+            @return large_contours (list) - Lista de contornos con área mayor al umbral.
+        '''
+        correct_contour = []
+        area_size:list = []
+        for cnt in filtered_contours:
+            area = cv2.contourArea(cnt)
+            area_size.append(area)
+
+        mode_cubes = np.median(area_size)
+        print(mode_cubes)
+        print(area_size)
+        large_contours = []
+        for i,contour in enumerate(filtered_contours):
+            if (area_size[i] < mode_cubes+1000): # Filtrar contornos muy pequeños
+                approx = cv2.approxPolyDP(contour, 0.04 * cv2.arcLength(contour, True), True)
+                print(len(approx))
+                
+                if len(approx) >= 4:
+                    # Calcular los lados del cuadrilátero
+                    side_lengths = []
+                    for i in range(4):
+                        p1 = approx[i]
+                        p2 = approx[(i + 1) % 4]  # El siguiente punto, tomando el primero cuando lleguemos al último
+                        side_length = np.linalg.norm(p2 - p1)  # Distancia Euclidiana entre los puntos
+                        side_lengths.append(side_length)
+                    
+                    # Calcular la diferencia entre los lados
+                    max_side = max(side_lengths)
+                    min_side = min(side_lengths)
+                    
+                    # Si la diferencia entre los lados es pequeña, probablemente es un cuadrado
+                    if max_side - min_side < 10:  # El umbral de diferencia puede ajustarse
+                        # Si los lados son casi iguales, es un cuadrado
+                        large_contours.append(contour)
+        if self.debug:
+            pass
         
+        return large_contours
 
     def _draw_contours(self, img:np.ndarray, contour:np.ndarray, color:tuple=(0, 255, 0), thickness:int=2):
         ''' 
@@ -438,33 +622,14 @@ class ImageProcessor_Top:
         
         # Encontrar contornos externos
         filtered_contours, contours = self._find_external_contours(morph_clean)
-
-        large_contours = self._separate_cubes(filtered_contours)
         
         # Filtrar los contornos por tamaño
-        # large_contours = self._filter_contours_by_size(filtered_contours, area_size)
+        large_contours = self._filter_contours_by_size(filtered_contours, area_size)
 
-        # Lista de los centros de los cubos
-        centers = []
-        colors = []
-        areas = []
-        colores = {0: (0,0,255), 1: (0,255,0), 2: (255,0,0), 3: (0, 255, 255)}
+        # large_contours = self._separate_cubes(large_contours)
         
         # Recorrer los contornos filtrados y calcular el color y la posición en la matriz para cada uno
-        for contour in large_contours:
-            # Obtener el centro del contorno y el color predominante
-            rect = cv2.minAreaRect(contour)
-            center = (int(rect[0][0]), int(rect[0][1]))
-            centers.append(center)
-            color = self._get_dominant_color(contour)
-            colors.append(color)
-            areas.append(cv2.contourArea(contour))
-
-            self._draw_contours(self.contour_img, contour, color=colores.get(color))
-
-            # Visualizar el contorno y el color en la imagen
-            cv2.circle(self.contour_img, center, 5, (0, 0, 0), -1)
-            cv2.putText(self.contour_img, str(color), (center[0], center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+        centers, colors, areas = self.filter_parents(large_contours)
         
         if len(large_contours) > 0:
             self.matrix = self._map_to_matrix(centers, colors, areas)
@@ -480,17 +645,23 @@ class ImageProcessor_Top:
 
 # Ejecutar el programa
 if __name__ == "__main__":
+    use_cam = False
+    if use_cam:
+        cam = cv2.VideoCapture(0)
+        if cam.isOpened():
+            _, frame = cam.read()
+            cv2.imshow("hola", frame)
+    else:
+        # figura = 18
+        figura = 25
 
-    # Crear instancia de ImageProcessor con la ruta de la imagen
-    figura = 20
-    cam = cv2.VideoCapture(0)
+        ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Superior/Figura_{figura}_S.png'
+        frame = cv2.imread(ruta)
 
-    if cam.isOpened():
-        _, frame = cam.read()
     # ruta = f'src/proyecto_final/data/example_img/Figuras_Superior/Figura_{figura}_S.png'
     processor = ImageProcessor_Top()
     # frame = cv2.imread(ruta)
     # matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True, debug = True)
-    matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True)
+    matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True, debug=True)
     #print(np.array2string(matriz, separator=', ', formatter={'all': lambda x: f'{int(x)}'}))
     print(np.array(matriz))
