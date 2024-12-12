@@ -2,8 +2,7 @@
 int8 order
 ---
 #result definition
-int8[] up
-int8[] front
+int8[] figure_3d
 ---
 #feedback
 int8 feedback
