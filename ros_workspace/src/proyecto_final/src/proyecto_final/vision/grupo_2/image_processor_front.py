@@ -19,9 +19,10 @@ class ImageProcessor_Front:
     Métodos:
         - __init__() - Inicializa el objeto y configura la matriz 5x5 y las variables necesarias.
         - _preprocess_image() - Convierte la imagen a escala de grises y aplica filtros de detección de bordes.
-        - _find_external_contours() - Encuentra los contornos externos en la imagen.
-        - _filter_contours_by_size() - Filtra los contornos según su tamaño (eliminando los más pequeños).
-        - _get_dominant_color() - Obtiene el color dominante dentro de un contorno utilizando el espacio HSV.
+        - _get_cubes_location() - Recorta la imagen respecto a las máscaras de contraste obtenidas.
+        - _get_contrast_image() - Obtiene la localización de los cubos utilizando máscaras de color HSV.
+        - _filter_contours() - Filtra los contornos según su tamaño (eliminando los más pequeños).
+        - _get_color() - Obtiene el color de un contorno en base a las máscaras obtenidas previamente.
         - _align_equidistant() - Alinea los puntos detectados en una cuadrícula equidistante de 5x5.
         - _map_to_matrix() - Mapea las coordenadas de los centros de los cubos a una matriz 5x5.
         - _draw_contours() - Dibuja los contornos de los cubos sobre la imagen.
@@ -41,8 +42,8 @@ class ImageProcessor_Front:
         - matrix: Matriz inicializada con valores -1, que se usará para almacenar los colores detectados.
         - contour_img: Imagen utilizada para dibujar contornos detectados.
         - frame: Imagen original que se procesará.  
-        @param matrix_size (int) - Tamaño de la matriz cuadrada. Por defecto, 5.
-    '''
+            @param matrix_size (int) - Tamaño de la matriz cuadrada. Por defecto, 5.
+        '''
         self.matrix_size = matrix_size
         self.matrix = np.full((self.matrix_size, self.matrix_size), -1)
         self.contour_img = None
@@ -60,7 +61,7 @@ class ImageProcessor_Front:
             - Combina las detecciones en una imagen de magnitud.
             - Utiliza el filtro Canny para refinar los bordes detectados.
             - Aplica operaciones morfológicas para limpiar ruido.
-            @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
+                @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
         """
 
         self.filtered_colors = self._get_contrast_img(self.frame)
@@ -102,6 +103,11 @@ class ImageProcessor_Front:
         return new_gray
 
     def _get_cubes_location(self, constrast_images:list) -> np.ndarray:
+        """ 
+        Obtiene la ubicación de los cubos en la imagen utilizando las imágenes de contraste.
+            - Combina las máscaras de colores para identificar las áreas donde se encuentran los cubos.
+            @return result (numpy array) - Imagen con los cubos localizados.
+        """
         mask = np.zeros_like(self.frame[:,:,0]) 
 
         mask_combined = cv2.bitwise_or(mask, constrast_images[0])  
@@ -118,12 +124,15 @@ class ImageProcessor_Front:
         return result
 
     def _get_contrast_img(self, frame:np.ndarray) -> list:
-
+        ''' 
+        Obtiene las imágenes de contraste para cada color (rojo, verde, azul, amarillo) en el espacio HSV.
+            @param frame (numpy array) - Imagen de entrada para el análisis de colores.
+            @return filtered_images (list) - Lista de imágenes filtradas por color.
+        '''
         # Convertir la imagen a HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
    
         height, width = hsv.shape[:2]
-        black_mask = np.zeros((height, width), dtype=np.uint8)
         # Definir los rangos de colores en HSV
 
         # Verde: Hue entre 35 y 85, Saturación y Valor altos
@@ -229,35 +238,35 @@ class ImageProcessor_Front:
 
     def _filter_contours(self, contours:list) -> list:
         ''' 
-        Filtra los contornos según su tamaño, eliminando aquellos con un área menor a un umbral.
-            @param filtered_contours (list) - Lista de contornos externos filtrados.
-            @param area_size (int) - Umbral mínimo de área para considerar un contorno como válido. Por defecto, 2000.
-            @return large_contours (list) - Lista de contornos con área mayor al umbral.
+        Filtra los contornos para eliminar aquellos que son demasiado pequeños.
+            @param contours (list) - Lista de contornos detectados en la imagen.
+            @return filtered_contours (list) - Lista de contornos que pasan el filtro.
         '''
         correct_contour = []
         area_size = []
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            print(area)
             if area > 500:
                 correct_contour.append(cnt)
                 area_size.append(area)
 
         mode_cubes = np.median(area_size)
-        print(mode_cubes)
-        print(area_size)
         large_contours = []
         for contour in correct_contour:
                 
             large_contours.append(contour) # Sin filtrar por cuadraticidad
+
+        if self.debug:
+            print(f'Areas : {area_size}')
+            print(f'Media Areas: {mode_cubes}')
         
         return correct_contour
 
     def _get_color(self, center:list) -> int:
         ''' 
-        Determina el color (rojo, verde azul y amarillo) predominante dentro de un contorno basado en el espacio de color HSV.
-            @param contour (numpy array) - Contorno del que se quiere extraer el color predominante.
-            @return dominant_color (int) - Índice numérico que representa el color predominante (0=Rojo, 1=Verde, 2=Azul, 3=Amarillo).
+        Obtiene el color dominante de un contorno, basado en las máscaras de color preprocesadas.
+            @param contour (list) - Un contorno detectado en la imagen.
+            @return color (int) - El color detectado como un valor de índice (0: Rojo, 1: Verde, 2: Azul, 3: Amarillo).
         '''
         for i, color in enumerate(self.filtered_colors):
             if color[center[1],center[0]] > 20:
@@ -266,10 +275,9 @@ class ImageProcessor_Front:
 
     def _align_equidistant(self, points:list, side_length:float) -> list:
         ''' 
-        Alinea los puntos detectados en una cuadrícula equidistante.
-            @param points (list) - Lista de coordenadas de los puntos detectados.
-            @param side_length (float) - Longitud de los lados para definir la cuadrícula.
-            @return aligned_points_indices (list) - Índices de los puntos alineados en la cuadrícula.
+        Alinea los puntos detectados a una cuadrícula equidistante.
+            @param points (numpy array) - Lista de puntos detectados en la imagen.
+            @return aligned_points (numpy array) - Puntos alineados en una cuadrícula equidistante.
         '''
 
         # Encontrar los valores mínimo de X y máximo de Y
@@ -296,11 +304,9 @@ class ImageProcessor_Front:
 
     def _map_to_matrix(self, centers:list, colors:list, areas:list) -> np.ndarray:
         ''' 
-        Mapea los centros detectados y sus colores a una matriz 5x5.
-            @param centers (list) - Lista de centros detectados.
-            @param colors (list) - Lista de colores correspondientes a los centros.
-            @param areas (list) - Lista de áreas de los contornos detectados.
-            @return matrix (numpy array) - Matriz 5x5 representando los colores en sus posiciones.
+        Mapea los puntos detectados a una matriz de tamaño 5x5.
+            @param points (numpy array) - Lista de puntos detectados.
+            @return matrix (numpy array) - Matriz de 5x5 con los índices de color correspondientes.
         '''
         # Calcular el área promedio para el umbral
         side_length = round(np.sqrt(sum(areas) / len(areas)))
@@ -328,15 +334,10 @@ class ImageProcessor_Front:
 
     def _draw_contours(self, contour:np.ndarray, color:tuple=(0, 255, 0), thickness:int=2):
         ''' 
-        Dibuja los contornos detectados sobre la imagen original.
-
-            - Calcula un rectángulo delimitador alrededor del contorno.
-            - Dibuja el rectángulo sobre la imagen especificada.
-
-            @param img (numpy array) - Imagen sobre la que se dibujarán los contornos.
-            @param contour (numpy array) - Contorno detectado a dibujar.
-            @param color (tuple) - Color del rectángulo en formato BGR. Por defecto, verde (0, 255, 0).
-            @param thickness (int) - Grosor de las líneas del rectángulo. Por defecto, 2.
+        Dibuja los contornos de los cubos sobre la imagen original.
+            @param contours (list) - Lista de contornos detectados.
+            @param frame (numpy array) - Imagen sobre la cual se dibujarán los contornos.
+            @return contour_img (numpy array) - Imagen con los contornos dibujados.
         '''
         boundRect = cv2.boundingRect(contour)
         cv2.rectangle(self.contour_img, 
@@ -347,18 +348,9 @@ class ImageProcessor_Front:
 
     def process_image(self, frame:np.ndarray, mostrar:bool=False, debug:bool=False)-> tuple:
         ''' 
-        Ejecuta el flujo completo de procesamiento de una imagen para detectar colores y posiciones de cubos.
-            - Almacena la imagen original y una copia para dibujar contornos.
-            - Realiza el preprocesamiento para limpiar la imagen y detectar bordes.
-            - Encuentra y filtra los contornos relevantes basándose en su tamaño.
-            - Identifica los colores predominantes dentro de cada contorno y calcula las posiciones en una matriz.
-            - Dibuja contornos y anotaciones sobre la imagen de salida.
-            @param frame (numpy array) - Imagen de entrada en formato BGR.
-            @param area_size (int) - Umbral mínimo de área para considerar un contorno como válido. Por defecto, 2000.
-            @param mostrar (bool) - Si es True, muestra la imagen procesada.
-            @return (tuple) - Una tupla con:
-                - matrix (numpy array) - Matriz 5x5 que representa la cuadrícula con los colores detectados.
-                - contour_img (numpy array) - Imagen con los contornos y anotaciones dibujados.
+        Procesa la imagen, encuentra los contornos y cubos, y los mapea a la matriz.
+            @param frame (numpy array) - Imagen que se va a procesar.
+            @return matrix (numpy array) - Matriz con la información de los cubos detectados.
         '''
         self.frame = deepcopy(frame)
         self.contour_img = deepcopy(self.frame)
@@ -416,7 +408,7 @@ class ImageProcessor_Front:
         if cv2.waitKey(0) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
 
-        # return self.matrix, self.contour_img
+        return self.matrix, self.contour_img
 
 
 # Ejecutar el programa
