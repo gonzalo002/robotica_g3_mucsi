@@ -19,20 +19,10 @@ class ImageProcessor_Top:
 
     Métodos:
         - __init__() - Inicializa el objeto y configura la matriz 5x5 y las variables necesarias.
-        - _preprocess_image() - Convierte la imagen a escala de grises y aplica filtros de detección de bordes.
-        - _find_external_contours() - Encuentra los contornos externos en la imagen.
-        - _filter_contours_by_size() - Filtra los contornos según su tamaño (eliminando los más pequeños).
-        - _get_dominant_color() - Obtiene el color dominante dentro de un contorno utilizando el espacio HSV.
-        - _align_equidistant() - Alinea los puntos detectados en una cuadrícula equidistante de 5x5.
-        - _map_to_matrix() - Mapea las coordenadas de los centros de los cubos a una matriz 5x5.
-        - _draw_contours() - Dibuja los contornos de los cubos sobre la imagen.
-        - process_image() - Procesa la imagen completa, encuentra contornos y cubos, y los mapea a la matriz.
-
-    Atributos:
-        - matrix_size (int) - Tamaño de la matriz 5x5.
-        - matrix (numpy array) - Matriz que almacena la ubicación de los cubos detectados.
-        - contour_img (numpy array) - Imagen con los contornos de los cubos dibujados.
-        - frame (numpy array) - Imagen de entrada que se va a procesar.
+        - _preprocess_image() - Preprocesa la imagen y encuentra los contornos de los cubos en la imagen.
+        - _draw_cubes() - Dibuja los cubos encontrados y guarda su información (centro, área, color).
+        - _procesar_umbral_otsu() - Aplica un umbral de Otsu a la imagen en escala de grises.
+        - _get_contrast_img() - Separa la imagen en diferentes colores (rojo, verde, azul, amarillo) y mejora el contraste.
     '''
         
     def __init__(self, matrix_size:int=5) -> None:
@@ -42,8 +32,8 @@ class ImageProcessor_Top:
         - matrix: Matriz inicializada con valores -1, que se usará para almacenar los colores detectados.
         - contour_img: Imagen utilizada para dibujar contornos detectados.
         - frame: Imagen original que se procesará.  
-        @param matrix_size (int) - Tamaño de la matriz cuadrada. Por defecto, 5.
-    '''
+            @param matrix_size (int) - Tamaño de la matriz cuadrada. Por defecto, 5.
+        '''
         self.matrix_size = matrix_size
         self.matrix = np.full((self.matrix_size, self.matrix_size), -1)
         self.contour_img = None
@@ -66,7 +56,7 @@ class ImageProcessor_Top:
             - Combina las detecciones en una imagen de magnitud.
             - Utiliza el filtro Canny para refinar los bordes detectados.
             - Aplica operaciones morfológicas para limpiar ruido.
-            @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
+                @return morph_clean (numpy array) - Imagen binaria con los bordes detectados y limpiados.
         """
 
         cropped_frame = self._get_cubes_location(colored=True)
@@ -74,21 +64,24 @@ class ImageProcessor_Top:
         separated_colors = self._get_contrast_img(cropped_frame)
 
         for i, color in enumerate(separated_colors): # [red, green, blue, yellow]
-            img = deepcopy(cropped_frame)
             contours, _ = cv2.findContours(color, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-            correct_contours:list = []
             for cnt in contours:
                 area = cv2.contourArea(cnt)
                 
                 if area > self.base_area * 0.2:
                     self._draw_cubes(cnt, color, i)
 
-
- 
-                        
                 
     def _draw_cubes(self, cnt, img, color_cubo):
+        """ 
+        Dibuja los cubos sobre la imagen de contorno y guarda su centro, área y color.
+        Calcula el tamaño de los cubos basándose en el contorno detectado y ajusta según el área base.
+        
+            @param cnt (numpy array) - Contorno de un cubo detectado en la imagen.
+            @param img (numpy array) - Imagen de entrada donde se dibujarán los contornos de los cubos.
+            @param color_cubo (int) - Identificador del color del cubo (0 = rojo, 1 = verde, 2 = azul, 3 = amarillo).
+            """
         x, y, w, h = cv2.boundingRect(cnt)
 
         # Número de cubos por lado
@@ -137,12 +130,14 @@ class ImageProcessor_Top:
                     
             
         
-    
     def _procesar_umbral_otsu(self, gray:np.ndarray) -> np.ndarray:
         ''' 
         Aplica un umbral de Otsu para binarizar la imagen.
-            @param gray (numpy array) - Imagen en escala de grises.
-            @return otsu_thresh (numpy array) - Imagen binarizada tras el umbral de Otsu.
+            - Convierte la imagen en escala de grises a una imagen binaria.
+            - Utiliza un umbral de Otsu para decidir el valor de corte.
+            - Aplica una operación morfológica para limpiar pequeños ruidos en la imagen binaria.
+                @param gray (numpy array) - Imagen en escala de grises.
+                @return otsu_thresh (numpy array) - Imagen binarizada tras el umbral de Otsu.
         '''
         _, otsu_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
 
@@ -152,7 +147,18 @@ class ImageProcessor_Top:
         
         return cv2.morphologyEx(otsu_thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
     
+
     def _get_contrast_img(self, frame:np.ndarray) -> list:
+        ''' 
+        Separa la imagen en distintos colores, aplicando umbrales específicos para rojo, verde, azul y amarillo.
+        Genera imágenes contrastadas de cada color.
+            - Convierte la imagen original a espacio de color HSV.
+            - Aplica umbrales en los rangos de valores HSV para cada color (rojo, verde, azul, amarillo).
+            - Realiza operaciones morfológicas para limpiar las imágenes de cada color.
+            - Invertir la imagen de cada color para mejorar la detección.
+                @param frame (numpy array) - Imagen a procesar.
+                @return contrast_images (list) - Lista de imágenes filtradas por cada color (rojo, verde, azul, amarillo).
+        '''
 
         # Convertir la imagen a HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -238,6 +244,7 @@ class ImageProcessor_Top:
              
         return resultado
 
+
     def _get_cubes_location(self, colored:bool = False) -> np.ndarray:
         ''' 
         Aplica un umbral de Otsu para binarizar la imagen y encuentra el bounding box del contorno más grande.
@@ -272,18 +279,12 @@ class ImageProcessor_Top:
             y -= int(h * expand_factor)
             w += int(w * expand_factor * 2)  # Expandir a ambos lados
             h += int(h * expand_factor * 2)  # Expandir arriba y abajo
-            
-            # Dibujar el bounding box alrededor del contorno más grande
-            # cv2.rectangle(copy, (x, y), (x + w, y + h), (0, 255, 0), 2) 
 
             # Crear una máscara del tamaño de la imagen completa, con todos los valores a 0 (negro)
             mask = np.zeros_like(gray)
             
             # Dibujar un rectángulo blanco (255) en la máscara en el área del bounding box
             mask[y:y+h, x:x+w] = 255
-            
-            # Aplicar la máscara a la imagen original
-            # result = cv2.bitwise_and(gray, mask)
 
             
             if colored:
@@ -330,6 +331,7 @@ class ImageProcessor_Top:
         
         return aligned_points_indices
 
+
     def _map_to_matrix(self, centers:list, colors:list, areas:list) -> np.ndarray:
         ''' 
         Mapea los centros detectados y sus colores a una matriz 5x5.
@@ -360,16 +362,18 @@ class ImageProcessor_Top:
         
         return matrix
 
-
     
     def calibrate_cube_area(self) -> None:
+        ''' 
+        Obtiene el area de un cubo para utilizarlo como medida promedio.
+            @return None
+        '''
         cropped_frame = self._get_cubes_location(colored=True)
 
         separated_colors = self._get_contrast_img(cropped_frame)
         
         areas = []
         for color in separated_colors: # [red, green, blue, yellow]
-            img = deepcopy(cropped_frame)
             contours, _ = cv2.findContours(color, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
             try:
@@ -383,7 +387,7 @@ class ImageProcessor_Top:
 
         
 
-    def process_image(self, frame:np.ndarray, area_size:int = 2000, mostrar:bool=False, debug:bool = False)->tuple:
+    def process_image(self, frame:np.ndarray, calibration:bool = False, mostrar:bool=False, debug:bool = False)->tuple:
         ''' 
         Ejecuta el flujo completo de procesamiento de una imagen para detectar colores y posiciones de cubos.
             - Almacena la imagen original y una copia para dibujar contornos.
@@ -400,7 +404,8 @@ class ImageProcessor_Top:
                 - contour_img (numpy array) - Imagen con los contornos y anotaciones dibujados.
         '''
         self.frame = deepcopy(frame)
-        #self.calibrate_cube_area()
+        if calibration:
+            self.calibrate_cube_area()
         self.contour_img = deepcopy(self.frame)
         self.debug = debug
 
@@ -422,8 +427,8 @@ class ImageProcessor_Top:
 # Ejecutar el programa
 if __name__ == "__main__":
     
-    use_cam = True
-    num = 0
+    use_cam = False
+    num = 19
     
     if use_cam:
         cam = cv2.VideoCapture(num)
@@ -435,6 +440,5 @@ if __name__ == "__main__":
 
     processor = ImageProcessor_Top()
     
-    matriz, imagen = processor.process_image(frame, area_size=300, mostrar = True, debug=True)
-    #print(np.array2string(matriz, separator=', ', formatter={'all': lambda x: f'{int(x)}'}))
+    matriz, imagen = processor.process_image(frame, mostrar = True, debug=True)
     print(np.array(matriz))
