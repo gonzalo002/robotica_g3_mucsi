@@ -8,23 +8,23 @@ class FigureGenerator:
     def __init__(self) -> None:
         self.matriz3D = None
 
-    def generate_figure_from_matrix(self, plant_matrix, side_matrix, tkinter:bool=False):
+    def generate_figure_from_matrix(self, plant_matrix, side_matrix, paint:bool = False, tkinter:bool=False):
 
         anchura, profundidad, plant_matrix_recortada = self._cut_matrix_finding_shape(plant_matrix)
-        altura, _, front_matrix_recortada = self._cut_matrix_finding_shape(side_matrix)
+        altura, anchura2, front_matrix_recortada = self._cut_matrix_finding_shape(side_matrix)
         
-        if altura is None and anchura is None and profundidad is None:
+        if altura is None or anchura is None or profundidad is None or anchura != anchura2:
             return self._paint_matrix(np.array([[[]]]), 1, tkinter)
 
-        self.matriz3D = np.full((anchura, altura, profundidad), -1)
-        matriz3D_positiva = np.full((anchura, altura, profundidad), -1)
-        matriz3D_inversa = np.full((anchura, altura, profundidad), -1)
+        self.matriz3D = deepcopy(np.full((anchura, altura, profundidad), -1))
+        matriz3D_positiva = deepcopy(np.full((anchura, altura, profundidad), -1))
+        matriz3D_inversa = deepcopy(np.full((anchura, altura, profundidad), -1))
         front_matrix_recortada_inv = deepcopy(front_matrix_recortada)
 
         # Definir el tamaño de cada cubo
         size = 1
 
-        for columna_planta in range(0, profundidad, 1):
+        for columna_planta in range(profundidad):
             columna_planta_inversa = profundidad - 1 - columna_planta
             for fila_planta in range(anchura-1, -1, -1):
                 if plant_matrix_recortada[fila_planta][columna_planta] != -1:
@@ -45,8 +45,15 @@ class FigureGenerator:
                             matriz3D_positiva[x][z][y] = 4
 
                         elif cube_found and front_matrix_recortada[fila_lateral][columna_lateral] != -1:
-                            matriz3D_positiva[x][z][y] = front_matrix_recortada[fila_lateral][columna_lateral]
-                            front_matrix_recortada[fila_lateral][columna_lateral] = -1
+                            front_cube = False
+                            for col_plant in range(columna_planta, profundidad, 1):
+                                if front_matrix_recortada[fila_lateral][columna_lateral] == plant_matrix_recortada[fila_planta][col_plant]:
+                                    front_cube = True
+                            if not front_cube:
+                                matriz3D_positiva[x][z][y] = front_matrix_recortada[fila_lateral][columna_lateral]
+                                front_matrix_recortada[fila_lateral][columna_lateral] = -1
+                            else:
+                                matriz3D_positiva[x][z][y] = 4
 
                     if not cube_found:
                         z= 0
@@ -78,8 +85,15 @@ class FigureGenerator:
                         z= 0
                         matriz3D_inversa[x][z][y] = color_cubo
 
+        self._paint_matrix(matriz3D=matriz3D_positiva, size=size, tkinter=tkinter)
+
+        self._paint_matrix(matriz3D=matriz3D_inversa, size=size, tkinter=tkinter)
+                        
         self._compare_matrix(matriz3D_positiva, matriz3D_inversa)
-        return self._paint_matrix(self.matriz3D, size, tkinter)
+        if paint:
+            return self._paint_matrix(self.matriz3D, size, tkinter)
+        else:
+            return self.matriz3D
                 
     def _cut_matrix(self, matriz, num_filas, num_columnas):
         # Recortar la matriz hasta el tamaño deseado
@@ -249,7 +263,51 @@ if __name__ in "__main__":
                     [-1, -1, -1, -1, -1],
                     [-1, 1, -1, -1, -1],
                     [1, 3, 3, -1, -1]]
-
+    
+    top_side_8 = [[-1, -1, -1, -1, -1],
+                [-1, -1, -1, -1, -1],
+                [ 0,  2,  2, -1, -1],
+                [ 3, -1,  1, -1, -1],
+                [ 3,  1,  0, -1, -1]]
+    
+    front_side_8 = [[-1, -1, -1, -1, -1],
+                    [-1, -1, -1, -1, -1],
+                    [-1, -1,  2, -1, -1],
+                    [ 3, -1,  1, -1, -1],
+                    [ 0,  2,  3, -1, -1]]
+    
+    front_side_9 = [[-1, -1, -1, -1, -1],
+                    [-1,  0, -1, -1, -1],
+                    [-1,  2,  1, -1, -1],
+                    [-1,  3,  2, -1, -1],
+                    [ 1,  2,  1,  0, -1]]
+    top_side_9 = [[-1, -1, -1, -1, -1],
+                    [ 2,  3,  3,  0, -1],
+                    [ 3,  0,  1,  1, -1],
+                    [ 1,  0,  3,  2, -1],
+                    [ 2,  2,  3,  1, -1]]
+    
+    front_side_10 = [[-1, -1, -1, -1, -1,],
+                    [-1,  0, -1, -1, -1,],
+                    [ 1,  2, -1, -1, -1,],
+                    [ 0,  2, -1, -1, -1,],
+                    [ 2,  1,  0, -1, -1,]]
+    top_side_10 = [[-1, -1, -1, -1, -1,],
+                [ -1,  -1,  -1,  -1, -1,],
+                [ 3,  3,  0,  -1, -1,],
+                [ 3,  0,  1,  -1, -1,],
+                [ 1,  0,  2,  -1, -1,]]
+    
+    front_side_11 = [[-1, -1, -1, -1, -1],
+                     [-1, -1, -1, -1, -1],
+                     [ 0, -1, -1, -1, -1],
+                     [ 1, -1,  0, -1, -1],
+                     [ 1,  1,  2, -1, -1]]
+    top_side_11 = [[-1, -1, -1, -1, -1],
+                [-1, -1, -1, -1, -1],
+                [ 3,  2,  0, -1, -1],
+                [ 2, -1,  1, -1, -1],
+                [ 0,  3,  1, -1, -1]]
     pruebas_front = [[-1, -1, -1, -1, -1],
                     [-1, -1, -1, -1, -1],
                     [-1, 0, -1, -1, -1],
@@ -276,9 +334,9 @@ if __name__ in "__main__":
                             [3, 2, -1, -1, -1]]
 
     vacia = [[-1, -1, -1, -1, -1],
-                            [-1, -1, -1, -1, -1],
-                            [-1, -1, -1, -1, -1],
-                            [-1, -1, -1, -1, -1],
-                            [-1, -1, -1, -1, -1]]
+            [-1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1]]
 
-    generator._draw_pyramid_from_matrices(vacia, vacia)
+    generator.generate_figure_from_matrix(top_side_11, front_side_11 , paint=True)
