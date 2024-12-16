@@ -162,11 +162,11 @@ def control_callback(msg, control_robot):
         pose_goal.orientation.z = -0.007263
         pose_goal.orientation.w = 0.009946
         
-        success = control_robot.move_to_pose(pose_goal)
-        if success:
-            print("El robot se ha movido a la pose inicial.")
-        else:
-            print("No se pudo mover a la pose inicial.")
+        #success = control_robot.move_to_pose(pose_goal)
+        #if success:
+            #print("El robot se ha movido a la pose inicial.")
+        #else:
+            #print("No se pudo mover a la pose inicial.")
         control_por_mano_activado = True
         print("Control por detección de manos activado.")
     elif action_code == 6:
@@ -195,6 +195,7 @@ def hand_data_callback(msg, control_robot):
 
     x = msg.x
     y = msg.y
+    z = msg.z
     is_open = msg.is_open
     is_peace = msg.is_peace
     is_dino = msg.is_dino
@@ -202,21 +203,26 @@ def hand_data_callback(msg, control_robot):
     if not is_open:
         limitesx = [0.23207591013811013, -0.19061986164757674]
         limitesy = [0.44488890481150184, 0.23159845770381593]
+        limitesz = [0.398362,0.2]
         rango_x_cam = 640
         rango_y_cam = 480
+        rango_z_cam = 480
         rango_x_robot = limitesx[0] - limitesx[1]
         rango_y_robot = limitesy[0] - limitesy[1]
+        rango_z_robot = limitesz[0] - limitesz[1]
 
         current_pose = control_robot.get_pose()
         
         # Calcular el desplazamiento proporcional
         delta_x = (x / rango_x_cam) * rango_x_robot * 0.1
         delta_y = (y / rango_y_cam) * rango_y_robot * 0.1
+        delta_z = (z / rango_z_cam) * rango_z_robot * 0.1
 
         # Crear nueva pose objetivo
         target_pose = copy.deepcopy(current_pose)
         target_pose.position.x = current_pose.position.x + delta_x
         target_pose.position.y = current_pose.position.y + delta_y
+        target_pose.position.z = current_pose.position.z + delta_z
 
         # Verificar límites
         if target_pose.position.x > limitesx[0] or target_pose.position.x < limitesx[1]:
@@ -225,7 +231,9 @@ def hand_data_callback(msg, control_robot):
         if target_pose.position.y > limitesy[0] or target_pose.position.y < limitesy[1]:
             rospy.logwarn(f"Posición Y fuera de límites: {target_pose.position.y}")
             return
-
+        if target_pose.position.z > limitesz[0] or target_pose.position.z < limitesz[1]:
+            rospy.logwarn(f"Posición Z fuera de límites: {target_pose.position.z}")
+            return
         try:
             # Planificar y ejecutar el movimiento directamente usando move_to_pose
             success = control_robot.move_to_pose(target_pose, wait=False)
@@ -240,11 +248,11 @@ def hand_data_callback(msg, control_robot):
     elif is_open:
         rospy.loginfo("Mano abierta; el robot no se mueve.")
         # Verificar el estado de la pinza
-        if is_dino and not control_robot.objeto_agarrado:
+        if is_peace and not control_robot.objeto_agarrado:
             rospy.loginfo("Pinza cerrada - Intentando agarrar objeto")
             control_robot.abrir_pinza()
             control_robot.objeto_agarrado = True  # Actualizar estado
-        elif is_peace and control_robot.objeto_agarrado:
+        elif is_dino and control_robot.objeto_agarrado:
             rospy.loginfo("Pinza abierta - Soltando objeto")
             control_robot.cerrar_pinza()
             control_robot.objeto_agarrado = False
