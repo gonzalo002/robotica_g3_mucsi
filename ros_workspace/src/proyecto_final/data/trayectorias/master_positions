@@ -30,30 +30,38 @@ J_PRE_ARUCO:
 - 1.5737088918685913
 - 0.5627355575561523
 
-P_FIGURE_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose # Pose Inicial de la Figura
-  state:
-  - !!python/object/new:geometry_msgs.msg._Point.Point
-    state:
-    - -0.05524835740165217
-    - 0.3268545994769537
-    - 0.05
-  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
-    state:
-    - 0.9997245837837158
-    - 0.005451434066390398
-    - -0.021002075987443268
-    - 0.008941546248486577
+J_DISCARD_ORIGIN:
+- 1.9654215574264526
+- -1.6516591511168421
+- 1.1777961889850062
+- -1.100713090305664
+- -1.5666144529925745
+- -1.2541945616351526
 
-P_DISCARD_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose # Pose Inicial Zona de Descartes
+P_MATRIX_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose # Pose Inicial de la Figura
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
     state:
-    - -0.06668513468581726
-    - 0.4170908324399602
-    - 0.326466814570993
+    - 0.11215891055710016
+    - 0.25271969505889574
+    - 0.2330281192624357
   - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
     state:
-    - 0.9995425653830327
-    - 0.029270554140318202
-    - -0.006887485949338611
-    - 0.0032337571217133203
+    - -0.9999318629412033
+    - -0.011673449550283578
+    - -1.9590974205304992e-06
+    - 6.8332781290740655e-06
+    
+P_DISCARD_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -0.28996691599352165
+    - 0.18631245300936045
+    - 0.23539582854608912
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.6802708033654928
+    - 0.7329608675315642
+    - -2.6605306984095323e-05
+    - 6.928307312140119e-06
