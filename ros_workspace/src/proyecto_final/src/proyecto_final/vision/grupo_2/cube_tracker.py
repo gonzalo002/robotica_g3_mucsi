@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from copy import deepcopy
-import yaml
+import yaml, os
 from math import pi
 
 class CubeTracker:
@@ -44,6 +44,7 @@ class CubeTracker:
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict)
         self.aruco_params = cv2.aruco.DetectorParameters()
         self.debug = False
+        self.i = 0
 
         # Obtener calibración de la cámara
         self._get_camara_calibration(cam_calib_path)
@@ -350,6 +351,8 @@ class CubeTracker:
             @return resultado (list) - Imagen procesada con cubos identificados y etiquetados.
         '''
         self.debug = debug
+        if self.debug:
+            cv2.imshow("Imagen Original", frame)
         # Realizar copia del frame
         self.frame = deepcopy(cv2.undistort(frame, self.camera_matrix, self.dist_coeffs))
         frame = deepcopy(cv2.undistort(frame, self.camera_matrix, self.dist_coeffs))
@@ -372,23 +375,25 @@ class CubeTracker:
         if mostrar:
             cv2.imshow('Contoured Image', self.imagen_analizada)
 
+        if mostrar or debug:
             if cv2.waitKey(0) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
 
         return self.imagen_analizada, resultado
 
 if __name__ == "__main__":
-    use_cam = True
-    cube_tracker = CubeTracker(cam_calib_path="/home/laboratorio/ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
+    use_cam = False
+    file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', "/")
+    cube_tracker = CubeTracker(cam_calib_path=f"{file_path}/data/necessary_data/ost.yaml")
 
     if use_cam:
         cam = cv2.VideoCapture(0)
         if cam.isOpened():
             _, frame = cam.read()
-            cv2.imshow("hola", frame)
+            cv2.imshow("Frame Capturado", frame)
     else:
-        num = 1
-        ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Cubos_Exparcidos/Cubos_Exparcidos_{num}.png'
+        num = 0
+        ruta = f'{file_path}/data/cubos_exparcidos/Cubos_Exparcidos_{num}.png'
         frame = cv2.imread(ruta)
 
     _, resultado = cube_tracker.process_image(frame, area_size=1000, mostrar=True, debug=True)

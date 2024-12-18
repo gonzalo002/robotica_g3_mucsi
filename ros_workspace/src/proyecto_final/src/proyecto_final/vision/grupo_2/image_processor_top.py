@@ -1,7 +1,8 @@
-import cv2
+import cv2, os, yaml
 import numpy as np
 from copy import deepcopy
 from math import sqrt
+
 
 class ImageProcessor_Top:
     ''' 
@@ -21,7 +22,7 @@ class ImageProcessor_Top:
         - __init__() - Inicializa el objeto y configura la matriz 5x5 y las variables necesarias.
         - _preprocess_image() - Preprocesa la imagen y encuentra los contornos de los cubos en la imagen.
         - _draw_cubes() - Dibuja los cubos encontrados y guarda su información (centro, área, color).
-        - _procesar_umbral_otsu() - Aplica un umbral de Otsu a la imagen en escala de grises.
+        - _umbralizacion() - Aplica un umbral de Otsu a la imagen en escala de grises.
         - _get_contrast_img() - Separa la imagen en diferentes colores (rojo, verde, azul, amarillo) y mejora el contraste.
     '''
         
@@ -46,8 +47,12 @@ class ImageProcessor_Top:
         
         self.diccionario_colores = {0: (0,0,255), 1: (0,255,0), 2: (255,0,0), 3: (0, 255, 255)}
         
-        self.base_area = 1043.0
-
+        try:
+            file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', "/")
+            with open(f'{file_path}/data/necessary_data/cube_area.yaml', 'r') as file:
+                self.base_area = yaml.safe_load(file)
+        except:
+            print('Calibrar Cubo!!')
         
     def _preprocess_image(self) -> np.ndarray:
         """ 
@@ -61,16 +66,32 @@ class ImageProcessor_Top:
 
         cropped_frame = self._get_cubes_location(colored=True)
 
-        separated_colors = self._get_contrast_img(cropped_frame)
+        if cropped_frame is not None:
+            separated_colors = self._get_contrast_img(cropped_frame)
 
-        for i, color in enumerate(separated_colors): # [red, green, blue, yellow]
-            contours, _ = cv2.findContours(color, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-            for cnt in contours:
-                area = cv2.contourArea(cnt)
-                
-                if area > self.base_area * 0.2:
-                    self._draw_cubes(cnt, color, i)
+            self.centers = []
+            self.areas = []
+            self.colors = []
+            if self.debug:
+                show_contorus = []
+                color_dict = {0: (0,0,255), 1:(0,255,0), 2:(255,0,0), 3:(0,255,255)}
+            for i, color in enumerate(separated_colors): # [red, green, blue, yellow]
+                contours, _ = cv2.findContours(color, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                if self.debug:
+                        show_contorus.append(contours)
+                for cnt in contours:
+                    area = cv2.contourArea(cnt)
+                    
+                    if area > self.base_area * 0.2:
+                        self._draw_cubes(cnt, color, i)
+        
+            if self.debug:
+                img = deepcopy(self.frame)
+                cont = 0
+                for temp_contours in show_contorus:
+                    cv2.drawContours(img, contourIdx=-1, contours=temp_contours, color=color_dict[cont], thickness=2)
+                    cont += 1
+                cv2.imshow('Todos los Contornos', img)
 
                 
     def _draw_cubes(self, cnt, img, color_cubo):
@@ -89,16 +110,16 @@ class ImageProcessor_Top:
 
         # Tamaño de cada cubo
         if (w//lado - w/lado) > 0.6:
-            num_cubos_x = int(w/lado) + 1 
+            num_cubos_x = int(w/(lado-4)) + 1 
         else:
-            num_cubos_x = int(w/lado)
+            num_cubos_x = int(w/(lado-4))
             if num_cubos_x == 0:
                 num_cubos_x = 1
         
         if (h//lado - h/lado) > 0.6:
-            num_cubos_y = int(h/lado) + 1 
+            num_cubos_y = int(h/(lado-4)) + 1 
         else:
-            num_cubos_y = int(h/lado)
+            num_cubos_y = int(h/(lado-4))
             if num_cubos_y == 0:
                 num_cubos_y = 1
         
@@ -130,22 +151,22 @@ class ImageProcessor_Top:
                     
             
         
-    def _procesar_umbral_otsu(self, gray:np.ndarray) -> np.ndarray:
+    def _umbralización(self, gray:np.ndarray) -> np.ndarray:
         ''' 
-        Aplica un umbral de Otsu para binarizar la imagen.
+        Aplica un umbral para binarizar la imagen.
             - Convierte la imagen en escala de grises a una imagen binaria.
-            - Utiliza un umbral de Otsu para decidir el valor de corte.
+            - Utiliza un umbral para decidir el valor de corte.
             - Aplica una operación morfológica para limpiar pequeños ruidos en la imagen binaria.
                 @param gray (numpy array) - Imagen en escala de grises.
-                @return otsu_thresh (numpy array) - Imagen binarizada tras el umbral de Otsu.
+                @return thresh (numpy array) - Imagen binarizada tras la umbralizacion.
         '''
-        _, otsu_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)
 
         if self.debug:
-            cv2.imshow("Otsu", otsu_thresh)
+            cv2.imshow("Umbralización", thresh)
+
         kernel = np.ones((3, 3), np.uint8)
-        
-        return cv2.morphologyEx(otsu_thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
+        return cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
     
 
     def _get_contrast_img(self, frame:np.ndarray) -> list:
@@ -167,24 +188,24 @@ class ImageProcessor_Top:
         black_mask = np.zeros((height, width), dtype=np.uint8)
         # Definir los rangos de colores en HSV
 
-        # Verde: Hue entre 35 y 85, Saturación y Valor altos
+        # Verde: 
         lower_green = np.array([30, 50, 50], np.uint8)   # Mínimo verde
         upper_green = np.array([70, 255, 255], np.uint8) # Máximo verde
 
-        # Rojo: Hue entre 0 y 10, o entre 170 y 180, Saturación y Valor altos
-        lower_red1 = np.array([0, 100, 100], np.uint8)    # Rojo (primer rango) (0, 100, 100), (15, 255, 255)
-        upper_red1 = np.array([20, 255, 255], np.uint8)  # Rojo (primer rango)
+        # Rojo: 
+        lower_red = np.array([0, 100, 100], np.uint8)    # Minimo rojo
+        upper_red = np.array([20, 255, 255], np.uint8)  # Maximo rojo
 
-        # Azul: Hue entre 100 y 140, Saturación y Valor altos
+        # Azul: 
         lower_blue = np.array([100, 50, 50], np.uint8)   # Mínimo azul
         upper_blue = np.array([140, 255, 255], np.uint8) # Máximo azul
 
-        # Amarillo: Hue entre 20 y 40, Saturación y Valor altos
+        # Amarillo: 
         lower_yellow = np.array([20, 30, 30], np.uint8)  # Mínimo amarillo
         upper_yellow = np.array([40, 255, 255], np.uint8)# Máximo amarillo
 
-        lower_values = [lower_red1, lower_green, lower_blue, lower_yellow]
-        upper_values = [upper_red1, upper_green, upper_blue, upper_yellow]
+        lower_values = [lower_red, lower_green, lower_blue, lower_yellow]
+        upper_values = [upper_red, upper_green, upper_blue, upper_yellow]
         filtered_images:list = []
         
         for i in range(len(lower_values)):
@@ -225,10 +246,10 @@ class ImageProcessor_Top:
         mask_green = cv2.bitwise_or(mask_green, y_inv)
         
         mask_green = cv2.bitwise_not(mask_green)
-        
-        gray_g =cv2.bitwise_and(contrast_images[1], contrast_images[1], mask=mask_green)
-        gray_g = cv2.cvtColor(gray_g, cv2.COLOR_BGR2GRAY)
-        _, g_inv = cv2.threshold(gray_g, 50, 255, cv2.THRESH_BINARY)                     
+
+        color_g =cv2.bitwise_and(contrast_images[1], contrast_images[1], mask=mask_green)
+        gray_g = cv2.cvtColor(color_g, cv2.COLOR_BGR2GRAY)
+        _, g_inv = cv2.threshold(gray_g, 40, 255, cv2.THRESH_BINARY)                     
              
         resultado= [r_inv, g_inv, b_inv, y_inv]
         
@@ -237,10 +258,10 @@ class ImageProcessor_Top:
             resultado[i] = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations=1)
             
         if self.debug:
-             cv2.imshow('Red Only', resultado[0])
-             cv2.imshow('Green Only', resultado[1])
-             cv2.imshow('Blue Only', resultado[2])
-             cv2.imshow('Yellow Only', resultado[3])
+             cv2.imshow('Red Only', contrast_images[0])
+             cv2.imshow('Green Only', color_g)
+             cv2.imshow('Blue Only', contrast_images[2])
+             cv2.imshow('Yellow Only', contrast_images[3])
              
         return resultado
 
@@ -255,8 +276,7 @@ class ImageProcessor_Top:
         gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         
         # Binarizar la imagen utilizando un umbral fijo
-        # _, binary_image = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
-        binary_image = self._procesar_umbral_otsu(gray)
+        binary_image = self._umbralización(gray)
         
         # Operación de cierre para limpiar la imagen
         kernel = np.ones((5, 5), np.uint8)
@@ -286,7 +306,6 @@ class ImageProcessor_Top:
             # Dibujar un rectángulo blanco (255) en la máscara en el área del bounding box
             mask[y:y+h, x:x+w] = 255
 
-            
             if colored:
                 result = self.frame
                 result[:,:,0] = cv2.bitwise_and(self.frame[:,:,0], morph_clean)
@@ -298,7 +317,10 @@ class ImageProcessor_Top:
             if self.debug:
                 cv2.imshow('image_cropped', result)
     
-        return result
+            return result
+        else:
+            print('Contornos no encontrados')
+            return []
     
 
     def _align_equidistant(self, points:list, side_length:float) -> list:
@@ -319,6 +341,16 @@ class ImageProcessor_Top:
         # Crear las listas de valores equidistantes
         lista_resultado_x = [min_x + side_length * i for i in range(num_elements)]
         lista_resultado_y = [max_y - side_length * i for i in range(num_elements)]
+
+        if self.debug:
+            grid_image = deepcopy(self.contour_img)
+            for x in lista_resultado_x:
+                grid_image = cv2.line(grid_image, (x, lista_resultado_y[0]), (x, lista_resultado_y[4]), (255, 0, 255), 2)
+
+            # Dibujar las líneas horizontales
+            for y in lista_resultado_y:
+                grid_image = cv2.line(grid_image, (lista_resultado_x[0], y), (lista_resultado_x[4], y), (255, 0, 255), 2)
+            cv2.imshow('Imagen con Rejilla', grid_image)
 
         # Alinear los puntos a la cuadrícula más cercana
         aligned_points_indices = []  # Lista para almacenar los índices de los puntos alineados
@@ -359,7 +391,6 @@ class ImageProcessor_Top:
             row = 4 - center[1] # Invertir el eje Y
             col = center[0]
             matrix[row][col] = color
-        
         return matrix
 
     
@@ -382,9 +413,14 @@ class ImageProcessor_Top:
             except:
                 pass
         self.base_area = np.max(areas)
-        print(self.base_area)
-        
-
+        if self.base_area < 2000:
+            try:
+                self.base_area = float(self.base_area)
+                file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', "/")
+                with open(f'{file_path}/data/necessary_data/cube_area.yaml', 'r') as file:
+                    yaml.dump(self.base_area, file)
+            except:
+                print('Fallo al calibrar')
         
 
     def process_image(self, frame:np.ndarray, calibration:bool = False, mostrar:bool=False, debug:bool = False)->tuple:
@@ -403,42 +439,46 @@ class ImageProcessor_Top:
                 - matrix (numpy array) - Matriz 5x5 que representa la cuadrícula con los colores detectados.
                 - contour_img (numpy array) - Imagen con los contornos y anotaciones dibujados.
         '''
+        self.matrix = deepcopy(np.full((self.matrix_size, self.matrix_size), -1))
         self.frame = deepcopy(frame)
-        if calibration:
-            self.calibrate_cube_area()
         self.contour_img = deepcopy(self.frame)
         self.debug = debug
 
-        # Preprocesamiento de la imagen
-        self._preprocess_image()
-        
-        if len(self.centers) > 0:
-            self.matrix = self._map_to_matrix(self.centers, self.colors, self.areas)
+        if calibration:
+            self.calibrate_cube_area()
+        else:
+            # Preprocesamiento de la imagen
+            self._preprocess_image()
+            
+            if len(self.centers) > 0:
+                self.matrix = self._map_to_matrix(self.centers, self.colors, self.areas)
 
-        if mostrar:
-            cv2.imshow('Contoured Image', self.contour_img)
+            if mostrar:
+                print(f'Matriz Top:\n {self.matrix}')
+                cv2.imshow('Contoured Image', self.contour_img)
 
-        if cv2.waitKey(0) & 0xFF == ord('q'):
-            cv2.destroyAllWindows()
+            if cv2.waitKey(0) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
 
         return self.matrix, self.contour_img
 
 
+
 # Ejecutar el programa
 if __name__ == "__main__":
-    
-    use_cam = False
-    num = 19
+    use_cam = True
+    num_cam = 9
+    num_img = 0
     
     if use_cam:
-        cam = cv2.VideoCapture(num)
+        cam = cv2.VideoCapture(num_cam)
         if cam.isOpened():
             _, frame = cam.read()
     else:
-        ruta = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Superior/Figura_{num}_S.png'
+        file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', "/")
+        ruta = f'{file_path}/data/Figuras_Superior/Figura_{num_img}_S.png'
         frame = cv2.imread(ruta)
 
     processor = ImageProcessor_Top()
     
-    matriz, imagen = processor.process_image(frame, mostrar = True, debug=True)
-    print(np.array(matriz))
+    matriz, imagen = processor.process_image(frame, mostrar = True, debug=True, calibration=False)
