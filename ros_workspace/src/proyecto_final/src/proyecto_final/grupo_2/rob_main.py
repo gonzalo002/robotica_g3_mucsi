@@ -1,17 +1,13 @@
 #!/usr/bin/python3
 
 # Importaciones Propias
-from control_robot import ControlRobot
-from proyecto_final.vision.grupo_2.cube_tracker import CubeTracker
+from proyecto_final.control_robot import ControlRobot
 from action_client_master import MasterClient
-from vision.grupo_2.image_processor_front_v2 import ImageProcessor_Front
-from vision.grupo_2.image_processor_top import ImageProcessor_Top
-from vision.grupo_2.generacion_figura import FigureGenerator
 
 # Importaciones de Datos
 from geometry_msgs.msg import Pose, Quaternion
 from sensor_msgs.msg import JointState
-from proyecto_final.msg import IdCubos
+from proyecto_final.msg import IdCubos, CubosResult
 
 # Importaciones de ROS
 import rospy
@@ -60,13 +56,13 @@ class SecuenceCommander:
         self.simulation = simulation
         self.discarded_cubes:list = [0, 0, 0, 0] # RGBY
         self.matriz3D = np.full((5, 5, 5), -1, dtype=int)
-        self.cubos:List[IdCubos] = []
+        self.cubes:List[IdCubos] = []
         self.cube_size = 0.025
-        self.cube_separation = 0.01
+        self.cube_separation = 0.03
+        self.altura_z = 0.237
 
         # Clases
         self.robot = ControlRobot('robot')
-        self.cube_tracker = CubeTracker(cam_calib_path=f"{self.data_abs_path}/camera_data/ost.yaml")
         self.action_client = MasterClient()
 
         # Posiciones Maestras
@@ -80,7 +76,9 @@ class SecuenceCommander:
         self.j_off_camera:JointState = self.robot.read_from_yaml(f'{self.data_abs_path}/trayectorias/master_positions', 'J_OFF_CAMERA')
         self.j_home:JointState = self.robot.read_from_yaml(f'{self.data_abs_path}/trayectorias/master_positions', 'J_HOME')
         self.j_prev_aruco:JointState = self.robot.read_from_yaml(f'{self.data_abs_path}/trayectorias/master_positions', 'J_PRE_ARUCO')
-         
+        self.j_discard_origin:JointState = self.robot.read_from_yaml(f'{self.data_abs_path}/trayectorias/master_positions', 'J_DISCARD_ORIGIN')
+        
+        
     def _moveJoint(self, jointstate:JointState) -> bool:   
         ''' 
         Mueve las articulaciones del robot a una posición especificada usando un JointState.
@@ -121,14 +119,15 @@ class SecuenceCommander:
         
         self._moveJoint(self.j_link_1)     
                 
-        for cube_id, cubo in enumerate(self.cubos):
+        for cube_id, cubo in enumerate(self.cubes):
             pose = deepcopy(cubo.pose)
             color = cubo.color
             if pose.position.x > x_min and pose.position.x < x_max:
                 if pose.position.y > y_min and pose.position.y < y_max:
-                    self._pick_cube(pose, cube_id)
-                    self._drop_cube(make_figure=False, cube_id=cube_id, matrix_position=[0, color, self.discarded_cubes[color]])
-                    self.discarded_cubes[color] += 1
+                    if self._pick_cube(pose, cube_id):
+                        self._moveJoint(self.j_discard_origin)
+                        if self._drop_cube(make_figure=False, cube_id=cube_id, matrix_position=[0, color, self.discarded_cubes[color]]):
+                            self.discarded_cubes[color] += 1
 
     def create_figure(self) -> None:
         ''' 
@@ -153,10 +152,10 @@ class SecuenceCommander:
                             cube_matrix[i,j,k] = pose
                             self.discarded_cubes[figure_color] -= 1
                         else:
-                            for cube_id, cubo in enumerate(self.cubos):
+                            for cube_id, cubo in enumerate(self.cubes):
                                 if figure_color != 4 and cubo.color == figure_color:
                                     cube_matrix[i,j,k] = cubo.pose
-                                    self.cubos.pop(cube_id)
+                                    self.cubes.pop(cube_id)
                                 else: # Color desconocido
                                     cubos_sin_color.append([i,j,k])
         
@@ -175,8 +174,8 @@ class SecuenceCommander:
                         cubos_descarte = True
                         continue
             else: 
-                cube_matrix[matrix_position[0], matrix_position[1], matrix_position[2]] = self.cubos[0].pose
-                self.cubos.pop(0)
+                cube_matrix[matrix_position[0], matrix_position[1], matrix_position[2]] = self.cubes[0].pose
+                self.cubes.pop(0)
 
 
         for j in range(z):
@@ -201,7 +200,7 @@ class SecuenceCommander:
         if not self.simulation:
             gripper, _ = self.robot.get_pinza_state()
             if gripper < 20.0:  # Si la pinza no está completamente cerrada, se cierra.
-                self.robot.move_gripper(80.0, 10.0, 0.8)
+                self.robot.move_gripper(80.0, 5.0, 0.8)
         
         pose_previa = deepcopy(pose)
         pose_previa.position.z = 0.3  # Eleva la posición del cubo antes de moverlo
@@ -210,15 +209,15 @@ class SecuenceCommander:
 
         # Si el movimiento al cubo es exitoso, se adjunta el cubo a la pinza.
         if self.robot.move_carthesian_trayectory([pose_previa, pose]):
-            self.robot.scene.attach_box(link='onrobot_rg2_base_link', name=f'Cubo_{cube_id}')
-
+            #self.robot.scene.attach_box(link='onrobot_rg2_base_link', name=f'Cubo_{cube_id}')
+            self.robot.scene.remove_world_object(f'Cubo_{cube_id}')
             if not self.simulation:
                 self.robot.move_gripper(0.0, 10.0, 1.5)  # Abre la pinza para tomar el cubo
                 rospy.loginfo('Cubo Agarrado')
 
             # Si el movimiento de vuelta es exitoso, vuelve a la posición inicial.
             if self.robot.move_carthesian_trayectory([pose, pose_previa]):
-                self._moveJoint(self.j_link_1)
+                #self._moveJoint(self.j_link_1)
 
                 return True # Secuencia Completada
         return False # Secuencia Fallida
@@ -236,6 +235,7 @@ class SecuenceCommander:
             _, effort = self.robot.get_pinza_state()
             if not effort:  # Si no hay esfuerzo en la pinza, significa que no se tiene cubo.
                 rospy.logerr('Sin Cubo Para Dejada')
+                return False
 
         if len(matrix_position) != 3:  # Verifica que la matriz de posición tenga 3 elementos.
             raise ValueError('Invalid Input, Matrix position len must be 3')
@@ -246,7 +246,7 @@ class SecuenceCommander:
         else:
             pose: Pose = deepcopy(self.p_discard_origin)  # Pose inicial para desechar el cubo.
 
-        pose.position.z += 0.22  # Ajuste en la posición Z.
+        pose.position.z = self.altura_z # Ajuste en la posición Z.
 
         # Ajuste en la posición X, Y y Z basados en la matriz de posición.
         pose.position.x += ((self.cube_size + self.cube_separation) * matrix_position[0])
@@ -258,97 +258,65 @@ class SecuenceCommander:
 
         self._movePose(pose_previa)  # Mueve el robot a la posición previa.
 
+        simulation_pose = deepcopy(pose)
+        simulation_pose.position.z = ((self.cube_size) * matrix_position[2])+0.0125
         # Si el movimiento al lugar de dejar el cubo es exitoso, se quita el cubo de la pinza.
         if self.robot.move_carthesian_trayectory([pose_previa, pose]):
-            self.robot.scene.remove_attached_object(link='onrobot_rg2_base_link', name=f'Cubo_{cube_id}')
+            
+            
 
             if not self.simulation:
-                self.robot.move_gripper(30.0, 10.0)  # Abre la pinza para soltar el cubo.
+                self.robot.move_gripper(35.0, 10.0)  # Abre la pinza para soltar el cubo.
                 rospy.loginfo('Cubo Soltado')
 
             # Si no es para formar una figura, se actualiza la pose del cubo en el diccionario.
             if not make_figure:
-                self.cubos[cube_id].pose = deepcopy(pose)
+                self.cubes[cube_id].pose = deepcopy(pose)
 
             # Si el movimiento de vuelta es exitoso, vuelve a la posición inicial.
             if self.robot.move_carthesian_trayectory([pose, pose_previa]):
                 self._moveJoint(self.j_link_1)
+                self.robot.add_box_obstacle(f"Cubo_{cube_id}", simulation_pose, (0.025, 0.025, 0.025))
 
                 return True # Secuencia Completada
         
         return False # Secuencia no Completada
                 
                 
-    def track_cubes(self, cam_id:int, use_cam:bool = True, mostrar:bool = False, debug:bool = False) -> dict:
+    def track_cubes(self) -> dict:
         ''' 
-        Rastrea la posición de los cubos utilizando una cámara.
-            @param cam_id (int) - Identificador de la cámara.
-            @param use_cam (bool) - Determina si se usa una cámara real o una imagen almacenada.
-            @param mostrar (bool) - Si es verdadero, muestra la imagen con los cubos.
-            @param debug (bool) - Si es verdadero, muestra información de depuración.
-            @return dict - Diccionario con la información de los cubos localizados.
+        Rastrea la posición de los cubos utilizando la cámara superior.
         '''
+        # Mover el robot fuera del espacio de trabajo
         self._free_camera_space()
-
-        if use_cam:
-            cam = cv2.VideoCapture(cam_id)
-            if cam.isOpened():
-                _, frame = cam.read()
-        else:
-            num = 10
-            ruta = f'{self.data_abs_path}/example_img/Cubos_Exparcidos/Cubos_Exparcidos_{num}.png'
-            frame = cv2.imread(ruta)
         
-        _, resultado = self.cube_tracker.process_image(frame, area_size=1000, mostrar=mostrar, debug=debug)
+        # Llama al Cube Tracker Action
+        cubos = self.action_client.obtain_cube_pose()
         
-        cubos = self._dict_to_cube(resultado)
-        
-        return self._cube_to_aruco(cubos)
+        # Guardamos las posiciones reales de los cubos
+        self.cubes = self._cube_to_aruco(cubos)
 
             
-    def _cube_to_aruco(self, cubos:list) -> list:
+    def _cube_to_aruco(self, cubos:CubosResult) -> list:
         ''' 
         Convierte las posiciones de los cubos a coordenadas ArUco.
             @param cubos (list) - Lista de cubos con sus posiciones.
             @return cubos (list) - Lista de cubos con las nuevas posiciones ajustadas.
         '''
         cubo:IdCubos
-        for i, cubo in enumerate(cubos):
-            cubo.pose.position.x += self.p_aruco.position.x
-            cubo.pose.position.y += self.p_aruco.position.y  
+        lista_cubos = []
+        for i, cubo in enumerate(cubos.cubes_position):
+            new_cube = cubo
+            new_cube.pose.position.x += self.p_aruco.position.x
+            new_cube.pose.position.y += self.p_aruco.position.y  
                    
-            self.robot.add_box_obstacle(f"Cubo_{i}", cubo.pose, (0.025, 0.025, 0.025))
+            self.robot.add_box_obstacle(f"Cubo_{i}", new_cube.pose, (0.025, 0.025, 0.025))
             
-            cubo.pose.position.z = 0.2325
+            new_cube.pose.position.z = self.altura_z
+            lista_cubos.append(new_cube)
             
-        return cubos
+        return lista_cubos
             
-    
-    def _dict_to_cube(self, dict_cubos:list) -> list:
-        ''' 
-        Convierte una lista de diccionarios con información de cubos a una lista de objetos cubo.
-            @param dict_cubos (list) - Lista de diccionarios con la información de cada cubo.
-            @return cubos (list) - Lista de objetos de tipo IdCubos.
-        '''
-        cubos = []
-        for dict in dict_cubos:
-            cubo = IdCubos()
-            
-            positions = dict['Position']
-            angle = dict['Angle']
-            color = dict['Color']
-
-            cubo.pose.position.x = positions[0]
-            cubo.pose.position.y = positions[1]
-            cubo.pose.position.z = 0.0125  # Altura inicial del cubo.
-            
-            # Convierte el ángulo de Euler a quaternion.
-            cubo.pose.orientation = Quaternion(*quaternion_from_euler(pi, 0, -angle, 'sxyz'))
-
-            cubo.color = color
-            cubos.append(cubo)
-            
-        return cubos
 
 
     def rob_camera_calibration(self) -> None:
@@ -381,6 +349,9 @@ class SecuenceCommander:
         Libera el espacio de la cámara moviendo el robot a una posición fuera del área de visión.
             @return None
         '''
+        gripper, _ = self.robot.get_pinza_state()
+        if gripper < 20.0:  # Si la pinza no está completamente cerrada, se cierra.
+            self.robot.move_gripper(35.0, 5.0, 0.8)
         self._moveJoint(self.j_off_camera)  # Mueve el robot a una posición predeterminada fuera del área de la cámara.
 
 
@@ -399,13 +370,13 @@ class SecuenceCommander:
             self.pose_aruco = self.robot.read_from_yaml(f'{self.data_abs_path}/trayectorias/pose_aruco', 'P_ARUCO')
 
         # Realiza el rastreo de los cubos utilizando la cámara o imágenes de ejemplo.
-        self.cubos = self.track_cubes(cam_id=cam_id, use_cam=True)
+        self.cubes = self.track_cubes(cam_id=cam_id, use_cam=True)
         
         # Limpia el espacio de trabajo antes de formar la figura.
-        self.empty_workspace(cubos=self.cubos)
+        self.empty_workspace(cubos=self.cubes)
 
         # Crea la figura usando la matriz de cubos rastreados.
-        self.create_figure(cubos=self.cubos)
+        self.create_figure(cubos=self.cubes)
         
         # Vuelve a la posición de inicio después de la ejecución.
         self._moveJoint(self.j_home)
@@ -434,26 +405,26 @@ class SecuenceCommander:
             Input -> Ninguno
             Output -> Matriz 3D con la forma de la figura a generar.
             """
-            # Procesa una imagen lateral de una figura para generar la matriz de la figura.
-            num = 14
-            ruta_front = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Lateral/Figura_{num}_L.png'
-            frame_front = cv2.imread(ruta_front)
+            # # Procesa una imagen lateral de una figura para generar la matriz de la figura.
+            # num = 14
+            # ruta_front = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Lateral/Figura_{num}_L.png'
+            # frame_front = cv2.imread(ruta_front)
 
-            processor_front = ImageProcessor_Front()  # Procesador de la imagen frontal.
-            matriz_front, _ = processor_front.process_image(frame_front, mostrar=True)  # Procesa la imagen frontal.
+            # processor_front = ImageProcessor_Front()  # Procesador de la imagen frontal.
+            # matriz_front, _ = processor_front.process_image(frame_front, mostrar=True)  # Procesa la imagen frontal.
 
-            # Procesa una imagen superior de la figura para generar la matriz superior.
-            num = 15
-            ruta_top = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Superior/Figura_{num}_S.png'
-            frame_top = cv2.imread(ruta_top)
+            # # Procesa una imagen superior de la figura para generar la matriz superior.
+            # num = 15
+            # ruta_top = f'/home/laboratorio/ros_workspace/src/proyecto_final/data/example_img/Figuras_Superior/Figura_{num}_S.png'
+            # frame_top = cv2.imread(ruta_top)
 
-            processor_top = ImageProcessor_Top()  # Procesador de la imagen superior.
+            # processor_top = ImageProcessor_Top()  # Procesador de la imagen superior.
 
-            matriz_top, _ = processor_top.process_image(frame_top, mostrar=True)  # Procesa la imagen superior.
+            # matriz_top, _ = processor_top.process_image(frame_top, mostrar=True)  # Procesa la imagen superior.
 
-            # Genera la figura a partir de las matrices procesadas.
-            generator = FigureGenerator()
-            self.matriz3D = generator.generate_figure_from_matrix(matriz_top, matriz_front)
+            # # Genera la figura a partir de las matrices procesadas.
+            # generator = FigureGenerator()
+            # self.matriz3D = generator.generate_figure_from_matrix(matriz_top, matriz_front)
 
         if localizar_cubos and not manual:
             """
@@ -461,7 +432,7 @@ class SecuenceCommander:
             Output -> Localización de los cubos (lista de objetos IdCubos).
             """
             # Localiza los cubos en la escena utilizando las imágenes o la cámara.
-            self.cubos = self.track_cubes(0, False, True)
+            self.cubes = self.track_cubes(0, False, True)
             
             # cubos = [IdCubos]  # Los cubos son objetos de tipo IdCubos.
 
@@ -471,15 +442,15 @@ class SecuenceCommander:
             Output -> Ninguno
             """
             # Limpia el espacio de trabajo antes de montar la figura.
-            self.empty_workspace(self.cubos)  # El orden es importante, primero se limpia el espacio.
+            self.empty_workspace(self.cubes)  # El orden es importante, primero se limpia el espacio.
 
             # Crea la figura con los cubos localizados.
             self.create_figure()
 
 
 if __name__ == '__main__':
-    use_cam = True
-    
     robot = SecuenceCommander(simulation=False)
-    #robot.free_camera_space()
-    robot.secuencia_tkinter()
+    #robot.rob_camera_calibration()
+    cubes_position = robot.track_cubes()
+    robot.empty_workspace()
+    #robot.secuencia_tkinter()
