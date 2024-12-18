@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-import rospy
-import actionlib
-import cv2
+import cv2, os, rospy, actionlib
 from time import time
 from math import pi
 from copy import deepcopy
@@ -11,7 +9,7 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Quaternion
 from tf.transformations import quaternion_from_euler
 from proyecto_final.vision.grupo_2.cube_tracker import CubeTracker
-from proyecto_final.msg import CubosAction, CubosActionFeedback, CubosActionGoal, CubosActionResult, IdCubos
+from proyecto_final.msg import CubosAction, CubosFeedback, CubosGoal, CubosResult, IdCubos
 
 
 class CubeTrackerActionServer(object):
@@ -21,9 +19,10 @@ class CubeTrackerActionServer(object):
         rospy.init_node('cube_tracker_node')
 
         # Definición de variables Python
+        self.file_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
         self.obtain_img = False
         self.cv_img = None
-        self.CubeTracker = CubeTracker(cam_calib_path="/home/laboratorio/ros_workspace/src/proyecto_final/data/camera_data/ost.yaml")
+        self.CubeTracker = CubeTracker(cam_calib_path=f"{self.file_path}/data/camera_data/ost.yaml")
         self.bridge = CvBridge()
         
         # Definicion de variables ROS
@@ -39,17 +38,18 @@ class CubeTrackerActionServer(object):
             @param image (Image) - Imagen de la camara
         '''
         if self.obtain_img:
-            self.cv_img = self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough')
+            self.cv_img = deepcopy(self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough'))
+            self.cv_img = deepcopy(cv2.cvtColor(self.cv_img, cv2.COLOR_RGB2BGR)) #Convertir imagen a BGR
             self.obtain_img = False
 
-    def execute_cb(self, goal:CubosActionGoal)->None:
+    def execute_cb(self, goal:CubosGoal)->None:
         ''' 
         Callback del action server del CubeTracker
             @param goal (numpy array) - Goal recibido por el cliente
         '''
         if goal.order == 1:
             self.obtain_img = True
-            feedback = CubosActionFeedback()  # Crear un objeto de feedback
+            feedback = CubosFeedback()  # Crear un objeto de feedback
 
             # Crear y ejecutar el hilo de feedback
             feedback_thread = Thread(target=self.send_feedback, args=(feedback,))
@@ -72,23 +72,25 @@ class CubeTrackerActionServer(object):
                     self._action_server.set_aborted()  # Marcar la acción como fallida
                     return
 
-                rospy.sleep(0.1)
+                rospy.sleep(0.2)
                 
             if imagen is None:
                 return
+
             # Paso 2: Procesar la imagen
-            resultado_final = CubosActionResult()
+            resultado_final = CubosResult()
             _, resultado = self.CubeTracker.process_image(imagen)
             cv2.imwrite("imagen.png", imagen)
-            resultado_final.result.cubes_position = self._dict_to_cube(resultado)
+            resultado_final.cubes_position = self._dict_to_cube(resultado)
 
             # Paso 3: Finalizar la acción con el resultado procesado
             self._action_server.set_succeeded(resultado_final)
 
             # Esperar a que el hilo de feedback termine
             feedback_thread.join()
+            self.cv_img = None
 
-    def send_feedback(self, feedback:CubosActionFeedback):
+    def send_feedback(self, feedback:CubosFeedback):
         ''' 
         Función que utiliza el hilo para enviar el feedback al cliente
             @param feedback (CubosActionFeedback) - Feedback
@@ -111,7 +113,7 @@ class CubeTrackerActionServer(object):
             # Ajustamos la posición y orientación
             cubo.pose.position.x = dict['Position'][0]
             cubo.pose.position.y = dict['Position'][1]
-            cubo.pose.position.z = 0.01
+            cubo.pose.position.z = 0.0125
             cubo.pose.orientation = Quaternion(*quaternion_from_euler(pi, 0, -dict['Angle'], 'sxyz'))
 
             # Ajustamos el color del cubo
