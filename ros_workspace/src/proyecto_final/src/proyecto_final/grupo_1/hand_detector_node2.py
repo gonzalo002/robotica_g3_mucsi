@@ -9,11 +9,19 @@ import cv2
 import mediapipe as mp 
 import numpy as np
 
-def detectar_gesto(contorno, area):
-    AREA_UMBRAL = 39000
-    if area > AREA_UMBRAL:
-        return True
-    return False
+def detectar_gesto(contorno, area, z):
+    # Definir AREA_UMBRAL por defecto
+    AREA_UMBRAL = 59000  # valor por defecto
+
+    # Ajustar AREA_UMBRAL según la posición z
+    if -50.0 < z <= 0.0:
+        AREA_UMBRAL = 59000
+    elif 0.0 <= z < 192.0:
+        AREA_UMBRAL = 90000
+    elif -182.0 < z < -50.0:
+        AREA_UMBRAL = 39000
+
+    return area > AREA_UMBRAL
 
 def detectar_dislike(contorno):
     try:
@@ -32,7 +40,7 @@ def detectar_dislike(contorno):
             approx = cv2.approxPolyDP(contorno, epsilon, True)
             x, y, w, h = cv2.boundingRect(contorno)
             aspect_ratio = float(w) / h
-            if 10 <= len(approx) <= 12 and 0.68 <= aspect_ratio <= 0.90:
+            if 6 <= len(approx) <= 7 and 0.70 <= aspect_ratio <= 0.90:
                 return True
         return False
     except:
@@ -56,7 +64,7 @@ def detectar_dino(contorno):
             x, y, w, h = cv2.boundingRect(contorno)
             aspect_ratio = float(w) / h
             
-            if 8 <= len(approx) <= 10 and 0.89 <= aspect_ratio <= 1.46:
+            if 8 <= len(approx) <= 9 and 1.0 <= aspect_ratio <= 1.46:
                 return True
         return False
     except:
@@ -74,7 +82,7 @@ def detectar_paz(contorno):
         solidity = float(contour_area) / hull_area
         
         # Ajustamos los parámetros para una mejor detección del gesto de paz
-        if 0.55 <= solidity <= 0.75:
+        if 0.67 <= solidity <= 0.75:
             epsilon = 0.02 * cv2.arcLength(contorno, True)
             approx = cv2.approxPolyDP(contorno, epsilon, True)
             x, y, w, h = cv2.boundingRect(contorno)
@@ -93,8 +101,8 @@ def hand_detector():
     hands1 = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
     hands2 = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
 
-    cap1 = cv2.VideoCapture(6)
-    cap2 = cv2.VideoCapture(2)
+    cap1 = cv2.VideoCapture(7)
+    cap2 = cv2.VideoCapture(3)
 
     rate = rospy.Rate(10)
     
@@ -108,9 +116,6 @@ def hand_detector():
         
         ret1, frame1 = cap1.read()
         ret2, frame2 = cap2.read()
-
-        print(ret1)
-        print(ret2)
 
         if not ret1:
                 return True
@@ -127,7 +132,7 @@ def hand_detector():
         results2 = hands2.process(rgb_frame2)
 
         # Inicializar hand_data con valores por defecto y mano no detectada
-        hand_data = HandData()
+        hand_data = HandData()        
         hand_data.x = 0.0
         hand_data.y = 0.0
         hand_data.z = 0.0
@@ -135,6 +140,7 @@ def hand_detector():
         hand_data.is_peace = False
         hand_data.is_dino = False
         hand_data.is_dislike = False
+        area = 0.0
 
         if results1.multi_hand_landmarks:
             hand_data.hand_detected = True
@@ -163,7 +169,10 @@ def hand_detector():
                     if contours:
                         cnt = max(contours, key=cv2.contourArea)
                         area = cv2.contourArea(cnt)
-                        hand_data.is_open = detectar_gesto(cnt, area)
+                        
+                        # Detección de gestos usando el área de cámara 1 y z de cámara 2
+                        hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
+                        
                         hand_data.is_peace = detectar_paz(cnt)
                         hand_data.is_dino = detectar_dino(cnt)
                         hand_data.is_dislike = detectar_dislike(cnt)
@@ -191,9 +200,9 @@ def hand_detector():
         
         if results2.multi_hand_landmarks:
             hand_data.hand_detected = True
-            # Procesar cámara 1 para x, y
+            # Procesar cámara 2 para z
             for hand_landmarks in results2.multi_hand_landmarks:
-                h, w, _ = frame1.shape
+                h, w, _ = frame2.shape
                 landmarks = [(int(lm.x * w), int(lm.y * h)) for lm in hand_landmarks.landmark]
 
                 x_min = max(0, min(landmarks, key=lambda p: p[0])[0] - 30)
@@ -202,6 +211,8 @@ def hand_detector():
                 y_max = min(h, max(landmarks, key=lambda p: p[1])[1] + 30)
                 centro_x = (x_min + x_max) // 2
                 centro_y = (y_min + y_max) // 2
+                
+                # Actualizar z en hand_data
                 hand_data.z = float(h // 2 - centro_y)
 
                 # Detección de gestos
@@ -210,10 +221,18 @@ def hand_detector():
                     gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
                     _, thresh = cv2.threshold(gray_roi, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
                     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                    
-                            # Dibujar un círculo verde cuando se detecta la mano
+
+                    if contours:
+                        cnt = max(contours, key=cv2.contourArea)
+                        area = cv2.contourArea(cnt)
+                        # Actualizar is_open basado en el gesto detectado
+                        hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
+
+                # Dibujar un círculo verde cuando se detecta la mano
                 cv2.circle(frame2, (centro_x, centro_y), 10, (0, 255, 0), -1)
                 cv2.putText(frame2, "Mano detectada", (10, 30), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                cv2.putText(frame2, f"Z: {hand_data.z:.2f}", (10, 60),
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         else:
@@ -228,7 +247,8 @@ def hand_detector():
 
         pub.publish(hand_data)
         rate.sleep()
-
+    
+    hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
     cap1.release()
     cap2.release()
     cv2.destroyAllWindows()

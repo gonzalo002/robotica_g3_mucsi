@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/laboratorio/ros_workspace/build
 include CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosActionFeedback.dir/progress.make
 
 CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosActionFeedback:
-	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionFeedback.msg actionlib_msgs/GoalID:actionlib_msgs/GoalStatus:std_msgs/Header:proyecto_final/CubosFeedback
+	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/CubosActionFeedback.msg std_msgs/Header:proyecto_final/CubosFeedback:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID
 
 _proyecto_final_generate_messages_check_deps_CubosActionFeedback: CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosActionFeedback
 _proyecto_final_generate_messages_check_deps_CubosActionFeedback: CMakeFiles/_proyecto_final_generate_messages_check_deps_CubosActionFeedback.dir/build.make
