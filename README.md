@@ -143,4 +143,9 @@ export ROS_MASTER_URI=http://<IP_PC_MASTER>:11311/
 ```bash
 export ROS_IP=<IP_PC_ACTUAL>
 ```
-
+### Lanzar cámaras y servicios
+Con el fin de facilitar el lanzamiento de los servicios y las cámaras se ha creado un launch file que se puede ejecutar de la siguiente manera:
+```bash
+roslaunch proyecto_final group_2.launch cam_tracker:=true cam_view:=false
+```
+Este launch file tiene dos argumentos de entrada cam_tracker (activar la cámara superior para localizar cubos) y cam_view (activar las tres cámaras para obtener las vistas), ámbas están por defecto a true y solo puede tener como parámetros válidos: true o false. Según cómo se ajuste se lanzarán las cámaras o no, y además, si se lanza como false al envíar el request de alguno de los actions servers se indicara el número de imagen que se quiere analizar.
