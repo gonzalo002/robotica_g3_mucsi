@@ -34,16 +34,16 @@ RUN unzip /tmp/montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
 
 RUN pip install --upgrade pip \
 	catkin_tools \
-    tensorboard \
-    ur_rtde \
-    gymnasium==0.29.1 \
-    stable-baselines3[extra]==2.2.1 \
-    numpy --upgrade \
-    scipy \
-    opencv-contrib-python \
-    mediapipe \
-    ttkbootstrap \
-    Pillow==9.2.0
+	tensorboard \
+	ur_rtde \
+	gymnasium==0.29.1 \
+	stable-baselines3[extra]==2.2.1 \
+	numpy --upgrade \
+	scipy \
+	opencv-contrib-python \
+	mediapipe \
+	ttkbootstrap \
+	Pillow==9.2.0
 
 # Copiar el archivo user.py a la carpeta themes de ttkbootstrap
 COPY themes/user.py /usr/local/lib/python3.8/dist-packages/ttkbootstrap/themes/user.py
