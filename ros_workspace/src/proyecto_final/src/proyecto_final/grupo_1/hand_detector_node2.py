@@ -9,87 +9,60 @@ import cv2
 import mediapipe as mp 
 import numpy as np
 
-def detectar_gesto(contorno, area, z):
-    # Definir AREA_UMBRAL por defecto
-    AREA_UMBRAL = 59000  # valor por defecto
-
-    # Ajustar AREA_UMBRAL según la posición z
-    if -50.0 < z <= 0.0:
-        AREA_UMBRAL = 59000
-    elif 0.0 <= z < 192.0:
-        AREA_UMBRAL = 90000
-    elif -182.0 < z < -50.0:
-        AREA_UMBRAL = 39000
-
-    return area > AREA_UMBRAL
-
-def detectar_dislike(contorno):
+def detectar_dislike(landmarks):
     try:
-        hull = cv2.convexHull(contorno)
-        hull_area = cv2.contourArea(hull)
-        contour_area = cv2.contourArea(contorno)
+        # Pulgar hacia abajo, otros dedos cerrados
+        pulgar_abajo = landmarks[4].y > landmarks[3].y
+        indice_cerrado = landmarks[8].y > landmarks[6].y
+        medio_cerrado = landmarks[12].y > landmarks[10].y
+        anular_cerrado = landmarks[16].y > landmarks[14].y
+        menique_cerrado = landmarks[20].y > landmarks[18].y
         
-        if hull_area == 0:
-            return False
-
-        solidity = float(contour_area) / hull_area
-        
-        # Ajustamos los parámetros para una mejor detección del gesto de paz
-        if 0.5 <= solidity <= 0.7:
-            epsilon = 0.02 * cv2.arcLength(contorno, True)
-            approx = cv2.approxPolyDP(contorno, epsilon, True)
-            x, y, w, h = cv2.boundingRect(contorno)
-            aspect_ratio = float(w) / h
-            if 6 <= len(approx) <= 7 and 0.70 <= aspect_ratio <= 0.90:
-                return True
-        return False
+        return (pulgar_abajo and indice_cerrado and 
+                medio_cerrado and anular_cerrado and menique_cerrado)
     except:
         return False
 
-def detectar_dino(contorno):
+def detectar_dino(landmarks):
     try:
-        hull = cv2.convexHull(contorno)
-        hull_area = cv2.contourArea(hull)
-        contour_area = cv2.contourArea(contorno)
+        # Solo índice extendido, otros dedos cerrados
+        indice_extendido = landmarks[8].y < landmarks[6].y
+        medio_cerrado = landmarks[12].y > landmarks[10].y
+        anular_cerrado = landmarks[16].y > landmarks[14].y
+        menique_cerrado = landmarks[20].y > landmarks[18].y
+        pulgar_cerrado = landmarks[4].x > landmarks[3].x
         
-        if hull_area == 0:
-            return False
-
-        solidity = float(contour_area) / hull_area
-        
-        # Ajustamos los parámetros para una mejor detección del gesto de paz
-        if 0.6 <= solidity <= 0.73:
-            epsilon = 0.02 * cv2.arcLength(contorno, True)
-            approx = cv2.approxPolyDP(contorno, epsilon, True)
-            x, y, w, h = cv2.boundingRect(contorno)
-            aspect_ratio = float(w) / h
-            
-            if 8 <= len(approx) <= 9 and 1.0 <= aspect_ratio <= 1.46:
-                return True
-        return False
+        return (indice_extendido and medio_cerrado and 
+                anular_cerrado and menique_cerrado and pulgar_cerrado)
     except:
         return False
     
-def detectar_paz(contorno):
+def detectar_paz(landmarks):
+    # Verificar posiciones específicas de los dedos usando MediaPipe
     try:
-        hull = cv2.convexHull(contorno)
-        hull_area = cv2.contourArea(hull)
-        contour_area = cv2.contourArea(contorno)
+        # Índice y medio extendidos, otros dedos cerrados
+        indice_extendido = landmarks[8].y < landmarks[6].y
+        medio_extendido = landmarks[12].y < landmarks[10].y
+        anular_cerrado = landmarks[16].y > landmarks[14].y
+        menique_cerrado = landmarks[20].y > landmarks[18].y
+        pulgar_cerrado = landmarks[4].x > landmarks[3].x
         
-        if hull_area == 0:
-            return False
-
-        solidity = float(contour_area) / hull_area
-        
-        # Ajustamos los parámetros para una mejor detección del gesto de paz
-        if 0.67 <= solidity <= 0.75:
-            epsilon = 0.02 * cv2.arcLength(contorno, True)
-            approx = cv2.approxPolyDP(contorno, epsilon, True)
-            x, y, w, h = cv2.boundingRect(contorno)
-            aspect_ratio = float(w) / h
-            if 7 <= len(approx) <= 8 and 0.40 <= aspect_ratio <= 60:
-                return True
+        return (indice_extendido and medio_extendido and 
+                anular_cerrado and menique_cerrado and pulgar_cerrado)
+    except:
         return False
+
+def detectar_mano_abierta(landmarks):
+    try:
+        # Todos los dedos extendidos
+        indice_extendido = landmarks[8].y < landmarks[6].y
+        medio_extendido = landmarks[12].y < landmarks[10].y
+        anular_extendido = landmarks[16].y < landmarks[14].y
+        menique_extendido = landmarks[20].y < landmarks[18].y
+        pulgar_extendido = landmarks[4].x < landmarks[3].x  # Para mano derecha
+        
+        return (indice_extendido and medio_extendido and 
+                anular_extendido and menique_extendido and pulgar_extendido)
     except:
         return False
 
@@ -98,11 +71,25 @@ def hand_detector():
     pub = rospy.Publisher('/hand_data', HandData, queue_size=10)
 
     mp_hands = mp.solutions.hands
-    hands1 = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
-    hands2 = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
+    mp_draw = mp.solutions.drawing_utils
+    mp_drawing_styles = mp.solutions.drawing_styles
 
-    cap1 = cv2.VideoCapture(7)
-    cap2 = cv2.VideoCapture(3)
+    # Configurar MediaPipe con mayor confianza de detección
+    hands1 = mp_hands.Hands(
+        static_image_mode=False,
+        max_num_hands=1,
+        min_detection_confidence=0.7,
+        min_tracking_confidence=0.7
+    )
+    hands2 = mp_hands.Hands(
+        static_image_mode=False,
+        max_num_hands=1,
+        min_detection_confidence=0.7,
+        min_tracking_confidence=0.7
+    )
+
+    cap1 = cv2.VideoCapture(3)
+    cap2 = cv2.VideoCapture(7)
 
     rate = rospy.Rate(10)
     
@@ -113,142 +100,117 @@ def hand_detector():
     cv2.namedWindow(window_name2)
 
     while not rospy.is_shutdown():
-        
         ret1, frame1 = cap1.read()
         ret2, frame2 = cap2.read()
 
-        if not ret1:
-                return True
-        if not ret2:
-                return True
+        if not ret1 or not ret2:
+            return True
 
         frame1_flip1 = cv2.flip(frame1, 1)
         frame2_flip2 = cv2.flip(frame2, 1)
 
-        rgb_frame1 = cv2.cvtColor(frame1_flip1, cv2.COLOR_BGR2RGB)
-        rgb_frame2 = cv2.cvtColor(frame2_flip2, cv2.COLOR_BGR2RGB)
+        # Mejorar la visualización
+        frame1 = cv2.resize(frame1_flip1, (640, 480))
+        frame2 = cv2.resize(frame2_flip2, (640, 480))
+
+        rgb_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+        rgb_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB)
 
         results1 = hands1.process(rgb_frame1)
         results2 = hands2.process(rgb_frame2)
 
-        # Inicializar hand_data con valores por defecto y mano no detectada
-        hand_data = HandData()        
+        # Inicializar hand_data
+        hand_data = HandData()
+        hand_data.hand_detected = False
         hand_data.x = 0.0
         hand_data.y = 0.0
         hand_data.z = 0.0
-        hand_data.is_open = True  # Por defecto abierta
+        hand_data.is_open = False
         hand_data.is_peace = False
         hand_data.is_dino = False
         hand_data.is_dislike = False
-        area = 0.0
 
+        # Procesar cámara 1
         if results1.multi_hand_landmarks:
             hand_data.hand_detected = True
-            # Procesar cámara 1 para x, y
             for hand_landmarks in results1.multi_hand_landmarks:
-                h, w, _ = frame1.shape
-                landmarks = [(int(lm.x * w), int(lm.y * h)) for lm in hand_landmarks.landmark]
+                # Dibujar landmarks y conexiones
+                mp_draw.draw_landmarks(
+                    frame1,
+                    hand_landmarks,
+                    mp_hands.HAND_CONNECTIONS,
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style()
+                )
 
-                x_min = max(0, min(landmarks, key=lambda p: p[0])[0] - 30)
-                y_min = max(0, min(landmarks, key=lambda p: p[1])[1] - 30)
-                x_max = min(w, max(landmarks, key=lambda p: p[0])[0] + 30)
-                y_max = min(h, max(landmarks, key=lambda p: p[1])[1] + 30)
-
-                centro_x = (x_min + x_max) // 2
-                centro_y = (y_min + y_max) // 2
-                hand_data.x = -1*(float(centro_x - w // 2))
-                hand_data.y = float(h // 2 - centro_y)
-
-                # Detección de gestos
-                roi = frame1[y_min:y_max, x_min:x_max]
-                if roi.size > 0:
-                    gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-                    _, thresh = cv2.threshold(gray_roi, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-                    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-                    if contours:
-                        cnt = max(contours, key=cv2.contourArea)
-                        area = cv2.contourArea(cnt)
-                        
-                        # Detección de gestos usando el área de cámara 1 y z de cámara 2
-                        hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
-                        
-                        hand_data.is_peace = detectar_paz(cnt)
-                        hand_data.is_dino = detectar_dino(cnt)
-                        hand_data.is_dislike = detectar_dislike(cnt)
-                # Dibujar un círculo verde cuando se detecta la mano
-                cv2.circle(frame1, (centro_x, centro_y), 10, (0, 255, 0), -1)
-                cv2.putText(frame1, "Mano detectada", (10, 30), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-                # Añadir visualización del estado de la pinza
-                estado_texto = "Gesto de paz detectado" if hand_data.is_peace else "Gesto normal"
-                cv2.putText(frame1, estado_texto, (10, 60), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                           (0, 255, 0) if hand_data.is_peace else (0, 0, 255), 2)
+                landmarks = hand_landmarks.landmark
                 
-                # Añadir visualización del estado de la pinza
-                estado_texto = "Gesto de dino detectado" if hand_data.is_dino else "Gesto normal"   
-                cv2.putText(frame1, estado_texto, (10, 90), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                           (0, 255, 0) if hand_data.is_dino else (0, 0, 255), 2)
-                # Añadir visualización del estado de la pinza
-                estado_texto = "Gesto de dislike" if hand_data.is_dislike else "Gesto normal"   
-                cv2.putText(frame1, estado_texto, (10, 120), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                           (0, 255, 0) if hand_data.is_dislike else (0, 0, 255), 2)
-        
+                # Actualizar coordenadas
+                palm_center = landmarks[0]
+                hand_data.x = -1 * (palm_center.x * frame1.shape[1] - frame1.shape[1] // 2)
+                hand_data.y = frame1.shape[0] // 2 - palm_center.y * frame1.shape[0]
+
+                # Detectar gestos
+                hand_data.is_peace = detectar_paz(landmarks)
+                hand_data.is_dino = detectar_dino(landmarks)
+                hand_data.is_dislike = detectar_dislike(landmarks)
+                hand_data.is_open = detectar_mano_abierta(landmarks)
+
+                # Mostrar coordenadas de los dedos
+                for id, lm in enumerate(landmarks):
+                    h, w, c = frame1.shape
+                    cx, cy = int(lm.x * w), int(lm.y * h)
+                    # Mostrar puntos clave de los dedos (puntas y articulaciones base)
+                    if id in [4, 8, 12, 16, 20]:  # Puntas de los dedos
+                        cv2.circle(frame1, (cx, cy), 8, (255, 0, 0), cv2.FILLED)
+                    elif id in [3, 7, 11, 15, 19]:  # Articulaciones medias
+                        cv2.circle(frame1, (cx, cy), 5, (0, 255, 0), cv2.FILLED)
+
+                # Mostrar información en pantalla
+                info_text = [
+                    f"Mano: {'Abierta' if hand_data.is_open else 'Cerrada'}",
+                    f"Paz: {'Si' if hand_data.is_peace else 'No'}",
+                    f"Dino: {'Si' if hand_data.is_dino else 'No'}",
+                    f"Dislike: {'Si' if hand_data.is_dislike else 'No'}",
+                    f"X: {hand_data.x:.2f}",
+                    f"Y: {hand_data.y:.2f}"
+                ]
+
+                for i, text in enumerate(info_text):
+                    cv2.putText(frame1, text, (10, 30 + i*30),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                              (0, 255, 0), 2)
+
+        # Procesar cámara 2
         if results2.multi_hand_landmarks:
-            hand_data.hand_detected = True
-            # Procesar cámara 2 para z
             for hand_landmarks in results2.multi_hand_landmarks:
-                h, w, _ = frame2.shape
-                landmarks = [(int(lm.x * w), int(lm.y * h)) for lm in hand_landmarks.landmark]
+                # Dibujar landmarks y conexiones
+                mp_draw.draw_landmarks(
+                    frame2,
+                    hand_landmarks,
+                    mp_hands.HAND_CONNECTIONS,
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style()
+                )
 
-                x_min = max(0, min(landmarks, key=lambda p: p[0])[0] - 30)
-                y_min = max(0, min(landmarks, key=lambda p: p[1])[1] - 30)
-                x_max = min(w, max(landmarks, key=lambda p: p[0])[0] + 30)
-                y_max = min(h, max(landmarks, key=lambda p: p[1])[1] + 30)
-                centro_x = (x_min + x_max) // 2
-                centro_y = (y_min + y_max) // 2
-                
-                # Actualizar z en hand_data
-                hand_data.z = float(h // 2 - centro_y)
+                # Calcular coordenada Z
+                palm_center = hand_landmarks.landmark[0]
+                hand_data.z = frame2.shape[0] // 2 - palm_center.y * frame2.shape[0]
 
-                # Detección de gestos
-                roi = frame2[y_min:y_max, x_min:x_max]
-                if roi.size > 0:
-                    gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-                    _, thresh = cv2.threshold(gray_roi, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-                    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                # Mostrar coordenada Z
+                cv2.putText(frame2, f"Z: {hand_data.z:.2f}", (10, 30),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-                    if contours:
-                        cnt = max(contours, key=cv2.contourArea)
-                        area = cv2.contourArea(cnt)
-                        # Actualizar is_open basado en el gesto detectado
-                        hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
+        # Mostrar frames
+        cv2.imshow("Camara 1 (XY)", frame1)
+        cv2.imshow("Camara 2 (Z)", frame2)
 
-                # Dibujar un círculo verde cuando se detecta la mano
-                cv2.circle(frame2, (centro_x, centro_y), 10, (0, 255, 0), -1)
-                cv2.putText(frame2, "Mano detectada", (10, 30), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                cv2.putText(frame2, f"Z: {hand_data.z:.2f}", (10, 60),
-                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        else:
-            # Mostrar texto en rojo cuando no se detecta la mano
-            cv2.putText(frame1, "No se detecta mano", (10, 30), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-        cv2.imshow(window_name1, frame1)
-        cv2.imshow(window_name2, frame2)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
         pub.publish(hand_data)
         rate.sleep()
-    
-    hand_data.is_open = detectar_gesto(cnt, area, hand_data.z)
+
     cap1.release()
     cap2.release()
     cv2.destroyAllWindows()
