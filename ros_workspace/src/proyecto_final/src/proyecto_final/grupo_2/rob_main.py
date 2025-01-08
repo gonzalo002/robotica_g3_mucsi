@@ -88,8 +88,8 @@ class SecuenceCommander:
         # Poses
         self.p_figure_origin:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_MATRIX_ORIGIN')
         self.p_discard_origin:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_ORIGIN')
-        self.p_discard_origin_2:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_ORIGIN')
-        self.p_hand_origin = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_ORIGIN')        
+        self.p_discard_origin_2:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_2_ORIGIN')
+        self.p_hand_origin = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_HAND_ORIGIN')        
         self.p_aruco = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/pose_aruco', 'P_ARUCO')        
 
         # JointStates
@@ -98,7 +98,7 @@ class SecuenceCommander:
         self.j_home:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_HOME')
         self.j_prev_aruco:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_PRE_ARUCO')
         self.j_discard_origin:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_DISCARD_ORIGIN')
-        self.j_discard_origin_2:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_DISCARD_ORIGIN')
+        self.j_discard_origin_2:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_DISCARD_2_ORIGIN')
         
         
         
