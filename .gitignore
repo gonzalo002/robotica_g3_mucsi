@@ -1,4 +1,4 @@
-/.catkin_tools
-/build
-/devel
-/logs
+/ros_workspace/.catkin_tools
+/ros_workspace/build
+/ros_workspace/devel
+/ros_workspace/logs
