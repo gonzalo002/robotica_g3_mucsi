@@ -1,87 +1,66 @@
-#! /usr/bin/env python
-import sys
-import rospy
+#!/usr/bin/python3
 
-# Brings in the SimpleActionClient
-import actionlib
+import os
+# Configurar la variable de entorno para que no aparezcan mensajes de error de index de camara
+os.environ["OPENCV_LOG_LEVEL"] = "FATAL"
 
-# Brings in the messages used by the fibonacci action, including the
-# goal message and the result message.
-from proyecto_final.msg import FigurasAction, FigurasActionGoal, FigurasActionResult #Matriz Figura
-from proyecto_final.msg import CubosAction, CubosActionGoal, CubosActionResult #Pose Cubos
-from proyecto_final.msg import RLAction, RLActionGoal, RLActionResult # Orden Cubos
+import cv2
 
-class MasterClient:
-    def __init__(self) -> None:
-        # rospy.init_node('master_action_client')
-        pass
+colores = {
+    "rojo": "\033[31m",      # Rojo
+    "verde": "\033[32m",     # Verde
+    "amarillo": "\033[33m",  # Amarillo
+    "azul": "\033[34m",      # Azul
+    "magenta": "\033[35m",   # Magenta
+    "cian": "\033[36m",      # Cian
+    "blanco": "\033[37m",    # Blanco
+    "reset": "\033[0m"       # Restablecer al color predeterminado
+}
 
-    def client_figura():
-        # Creates the SimpleActionClient, passing the type of the action
-        client = actionlib.SimpleActionClient('figura_to_robot', FigurasActionResult)
 
-        # Espera hasta que se inicia el servidor y recibes el goal
-        client.wait_for_server()
+class CameraController:
+    def __init__(self, max_cameras:int):
+        self.cameras = []
+        self.cameras_index = []
+        self.camera_names = []
+        self.start(max_cameras)
 
-        # Creates a goal to send to the action server.
-        goal = FigurasActionGoal()
-        goal.goal.order = 1
+    def start(self, max_cameras:int):
+        for index in range(max_cameras):
+            cap = cv2.VideoCapture(index)
+            if cap.isOpened():
+                self.cameras.append(cap)
+                self.cameras_index.append(index)
+                self.camera_names.append(f"Cámara {index}")
+                print(f"{colores['verde']} --- CAMARA {index} DISPONIBLE ---{colores['reset']}")
+            else:
+                cap.release()
+        
+        if self.cameras is None:
+            print(f"{colores['rojo']} --- NINGUNA CÁMARA DISPONIBLE ---{colores['reset']}")
+            
+    def stop(self):
+        for cap in self.cameras:
+            cap.release()
+        
+        self.cameras = []
+        self.cameras_index = []
+        self.camera_names = []
 
-        # Sends the goal to the action server.
-        client.send_goal(goal)
+    def get_frame(self, camera_index):
+        
+        if 0 <= camera_index < len(self.cameras):
+            ret, frame = self.cameras[camera_index].read()
+            if ret:
+                return frame
+            else:
+                print(f"{colores['rojo']}[ERROR] Failed to read camera{colores['reset']}")
+                return None
+        else:
+            print(f"{colores['rojo']}[ERROR] Camera index out of range{colores['reset']}")
+            return None
 
-        # Espera al servidor a finalizar la acción
-        client.wait_for_result()
 
-        # Muestra el resultado del action ejecutado
-        return client.get_result()  # Reultado de las Figuras
-
-    def client_cubo():
-        # Creates the SimpleActionClient, passing the type of the action
-        client = actionlib.SimpleActionClient('cubo_to_robot', CubosActionResult)
-
-        # Espera hasta que se inicia el servidor y recibes el goal
-        client.wait_for_server()
-
-        # Creates a goal to send to the action server.
-        goal = CubosActionGoal()
-        goal.goal.order = 1
-
-        # Sends the goal to the action server.
-        client.send_goal(goal)
-
-        # Espera al servidor a finalizar la acción
-        client.wait_for_result()
-
-        # Muestra el resultado del action ejecutado
-        return client.get_result()  # Reultado de los Cubos
-
-    def client_rl():
-        # Creates the SimpleActionClient, passing the type of the action
-        client = actionlib.SimpleActionClient('agent_to_robot', RLActionResult)
-
-        # Espera hasta que se inicia el servidor y recibes el goal
-        client.wait_for_server()
-
-        # Creates a goal to send to the action server.
-        goal = RLActionGoal()
-        goal.goal.order = 1
-
-        # Sends the goal to the action server.
-        client.send_goal(goal)
-
-        # Espera al servidor a finalizar la acción
-        client.wait_for_result()
-
-        # Muestra el resultado del action ejecutado
-        return client.get_result()  # Reultado del Agente
-
-    if __name__ == '__main__':
-        try:
-            # Initializes a rospy node so that the SimpleActionClient can
-            # publish and subscribe over ROS.
-            rospy.init_node('fibonacci_client_py')
-            result = fibonacci_client()
-            print("Result:", ', '.join([str(n) for n in result.sequence]))
-        except rospy.ROSInterruptException:
-            print("program interrupted before completion", file=sys.stderr)
+if __name__ in "__main__":
+    controlador = CameraController(10)
+    controlador.get_frame(0)

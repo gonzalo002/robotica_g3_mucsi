@@ -69,7 +69,7 @@ class HandResult {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '2780ed3d510972b1ad13ff43244bdd9c';
+    return '8e2c27ecbe4c685c21e13c0026bb9b71';
   }
 
   static messageDefinition() {
@@ -84,11 +84,11 @@ class HandResult {
     float32 x
     float32 y
     float32 z
-    bool is_open
-    bool is_peace
     bool hand_detected
+    bool is_peace
     bool is_dino
     bool is_dislike
+    bool is_open
     
     `;
   }

@@ -21,11 +21,11 @@ class HandData {
       this.x = null;
       this.y = null;
       this.z = null;
-      this.is_open = null;
-      this.is_peace = null;
       this.hand_detected = null;
+      this.is_peace = null;
       this.is_dino = null;
       this.is_dislike = null;
+      this.is_open = null;
     }
     else {
       if (initObj.hasOwnProperty('x')) {
@@ -46,23 +46,17 @@ class HandData {
       else {
         this.z = 0.0;
       }
-      if (initObj.hasOwnProperty('is_open')) {
-        this.is_open = initObj.is_open
+      if (initObj.hasOwnProperty('hand_detected')) {
+        this.hand_detected = initObj.hand_detected
       }
       else {
-        this.is_open = false;
+        this.hand_detected = false;
       }
       if (initObj.hasOwnProperty('is_peace')) {
         this.is_peace = initObj.is_peace
       }
       else {
         this.is_peace = false;
-      }
-      if (initObj.hasOwnProperty('hand_detected')) {
-        this.hand_detected = initObj.hand_detected
-      }
-      else {
-        this.hand_detected = false;
       }
       if (initObj.hasOwnProperty('is_dino')) {
         this.is_dino = initObj.is_dino
@@ -76,6 +70,12 @@ class HandData {
       else {
         this.is_dislike = false;
       }
+      if (initObj.hasOwnProperty('is_open')) {
+        this.is_open = initObj.is_open
+      }
+      else {
+        this.is_open = false;
+      }
     }
   }
 
@@ -87,16 +87,16 @@ class HandData {
     bufferOffset = _serializer.float32(obj.y, buffer, bufferOffset);
     // Serialize message field [z]
     bufferOffset = _serializer.float32(obj.z, buffer, bufferOffset);
-    // Serialize message field [is_open]
-    bufferOffset = _serializer.bool(obj.is_open, buffer, bufferOffset);
-    // Serialize message field [is_peace]
-    bufferOffset = _serializer.bool(obj.is_peace, buffer, bufferOffset);
     // Serialize message field [hand_detected]
     bufferOffset = _serializer.bool(obj.hand_detected, buffer, bufferOffset);
+    // Serialize message field [is_peace]
+    bufferOffset = _serializer.bool(obj.is_peace, buffer, bufferOffset);
     // Serialize message field [is_dino]
     bufferOffset = _serializer.bool(obj.is_dino, buffer, bufferOffset);
     // Serialize message field [is_dislike]
     bufferOffset = _serializer.bool(obj.is_dislike, buffer, bufferOffset);
+    // Serialize message field [is_open]
+    bufferOffset = _serializer.bool(obj.is_open, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -110,16 +110,16 @@ class HandData {
     data.y = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [z]
     data.z = _deserializer.float32(buffer, bufferOffset);
-    // Deserialize message field [is_open]
-    data.is_open = _deserializer.bool(buffer, bufferOffset);
-    // Deserialize message field [is_peace]
-    data.is_peace = _deserializer.bool(buffer, bufferOffset);
     // Deserialize message field [hand_detected]
     data.hand_detected = _deserializer.bool(buffer, bufferOffset);
+    // Deserialize message field [is_peace]
+    data.is_peace = _deserializer.bool(buffer, bufferOffset);
     // Deserialize message field [is_dino]
     data.is_dino = _deserializer.bool(buffer, bufferOffset);
     // Deserialize message field [is_dislike]
     data.is_dislike = _deserializer.bool(buffer, bufferOffset);
+    // Deserialize message field [is_open]
+    data.is_open = _deserializer.bool(buffer, bufferOffset);
     return data;
   }
 
@@ -134,7 +134,7 @@ class HandData {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '9b0493b2ed6710620a749baf2ddc5457';
+    return 'dcd7b721daa328eeced1a03199aff024';
   }
 
   static messageDefinition() {
@@ -143,11 +143,11 @@ class HandData {
     float32 x
     float32 y
     float32 z
-    bool is_open
-    bool is_peace
     bool hand_detected
+    bool is_peace
     bool is_dino
     bool is_dislike
+    bool is_open
     
     `;
   }
@@ -179,11 +179,11 @@ class HandData {
       resolved.z = 0.0
     }
 
-    if (msg.is_open !== undefined) {
-      resolved.is_open = msg.is_open;
+    if (msg.hand_detected !== undefined) {
+      resolved.hand_detected = msg.hand_detected;
     }
     else {
-      resolved.is_open = false
+      resolved.hand_detected = false
     }
 
     if (msg.is_peace !== undefined) {
@@ -191,13 +191,6 @@ class HandData {
     }
     else {
       resolved.is_peace = false
-    }
-
-    if (msg.hand_detected !== undefined) {
-      resolved.hand_detected = msg.hand_detected;
-    }
-    else {
-      resolved.hand_detected = false
     }
 
     if (msg.is_dino !== undefined) {
@@ -212,6 +205,13 @@ class HandData {
     }
     else {
       resolved.is_dislike = false
+    }
+
+    if (msg.is_open !== undefined) {
+      resolved.is_open = msg.is_open;
+    }
+    else {
+      resolved.is_open = false
     }
 
     return resolved;

@@ -86,7 +86,7 @@ class HandAction {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '6ee07e099c3116daca4869c67c7e1851';
+    return 'f385f3cfcac25c55236f196a06ae2fdf';
   }
 
   static messageDefinition() {
@@ -186,11 +186,11 @@ class HandAction {
     float32 x
     float32 y
     float32 z
-    bool is_open
-    bool is_peace
     bool hand_detected
+    bool is_peace
     bool is_dino
     bool is_dislike
+    bool is_open
     
     ================================================================================
     MSG: proyecto_final/HandActionFeedback

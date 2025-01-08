@@ -27,21 +27,21 @@ struct HandData_
     : x(0.0)
     , y(0.0)
     , z(0.0)
-    , is_open(false)
-    , is_peace(false)
     , hand_detected(false)
+    , is_peace(false)
     , is_dino(false)
-    , is_dislike(false)  {
+    , is_dislike(false)
+    , is_open(false)  {
     }
   HandData_(const ContainerAllocator& _alloc)
     : x(0.0)
     , y(0.0)
     , z(0.0)
-    , is_open(false)
-    , is_peace(false)
     , hand_detected(false)
+    , is_peace(false)
     , is_dino(false)
-    , is_dislike(false)  {
+    , is_dislike(false)
+    , is_open(false)  {
   (void)_alloc;
     }
 
@@ -56,20 +56,20 @@ struct HandData_
    typedef float _z_type;
   _z_type z;
 
-   typedef uint8_t _is_open_type;
-  _is_open_type is_open;
+   typedef uint8_t _hand_detected_type;
+  _hand_detected_type hand_detected;
 
    typedef uint8_t _is_peace_type;
   _is_peace_type is_peace;
-
-   typedef uint8_t _hand_detected_type;
-  _hand_detected_type hand_detected;
 
    typedef uint8_t _is_dino_type;
   _is_dino_type is_dino;
 
    typedef uint8_t _is_dislike_type;
   _is_dislike_type is_dislike;
+
+   typedef uint8_t _is_open_type;
+  _is_open_type is_open;
 
 
 
@@ -103,11 +103,11 @@ bool operator==(const ::proyecto_final::HandData_<ContainerAllocator1> & lhs, co
   return lhs.x == rhs.x &&
     lhs.y == rhs.y &&
     lhs.z == rhs.z &&
-    lhs.is_open == rhs.is_open &&
-    lhs.is_peace == rhs.is_peace &&
     lhs.hand_detected == rhs.hand_detected &&
+    lhs.is_peace == rhs.is_peace &&
     lhs.is_dino == rhs.is_dino &&
-    lhs.is_dislike == rhs.is_dislike;
+    lhs.is_dislike == rhs.is_dislike &&
+    lhs.is_open == rhs.is_open;
 }
 
 template<typename ContainerAllocator1, typename ContainerAllocator2>
@@ -164,12 +164,12 @@ struct MD5Sum< ::proyecto_final::HandData_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "9b0493b2ed6710620a749baf2ddc5457";
+    return "dcd7b721daa328eeced1a03199aff024";
   }
 
   static const char* value(const ::proyecto_final::HandData_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x9b0493b2ed671062ULL;
-  static const uint64_t static_value2 = 0x0a749baf2ddc5457ULL;
+  static const uint64_t static_value1 = 0xdcd7b721daa328eeULL;
+  static const uint64_t static_value2 = 0xced1a03199aff024ULL;
 };
 
 template<class ContainerAllocator>
@@ -191,11 +191,11 @@ struct Definition< ::proyecto_final::HandData_<ContainerAllocator> >
     return "float32 x\n"
 "float32 y\n"
 "float32 z\n"
-"bool is_open\n"
-"bool is_peace\n"
 "bool hand_detected\n"
+"bool is_peace\n"
 "bool is_dino\n"
 "bool is_dislike\n"
+"bool is_open\n"
 ;
   }
 
@@ -217,11 +217,11 @@ namespace serialization
       stream.next(m.x);
       stream.next(m.y);
       stream.next(m.z);
-      stream.next(m.is_open);
-      stream.next(m.is_peace);
       stream.next(m.hand_detected);
+      stream.next(m.is_peace);
       stream.next(m.is_dino);
       stream.next(m.is_dislike);
+      stream.next(m.is_open);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -246,16 +246,16 @@ struct Printer< ::proyecto_final::HandData_<ContainerAllocator> >
     Printer<float>::stream(s, indent + "  ", v.y);
     s << indent << "z: ";
     Printer<float>::stream(s, indent + "  ", v.z);
-    s << indent << "is_open: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.is_open);
-    s << indent << "is_peace: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.is_peace);
     s << indent << "hand_detected: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.hand_detected);
+    s << indent << "is_peace: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.is_peace);
     s << indent << "is_dino: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.is_dino);
     s << indent << "is_dislike: ";
     Printer<uint8_t>::stream(s, indent + "  ", v.is_dislike);
+    s << indent << "is_open: ";
+    Printer<uint8_t>::stream(s, indent + "  ", v.is_open);
   }
 };
 

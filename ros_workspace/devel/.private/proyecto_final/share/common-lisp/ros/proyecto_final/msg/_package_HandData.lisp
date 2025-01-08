@@ -5,14 +5,14 @@
           Y
           Z-VAL
           Z
-          IS_OPEN-VAL
-          IS_OPEN
-          IS_PEACE-VAL
-          IS_PEACE
           HAND_DETECTED-VAL
           HAND_DETECTED
+          IS_PEACE-VAL
+          IS_PEACE
           IS_DINO-VAL
           IS_DINO
           IS_DISLIKE-VAL
           IS_DISLIKE
+          IS_OPEN-VAL
+          IS_OPEN
 ))

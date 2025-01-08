@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/laboratorio/ros_workspace/build
 include CMakeFiles/_proyecto_final_generate_messages_check_deps_FigurasActionResult.dir/progress.make
 
 CMakeFiles/_proyecto_final_generate_messages_check_deps_FigurasActionResult:
-	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/FigurasActionResult.msg std_msgs/Header:actionlib_msgs/GoalStatus:proyecto_final/FigurasResult:actionlib_msgs/GoalID
+	catkin_generated/env_cached.sh /usr/bin/python3 /opt/ros/noetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py proyecto_final /home/laboratorio/ros_workspace/build/devel/share/proyecto_final/msg/FigurasActionResult.msg proyecto_final/FigurasResult:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:std_msgs/Header
 
 _proyecto_final_generate_messages_check_deps_FigurasActionResult: CMakeFiles/_proyecto_final_generate_messages_check_deps_FigurasActionResult
 _proyecto_final_generate_messages_check_deps_FigurasActionResult: CMakeFiles/_proyecto_final_generate_messages_check_deps_FigurasActionResult.dir/build.make

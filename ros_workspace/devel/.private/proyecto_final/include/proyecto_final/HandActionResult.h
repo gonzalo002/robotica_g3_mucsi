@@ -137,12 +137,12 @@ struct MD5Sum< ::proyecto_final::HandActionResult_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "e5eb7fa694095afd0055440446dd2f5c";
+    return "c1398fe481ec688645caf4fea4973474";
   }
 
   static const char* value(const ::proyecto_final::HandActionResult_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xe5eb7fa694095afdULL;
-  static const uint64_t static_value2 = 0x0055440446dd2f5cULL;
+  static const uint64_t static_value1 = 0xc1398fe481ec6886ULL;
+  static const uint64_t static_value2 = 0x45caf4fea4973474ULL;
 };
 
 template<class ContainerAllocator>
@@ -233,11 +233,11 @@ struct Definition< ::proyecto_final::HandActionResult_<ContainerAllocator> >
 "float32 x\n"
 "float32 y\n"
 "float32 z\n"
-"bool is_open\n"
-"bool is_peace\n"
 "bool hand_detected\n"
+"bool is_peace\n"
 "bool is_dino\n"
 "bool is_dislike\n"
+"bool is_open\n"
 ;
   }
 

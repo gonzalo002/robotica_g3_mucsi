@@ -200,7 +200,7 @@ def hand_data_callback(msg, control_robot):
     is_peace = msg.is_peace
     is_dino = msg.is_dino
 
-    if not is_open:
+    if is_open:
         limitesx = [0.23207591013811013, -0.19061986164757674]
         limitesy = [0.44488890481150184, 0.23159845770381593]
         limitesz = [0.398362,0.2]
@@ -245,7 +245,7 @@ def hand_data_callback(msg, control_robot):
                 
         except Exception as e:
             rospy.logerr(f"Error en el movimiento: {str(e)}")
-    elif is_open:
+    elif not is_open:
         rospy.loginfo("Mano abierta; el robot no se mueve.")
         # Verificar el estado de la pinza
         if is_peace and not control_robot.objeto_agarrado:

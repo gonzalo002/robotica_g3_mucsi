@@ -8,19 +8,19 @@ import struct
 
 
 class HandData(genpy.Message):
-  _md5sum = "9b0493b2ed6710620a749baf2ddc5457"
+  _md5sum = "dcd7b721daa328eeced1a03199aff024"
   _type = "proyecto_final/HandData"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """float32 x
 float32 y
 float32 z
-bool is_open
-bool is_peace
 bool hand_detected
+bool is_peace
 bool is_dino
 bool is_dislike
+bool is_open
 """
-  __slots__ = ['x','y','z','is_open','is_peace','hand_detected','is_dino','is_dislike']
+  __slots__ = ['x','y','z','hand_detected','is_peace','is_dino','is_dislike','is_open']
   _slot_types = ['float32','float32','float32','bool','bool','bool','bool','bool']
 
   def __init__(self, *args, **kwds):
@@ -31,7 +31,7 @@ bool is_dislike
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       x,y,z,is_open,is_peace,hand_detected,is_dino,is_dislike
+       x,y,z,hand_detected,is_peace,is_dino,is_dislike,is_open
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -46,25 +46,25 @@ bool is_dislike
         self.y = 0.
       if self.z is None:
         self.z = 0.
-      if self.is_open is None:
-        self.is_open = False
-      if self.is_peace is None:
-        self.is_peace = False
       if self.hand_detected is None:
         self.hand_detected = False
+      if self.is_peace is None:
+        self.is_peace = False
       if self.is_dino is None:
         self.is_dino = False
       if self.is_dislike is None:
         self.is_dislike = False
+      if self.is_open is None:
+        self.is_open = False
     else:
       self.x = 0.
       self.y = 0.
       self.z = 0.
-      self.is_open = False
-      self.is_peace = False
       self.hand_detected = False
+      self.is_peace = False
       self.is_dino = False
       self.is_dislike = False
+      self.is_open = False
 
   def _get_types(self):
     """
@@ -79,7 +79,7 @@ bool is_dislike
     """
     try:
       _x = self
-      buff.write(_get_struct_3f5B().pack(_x.x, _x.y, _x.z, _x.is_open, _x.is_peace, _x.hand_detected, _x.is_dino, _x.is_dislike))
+      buff.write(_get_struct_3f5B().pack(_x.x, _x.y, _x.z, _x.hand_detected, _x.is_peace, _x.is_dino, _x.is_dislike, _x.is_open))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -95,12 +95,12 @@ bool is_dislike
       _x = self
       start = end
       end += 17
-      (_x.x, _x.y, _x.z, _x.is_open, _x.is_peace, _x.hand_detected, _x.is_dino, _x.is_dislike,) = _get_struct_3f5B().unpack(str[start:end])
-      self.is_open = bool(self.is_open)
-      self.is_peace = bool(self.is_peace)
+      (_x.x, _x.y, _x.z, _x.hand_detected, _x.is_peace, _x.is_dino, _x.is_dislike, _x.is_open,) = _get_struct_3f5B().unpack(str[start:end])
       self.hand_detected = bool(self.hand_detected)
+      self.is_peace = bool(self.is_peace)
       self.is_dino = bool(self.is_dino)
       self.is_dislike = bool(self.is_dislike)
+      self.is_open = bool(self.is_open)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
@@ -114,7 +114,7 @@ bool is_dislike
     """
     try:
       _x = self
-      buff.write(_get_struct_3f5B().pack(_x.x, _x.y, _x.z, _x.is_open, _x.is_peace, _x.hand_detected, _x.is_dino, _x.is_dislike))
+      buff.write(_get_struct_3f5B().pack(_x.x, _x.y, _x.z, _x.hand_detected, _x.is_peace, _x.is_dino, _x.is_dislike, _x.is_open))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -131,12 +131,12 @@ bool is_dislike
       _x = self
       start = end
       end += 17
-      (_x.x, _x.y, _x.z, _x.is_open, _x.is_peace, _x.hand_detected, _x.is_dino, _x.is_dislike,) = _get_struct_3f5B().unpack(str[start:end])
-      self.is_open = bool(self.is_open)
-      self.is_peace = bool(self.is_peace)
+      (_x.x, _x.y, _x.z, _x.hand_detected, _x.is_peace, _x.is_dino, _x.is_dislike, _x.is_open,) = _get_struct_3f5B().unpack(str[start:end])
       self.hand_detected = bool(self.hand_detected)
+      self.is_peace = bool(self.is_peace)
       self.is_dino = bool(self.is_dino)
       self.is_dislike = bool(self.is_dislike)
+      self.is_open = bool(self.is_open)
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e)  # most likely buffer underfill
