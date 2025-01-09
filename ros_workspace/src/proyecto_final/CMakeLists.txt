@@ -170,6 +170,9 @@ include_directories(
 # in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/proyecto_final/control_robot.py
+  src/proyecto_final/HandDetectorTopic.py
+  src/proyecto_final/CubeTrackerActionServer.py
+  src/proyecto_final/FigurasActionServer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
