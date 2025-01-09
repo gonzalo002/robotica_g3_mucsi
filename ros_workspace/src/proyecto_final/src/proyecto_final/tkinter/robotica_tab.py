@@ -10,13 +10,12 @@ import cv2, os, rospy, actionlib
 import matplotlib.pyplot as plt
 from tkinter import messagebox
 from geometry2D import Geometry2D
-from proyecto_final.tkinter.hand_geometry import HandGeometry
 from PIL.ImageTk import PhotoImage
 from cv_bridge import CvBridge
 from ttkbootstrap.constants import *
 import sensor_msgs.msg
 from PIL import Image, Image, ImageDraw, ImageFont, ImageTk
-from proyecto_final.grupo_2.rob_main import SecuenceCommander
+from proyecto_final.rob_main import SecuenceCommander
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from proyecto_final.vision.grupo_2.generacion_figura import FigureGenerator
 
