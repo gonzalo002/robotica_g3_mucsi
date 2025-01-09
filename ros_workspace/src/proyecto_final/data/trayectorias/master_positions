@@ -39,12 +39,20 @@ J_MATRIX_ORIGIN:
 - 5.995807735417851
 
 J_DISCARD_ORIGIN:
-- 1.9654215574264526
-- -1.6516591511168421
-- 1.1777961889850062
-- -1.100713090305664
-- -1.5666144529925745
-- -1.2541945616351526
+- -0.2277143637286585
+- -1.3575881731561203
+- -1.539842128753662
+- -1.8138662777342738
+- 1.5733420848846436
+- -0.10102492967714483
+
+J_DISCARD_2_ORIGIN:
+- -2.1487272421466272
+- -1.6346632442870082
+- -1.1192048788070679
+- -1.9574839077391566
+- 1.5733743906021118
+- 0.9283180236816406
 
 P_MATRIX_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose # Pose Inicial de la Figura
   state:
@@ -60,7 +68,7 @@ P_MATRIX_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose # Pose Inicial
     - -5.149126908018109e-05
     - 8.728985659246074e-05
     
-P_DISCARD_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
+P_DISCARD_ORIGIN_V1: !!python/object/new:geometry_msgs.msg._Pose.Pose
   state:
   - !!python/object/new:geometry_msgs.msg._Point.Point
     state:
@@ -73,3 +81,45 @@ P_DISCARD_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
     - 0.7329608675315642
     - -2.6605306984095323e-05
     - 6.928307312140119e-06
+
+P_DISCARD_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -0.28996691599352165
+    - 0.22
+    - 0.23539582854608912
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.6802708033654928
+    - 0.7329608675315642
+    - -2.6605306984095323e-05
+    - 6.928307312140119e-06
+
+P_DISCARD_2_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - 0.3332830293129509
+    - 0.23
+    - 0.2335302994504278
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.7233505674517562
+    - -0.6904498301532557
+    - -0.006255739200495766
+    - 0.001963246193891617
+
+P_HAND_ORIGIN: !!python/object/new:geometry_msgs.msg._Pose.Pose
+  state:
+  - !!python/object/new:geometry_msgs.msg._Point.Point
+    state:
+    - -0.064253
+    - 0.416105
+    - 0.325710
+  - !!python/object/new:geometry_msgs.msg._Quaternion.Quaternion
+    state:
+    - 0.999468
+    - 0.030193
+    - -0.007263
+    - 0.009946
