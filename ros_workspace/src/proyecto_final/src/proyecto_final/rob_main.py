@@ -2,7 +2,7 @@
 
 # Importaciones Propias
 from proyecto_final.control_robot import ControlRobot
-from proyecto_final.grupo_2.MasterClient import MasterClient
+from proyecto_final.MasterClient import MasterClient
 from proyecto_final.funciones_auxiliares import crear_mensaje
 
 # Importaciones de Datos
