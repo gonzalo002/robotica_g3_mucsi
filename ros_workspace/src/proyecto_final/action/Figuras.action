@@ -1,8 +1,9 @@
-#goal definition
+# Request
 int8 order
 ---
-#result definition
+# Result
 int8[] figure_3d
+int8[] shape_3d
 ---
-#feedback
+# Feedback
 int8 feedback

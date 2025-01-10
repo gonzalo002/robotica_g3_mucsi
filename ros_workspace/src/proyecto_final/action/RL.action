@@ -1,9 +1,10 @@
-#goal definition
+# Request
 IdCubos[] cubes_position
 int8[]  cubes_order
 ---
-#result definition
+# Result
 int8[] cubes_correct_order
+trajectory_msgs/JointTrajectoryPoint[] cubes_trajectories
 ---
-#feedback
+# Feedback
 int8 feedback
