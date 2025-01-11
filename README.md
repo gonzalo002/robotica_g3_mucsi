@@ -139,6 +139,9 @@ rosrun camera_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/u
 ### Conectar al master (de ordenador a ordenador)
 ```bash
 export ROS_MASTER_URI=http://<IP_PC_MASTER>:11311/
+```
+En nuestro caso:
+```bash
 export ROS_MASTER_URI=http://10.172.21.30:11311/
 ```
 ```bash
