@@ -1,1 +1,0 @@
-/home/laboratorio/ros_workspace/devel/.private/ur_calibration/share/ur_calibration/cmake/ur_calibrationConfig-version.cmake

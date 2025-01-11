@@ -1,1 +1,0 @@
-/home/laboratorio/ros_workspace/devel/.private/proyecto_final/share/roseus/ros/proyecto_final/manifest.l

@@ -1,1 +1,0 @@
-/home/laboratorio/ros_workspace/devel/.private/practica_2/share/practica_2/cmake/practica_2Config.cmake

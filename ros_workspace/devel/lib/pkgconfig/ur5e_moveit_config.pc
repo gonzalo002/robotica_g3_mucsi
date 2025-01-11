@@ -1,1 +1,0 @@
-/home/laboratorio/ros_workspace/devel/.private/ur5e_moveit_config/lib/pkgconfig/ur5e_moveit_config.pc

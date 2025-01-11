@@ -1,1 +1,0 @@
-/home/laboratorio/ros_workspace/devel/.private/proyecto_final/lib/proyecto_final/control_robot.py
