@@ -13,7 +13,7 @@ class FigureGenerator:
         self.message:str = None
         self.message_type:int = 0 # 1=Info, 2=Warn, 3=Error
 
-    def generate_figure_from_matrix(self, matriz_planta:list, matriz_alzado:list, matriz_perfil:list, figsize:tuple=(3,3), paint:bool = False, tkinter:bool=False):
+    def generate_figure_from_matrix(self, matriz_planta:list, matriz_alzado:list, matriz_perfil:list, figsize:tuple=(3,3), paint:bool = False, tkinter:bool=True):
         """
         Función principal de la clase, toma como entrada las tres matrices, analiza la anchura, profundidad y altura de la figura
         y compara los datos de las diferentes matrices hasta obtener la figura tridimensional resultante.
