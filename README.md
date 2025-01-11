@@ -149,17 +149,17 @@ Con el fin de facilitar el lanzamiento de los servicios y las cámaras se ha cre
 ```bash
 roslaunch proyecto_final figure_maker.launch cam_tracker:=true cam_view:=true
 ```
-Este launch file sirve para el lanzamiento de las cámaras y servicios necesarios para la detección y reconstrucción de la figura a traves del robot.
-El ordenador responsable de lanzar este launch file, debe ser el ordenador al que se conecten las cámaras asociadas a este proceso.
+- Este launch file sirve para el lanzamiento de las cámaras y servicios necesarios para la detección y reconstrucción de la figura a traves del robot.
+- El ordenador responsable de lanzar este launch file, debe ser el ordenador al que se conecten las cámaras asociadas a este proceso.
 
-Este launch file tiene dos argumentos de entrada cam_tracker (activar la cámara superior para localizar cubos) y cam_view (activar las tres cámaras para obtener las vistas), ámbas están por defecto a true y solo puede tener como parámetros válidos: true o false. Según cómo se ajuste se lanzarán las cámaras o no, y además, si se lanza como false al envíar el request de alguno de los actions servers se indicara el número de imagen que se quiere analizar.
+- Este launch file tiene dos argumentos de entrada cam_tracker (activar la cámara superior para localizar cubos) y cam_view (activar las tres cámaras para obtener las vistas), ámbas están por defecto a true y solo puede tener como parámetros válidos: true o false. Según cómo se ajuste se lanzarán las cámaras o no, y además, si se lanza como false al envíar el request de alguno de los actions servers se indicara el número de imagen que se quiere analizar.
 
 ### Lanzar cámaras y servicios para movimiento del robot a traves de mano
 Con el fin de facilitar el lanzamiento de los servicios y las cámaras se ha creado un launch file que se puede ejecutar de la siguiente manera:
 ```bash
 roslaunch proyecto_final hand_control.launch
 ```
-Este launch file sirve para el lanzamiento de las cámaras y servicios necesarios para el control del robot mediante la detección de la mano en el espacio de visión de las cámaras superior y lateral.
-El ordenador responsable de lanzar este launch file, debe ser el ordenador al que se conecten las cámaras asociadas a este proceso.
+- Este launch file sirve para el lanzamiento de las cámaras y servicios necesarios para el control del robot mediante la detección de la mano en el espacio de visión de las cámaras superior y lateral.
+- El ordenador responsable de lanzar este launch file, debe ser el ordenador al que se conecten las cámaras asociadas a este proceso.
 
-Para controlar el robot, es necesario lanzar el launch file de reconstrucción de figura ya que este es el responsable del robot.
+- Para controlar el robot, es necesario lanzar el launch file de reconstrucción de figura ya que este es el responsable del robot.
