@@ -3,6 +3,9 @@
   <arg name="cam_tracker" default="true" />
   <arg name="cam_view" default="true" />
 
+  <!-- LANZAR EL ROBOT -->
+  <include file="$(find launcher_robots_lab_robotica)/launch/robot_206.launch"/>
+
   <!-- Si cam_tracker o cam_view == TRUE -->
   <group if="$(eval cam_tracker or cam_view)">
     <!-- CÁMARA PLANTA -->
