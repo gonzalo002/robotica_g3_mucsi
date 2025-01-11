@@ -6,7 +6,7 @@ from time import sleep
 from copy import deepcopy
 from sympy import Q
 import ttkbootstrap as ttk
-import cv2, os, rospy, actionlib
+import cv2, rospy
 import matplotlib.pyplot as plt
 from tkinter import messagebox
 from geometry2D import Geometry2D
@@ -14,10 +14,11 @@ from PIL.ImageTk import PhotoImage
 from cv_bridge import CvBridge
 from ttkbootstrap.constants import *
 import sensor_msgs.msg
+from threading import Thread
 from PIL import Image, Image, ImageDraw, ImageFont, ImageTk
 from proyecto_final.rob_main import SecuenceCommander
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from proyecto_final.vision.grupo_2.generacion_figura import FigureGenerator
+from proyecto_final.vision.generacion_figura import FigureGenerator
 
 
 class RoboticaTkinter:
@@ -44,7 +45,7 @@ class RoboticaTkinter:
         self.subs_cam_alzado = rospy.Subscriber('/alzado_cam/image_raw', sensor_msgs.msg.Image, self.cb_image_alzado)
         self.subs_cam_lateral = rospy.Subscriber('/perfil_cam/image_raw', sensor_msgs.msg.Image, self.cb_image_lateral)
         self.subs_cam_hand_lateral = rospy.Subscriber('/lateral_hand_cam/image_raw', sensor_msgs.msg.Image, self.cb_hand_lateral)
-        self.subs_cam_hand_top = rospy.Subscriber('/top_hand_cam/image_raw', sensor_msgs.msg.Image, self.cb_hand_lateral)
+        self.subs_cam_hand_top = rospy.Subscriber('/top_hand_cam/image_raw', sensor_msgs.msg.Image, self.cb_hand_top)
 
 
         self.LF_rviz = None
@@ -52,9 +53,8 @@ class RoboticaTkinter:
         self.img_aspect_ratio = 0.4
         self.Logic_MakeFigure = False
         self.Logic_DetectFigure = False
-        self.Logic_Calibrate = False
+        self.Logic_Calibrate = True
         self.Contador_Calibrate = 0
-
 
         self.estilo()
         self.start_robot_tab()
@@ -304,7 +304,7 @@ class RoboticaTkinter:
         self.geometry1_frame.grid_columnconfigure(0, weight=1)
         self.geometry1_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        ttk.Label(self.geometry1_frame,text="REPRESENTACIÓN FIGURA", 
+        ttk.Label(self.geometry1_frame,text="REPRESENTACIÓN FIGURA 3D", 
                   font=("Montserrat SemiBold", 10), 
                   foreground="#000000").grid(row=0, column=0, pady=[0,5],sticky="N")
         
@@ -321,7 +321,7 @@ class RoboticaTkinter:
         self.geometry2_frame.grid_columnconfigure(0, weight=1)
         self.geometry2_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        ttk.Label(self.geometry2_frame,text="REPRESENTACIÓN FIGURA", 
+        ttk.Label(self.geometry2_frame,text="REPRESENTACIÓN INICIAL DEL WS", 
                   font=("Montserrat SemiBold", 10), 
                   foreground="#000000").grid(row=0, column=0, pady=[0,5],sticky="N")
         
@@ -401,7 +401,7 @@ class RoboticaTkinter:
         self.B_Calibrate = ttk.Button(self.F_cuarta_fila, command=self.command_calibrate_aruco, bootstyle="primary", text="CALIBRAR ARUCO")
         self.B_Calibrate.grid(row=0, column=1, sticky="nsew",padx=10, pady=0)
 
-        self.B_RemakeFigure = ttk.Button(self.F_cuarta_fila, bootstyle="primary", state="!disabled", text="RECONSTRUCT FIGURE")
+        self.B_RemakeFigure = ttk.Button(self.F_cuarta_fila, command=self.command_remake_figure, bootstyle="primary", state="disabled", text="RECONSTRUCT FIGURE")
         self.B_RemakeFigure.grid(row=0, column=2, sticky="nsew",padx=10, pady=0)
     
     def _fila_acciones_man(self):
@@ -440,20 +440,20 @@ class RoboticaTkinter:
 
         self.terminal = ttk.ScrolledText(self.F_terminal, 
                                     wrap=ttk.WORD, 
-                                    font=("Courier", 12),
+                                    font=("Courier", 10),
                                     height=2,
-                                    state=ttk.NORMAL)
+                                    state=ttk.DISABLED)
         self.terminal.configure(
             bg="#1e1e1e",  # Fondo negro
             fg="white",  # Texto blanco
             insertbackground="white",  # Cursor blanco
         )
         self.terminal.vbar.pack_forget() 
-        #self.terminal.config(yscrollcommand=self.terminal_scroll.set)
         self.terminal.grid(row=0, column=0, sticky="nsew")
         self.terminal.tag_configure("ERROR", foreground="red")  # Estilo para errores
         self.terminal.tag_configure("INPUT", foreground="magenta")  # Estilo para advertencias
         self.terminal.tag_configure("INFO", foreground="white")
+        self.terminal.tag_configure("WARN", foreground="yellow")
         self.terminal.tag_configure("SUCCESS", foreground="green")
 
         self._update_terminal()
@@ -461,7 +461,11 @@ class RoboticaTkinter:
     def _rviz_launch(self):
         try:
             # Lanzar RViz en un proceso separado y dar tiempo a que aparezca
-            self.rviz_process = subprocess.Popen(['rviz'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.rviz_process = subprocess.Popen(
+                    ['rviz', '-d', '/home/laboratorio/ros_workspace/src/proyecto_final/data/tkinter_img/tkinter.rviz'],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
             sleep(1)
             
             # Usa xwininfo para obtener la ventana de RViz
@@ -511,19 +515,26 @@ class RoboticaTkinter:
 
     def _update_images(self):
         aspect_ratio = 0.55
+        if not hasattr(self, "V_modo"):
+            return
         if self.V_modo.get() != 1:
             aspect_ratio = 0.4
             img2 = self._create_image_with_text(f"/cam_alzado\nNO PUBLICADO", aspect_ratio)
             self.L_img_alzado.config(image=img2)
             self.L_img_alzado.image = img2
-        
+
+            nombre_top = "/cam_top"
+            nombre_lateral = "/cam_lateral"
+        else:
+            nombre_top = "/cam_hand_top"
+            nombre_lateral = "/cam_hand_lateral"
 
         # Actualizar las etiquetas en la interfaz
-        img1 = self._create_image_with_text(f"/cam_top\nNO PUBLICADO", aspect_ratio)
+        img1 = self._create_image_with_text(f"{nombre_top}\nNO PUBLICADO", aspect_ratio)
         self.L_img_top.config(image=img1)
         self.L_img_top.image = img1
 
-        img3 = self._create_image_with_text(f"/cam_lateral\nNO PUBLICADO", aspect_ratio)
+        img3 = self._create_image_with_text(f"{nombre_lateral}\nNO PUBLICADO", aspect_ratio)
         self.L_img_lateral.config(image=img3)
         self.L_img_lateral.image = img3
 
@@ -578,7 +589,10 @@ class RoboticaTkinter:
             img = Image.fromarray(img)
             
             # Redimensionar la imagen
-            img_size = (int(640 * self.img_aspect_ratio), int(480 * self.img_aspect_ratio))
+            if self.V_modo.get() != 1: 
+                img_size = (int(img.size[0] * self.img_aspect_ratio), int(img.size[1] * self.img_aspect_ratio))
+            else:
+                img_size = (int(img.size[0] * 0.55), int(img.size[1] * 0.55))
             img = img.resize(img_size, Image.Resampling.LANCZOS)
 
             # Convertir TK
@@ -592,6 +606,8 @@ class RoboticaTkinter:
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
         '''
+        if not hasattr(self, "V_modo"):
+            return
         if self.V_modo.get() != 1: 
             # Convertir la imagen de ROS (sensor_msgs/Image) a OpenCV
             img = deepcopy(self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough'))
@@ -606,6 +622,9 @@ class RoboticaTkinter:
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
         '''
+        if not hasattr(self, "V_modo"):
+            return
+
         if self.V_modo.get() != 1: 
             # Convertir la imagen de ROS (sensor_msgs/Image) a OpenCV
             img = deepcopy(self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough'))
@@ -620,6 +639,8 @@ class RoboticaTkinter:
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
         '''
+        if not hasattr(self, "V_modo"):
+            return
         if self.V_modo.get() != 1: 
             # Convertir la imagen de ROS (sensor_msgs/Image) a OpenCV
             img = deepcopy(self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough'))
@@ -646,6 +667,8 @@ class RoboticaTkinter:
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
         '''
+        if not hasattr(self, "V_modo"):
+            return
         if self.V_modo.get() == 1: 
             # Convertir la imagen de ROS (sensor_msgs/Image) a OpenCV
             img = deepcopy(self.bridge.imgmsg_to_cv2(image, desired_encoding='passthrough'))
@@ -654,32 +677,43 @@ class RoboticaTkinter:
             if self.L_img_top.winfo_exists():
                 self.root.after(0, self.update_image, img, self.L_img_top)
 
-
     def command_detect_figure(self):
+        Thread(target=self.detect_figure_thread, daemon=True).start()
+
+
+    def detect_figure_thread(self):
         self.B_MakeFigure.state([ttk.DISABLED])
         self.B_Calibrate.state([ttk.DISABLED])
         self.B_RemakeFigure.state([ttk.DISABLED])
+        self.CB_modo.state([ttk.DISABLED])
 
         self.RobMain.detect_figure()
 
         if hasattr(self, "canvas_3d"):
             self.canvas_3d.get_tk_widget().destroy()
+
         fig_3d = self.Geometry3D._paint_matrix(self.RobMain.matriz3D, tkinter=True, figsize=(3,2.5))
         self.canvas_3d = FigureCanvasTkAgg(fig_3d, self.geometry1_frame)
         self.canvas_3d.get_tk_widget().grid(row=1, column=0)
 
-        if self.RobMain.matriz3D != np.all(self.matriz3D == -1):
+        if not np.all(self.RobMain.matriz3D == -1):
             self.Logic_DetectFigure = True
-            self.B_RemakeFigure.state(["!disabled"])
+            if self.Logic_Calibrate and self.Logic_DetectFigure:
+                self.B_RemakeFigure.state(["!disabled"])
 
         self.B_MakeFigure.state(["!disabled"])
         self.B_Calibrate.state(["!disabled"])
+        self.CB_modo.state(["!disabled"])
 
     def command_calibrate_aruco(self):
+        Thread(target=self.calibrate_aruco_thread, daemon=True).start()
+
+    def calibrate_aruco_thread(self):
         # --- DESABILITAR BOTONES ---
         self.B_MakeFigure.state([ttk.DISABLED])
         self.B_RemakeFigure.state([ttk.DISABLED])
         self.B_Calibrate.state([ttk.DISABLED])
+        self.CB_modo.state([ttk.DISABLED])
 
         # --- REALIZAR ACCIÓN ---
         if self.Contador_Calibrate == 0:
@@ -710,16 +744,41 @@ class RoboticaTkinter:
             self.Contador_Calibrate += 1
 
 
+        self.CB_modo.state(["!disabled"])
         self.B_Calibrate.state(["!disabled"])
 
     def command_hand_control(self):
         if self.V_HandControl.get() == 1:
-            self.B_HandControl.config(bootstyle="toolbutton-danger", text="PARAR CONTROL POR MANO")
-            self._update_hand_status()
+            if self.RobMain._hand_control_active():
+                self.B_HandControl.config(bootstyle="toolbutton-danger", text="PARAR CONTROL POR MANO")
+                self._update_hand_status()
+                self.feedback_thread = Thread(target=self.RobMain._control_robot_by_hand)
+                self.feedback_thread.start()
         else:
+            self.RobMain.hand_control = False
+            self.feedback_thread.join()
+            self.RobMain._hand_control_deactivate()
             self.B_HandControl.config(bootstyle="toolbutton-primary", text="EMPEZAR CONTROL POR MANO")
+            self.cv_img = []
 
+    def command_remake_figure(self):
+        Thread(target=self.remake_figure_thread, daemon=True).start()
 
+    def remake_figure_thread(self):
+        self.CB_modo.state([ttk.DISABLED])
+        self.RobMain.track_cubes()
+
+        if hasattr(self, "canvas_2d"):
+            self.canvas_2d.get_tk_widget().destroy()
+        fig_2d = self.Geometry2D.draw_2d_space(self.RobMain.cubes, tkinter=True,figsize=(4,3))
+        self.canvas_2d = FigureCanvasTkAgg(fig_2d, self.geometry2_frame)
+        self.canvas_2d.get_tk_widget().grid(row=1, column=0)
+
+        sleep(0.5)
+
+        if self.RobMain._test_figure():
+            self.RobMain.create_figure()
+        self.CB_modo.state(["!disabled"])
 
     def _update_hand_status(self):
         path = "/home/laboratorio/ros_workspace/src/proyecto_final/data/tkinter_img/"
@@ -728,6 +787,8 @@ class RoboticaTkinter:
                 gesture = "is_dino"
             elif self.RobMain.hand_gesture['is_peace']:
                 gesture = "is_peace"
+            elif self.RobMain.hand_gesture['is_dislike']:
+                gesture = "is_dislike"
             elif self.RobMain.hand_gesture['is_open']:
                 gesture = "is_open"
             else:
@@ -748,6 +809,7 @@ class RoboticaTkinter:
         self.L_img_mano.config(image=tk_image)
         self.L_img_mano.image = tk_image
 
+        self.scatter.set_sizes([100])
         self.scatter._offsets3d = (
             [self.RobMain.hand_pose[0]],
             [self.RobMain.hand_pose[1]],
@@ -766,9 +828,12 @@ class RoboticaTkinter:
 
     def setup_figure(self):
         """Configura la figura inicial y el scatter point."""
-        self.ax.set_xlim(self.RobMain.hand_range["x_min"], self.RobMain.hand_range["x_max"])
-        self.ax.set_ylim(self.RobMain.hand_range["y_min"], self.RobMain.hand_range["y_max"])
-        self.ax.set_zlim(self.RobMain.hand_range["z_min"], self.RobMain.hand_range["z_max"])
+        # self.ax.set_xlim(self.RobMain.hand_range["x_min"], self.RobMain.hand_range["x_max"])
+        # self.ax.set_ylim(self.RobMain.hand_range["y_min"], self.RobMain.hand_range["y_max"])
+        # self.ax.set_zlim(self.RobMain.hand_range["z_min"], self.RobMain.hand_range["z_max"])
+        self.ax.set_xlim(-300, 300)
+        self.ax.set_ylim(-300, 300)
+        self.ax.set_zlim(-300, 300)
         self.ax.set_xlabel("X")
         self.ax.set_ylabel("Y")
         self.ax.set_zlabel("Z")
@@ -777,19 +842,22 @@ class RoboticaTkinter:
             self.RobMain.hand_pose[1],
             self.RobMain.hand_pose[2],
             color="red",
-            s=100,
+            s=0,
         )
         self.ax.legend()
 
-
     def _update_terminal(self):
         if self.RobMain.message is not None and self.RobMain.message_type is not None:
-            self.terminal.insert(ttk.END, self.RobMain.message, self.RobMain.message_type)
+            self.terminal.config(state=ttk.NORMAL)
+            self.terminal.insert(ttk.END, f"{self.RobMain.message}\n", self.RobMain.message_type)
             self.terminal.yview(ttk.END)
+            self.terminal.config(state=ttk.DISABLED)
             self.RobMain.message = None
             self.RobMain.message_type = None
 
         self.root.after(49, self._update_terminal)
+        
+
 
     def estilo(self):
         style = ttk.Style()

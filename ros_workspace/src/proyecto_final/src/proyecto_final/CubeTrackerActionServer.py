@@ -9,7 +9,7 @@ from collections import Counter
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Quaternion
 from tf.transformations import quaternion_from_euler
-from proyecto_final.vision.grupo_2.cube_tracker import CubeTracker
+from proyecto_final.vision.cube_tracker import CubeTracker
 from proyecto_final.msg import CubosAction, CubosFeedback, CubosGoal, CubosResult, IdCubos
 from proyecto_final.funciones_auxiliares import crear_mensaje
 
@@ -80,7 +80,7 @@ class CubeTrackerActionServer(object):
         
         resultado_final = CubosResult()
         img_process, resultado = self.CubeTracker.process_image(img)
-        cv2.imwrite("CubeTracker.png", img_process)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/CubeTracker.png", img_process)
         resultado_final.cubes_position = self._dict_to_cube(resultado)
         resultado_final.color_counter = self.color_counter
 
@@ -131,7 +131,7 @@ class CubeTrackerActionServer(object):
             L_resultado.append(resultado)
 
         resultado_final = CubosResult()
-        cv2.imwrite("CubeTracker.png", img_process)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/CubeTracker.png", img_process)
         resultado_final.cubes_position = self._dict_to_cube(resultado)
         resultado_final.color_counter = self.color_counter
 

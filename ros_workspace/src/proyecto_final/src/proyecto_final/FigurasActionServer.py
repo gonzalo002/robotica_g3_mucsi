@@ -8,9 +8,9 @@ from cv_bridge import CvBridge
 from collections import Counter
 from proyecto_final.funciones_auxiliares import crear_mensaje
 from sensor_msgs.msg import Image
-from proyecto_final.vision.grupo_2.image_processor_front import ImageProcessor_Front
-from proyecto_final.vision.grupo_2.image_processor_top import ImageProcessor_Top
-from proyecto_final.vision.grupo_2.generacion_figura import FigureGenerator
+from proyecto_final.vision.image_processor_front import ImageProcessor_Front
+from proyecto_final.vision.image_processor_top import ImageProcessor_Top
+from proyecto_final.vision.generacion_figura import FigureGenerator
 from proyecto_final.msg import FigurasAction, FigurasFeedback, FigurasGoal, FigurasResult
 
 
@@ -140,9 +140,6 @@ class FigureMakerActionServer(object):
         L_img_perfil = deepcopy(self.cv_img_perfil)
         L_img_planta = deepcopy(self.cv_img_planta)
         
-        # cv2.imshow("Alzado", L_img_alzado[0])
-        # cv2.imshow("Alzado", L_img_perfil[0])
-        # cv2.imshow("Alzado", L_img_planta[0])
 
         # --- PASO 2: Procesar cada una de las imagenes ---
         L_matrix_alzado = []
@@ -158,20 +155,15 @@ class FigureMakerActionServer(object):
             matrix, img_planta = self.ImageProcessorPlanta.process_image(L_img_planta[i])
             L_matrix_planta.append(deepcopy(matrix))
         
-        cv2.imwrite("alzado.png", img_alzado)
-        cv2.imwrite("perfil.png", img_perfil)
-        cv2.imwrite("planta.png", img_planta)
-        
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/alzado.png", img_alzado)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/perfil.png", img_perfil)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/planta.png", img_planta)
         
         
         # --- PASO 3: Obtener la matriz más frecuente ---
         matrix_alzado = self._matriz_frecuente(L_matrix_alzado)
         matrix_perfil = self._matriz_frecuente(L_matrix_perfil)
         matrix_planta = self._matriz_frecuente(L_matrix_planta)
-        # print(f"ALZADO:\n{matrix_alzado}")
-        # print(f"\n\nPERFIL:\n{matrix_perfil}")
-        # print(f"\n\nPLANTA:\n{matrix_planta}")
-        
         
         
         # --- PASO 4: Obtener la figura 3D ---
@@ -195,9 +187,9 @@ class FigureMakerActionServer(object):
         # --- PASO 6: Esperar union del hilo ---
         self.running = False
         feedback_thread.join()
-        self.cv_img_alzado  = []
-        self.cv_img_perfil = []
-        self.cv_img_planta = []
+        self.cv_img_alzado  = deepcopy([])
+        self.cv_img_perfil = deepcopy([])
+        self.cv_img_planta = deepcopy([])
     
 
     def execute_cb_off(self, goal:FigurasGoal)->None:
@@ -213,7 +205,7 @@ class FigureMakerActionServer(object):
         feedback_thread = Thread(target=self.send_feedback, args=(feedback,))
         feedback_thread.start()
 
-        # --- PASO 1: Obtener las imagenes con timeout ---
+        # --- PASO 1: Obtener las imagenes ---
         L_img_alzado = cv2.imread(f"{self.file_path}/data/example_img/figuras_alzado/Figura_{goal.order}_A.png")
         L_img_perfil = cv2.imread(f"{self.file_path}/data/example_img/figuras_perfil/Figura_{goal.order}_L.png")
         L_img_planta = cv2.imread(f"{self.file_path}/data/example_img/figuras_planta/Figura_{goal.order}_S.png")
@@ -227,23 +219,17 @@ class FigureMakerActionServer(object):
             self.action_server.set_aborted()
             return
 
-        
-
         # --- PASO 2: Obtener las matrices ---
         matrix_alzado, img_alzado = self.ImageProcessorAlzado.process_image(L_img_alzado)    
         matrix_perfil, img_perfil = self.ImageProcessorPerfil.process_image(L_img_perfil)
         matrix_planta, img_planta = self.ImageProcessorPlanta.process_image(L_img_planta)
         
-        cv2.imwrite("alzado.png", img_alzado)
-        cv2.imwrite("perfil.png", img_perfil)
-        cv2.imwrite("planta.png", img_planta)
-        
-        # print(f"ALZADO:\n{matrix_alzado}")
-        # print(f"\n\nPERFIL:\n{matrix_perfil}")
-        # print(f"\n\nPLANTA:\n{matrix_planta}")
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/alzado.png", img_alzado)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/perfil.png", img_perfil)
+        cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/planta.png", img_planta)
         
         
-        # --- PASO 4: Obtener la figura 3D ---
+        # --- PASO 3: Obtener la figura 3D ---
         resultado_final = FigurasResult()
         figura_3d = self.FigureGenerator.generate_figure_from_matrix(matrix_planta, matrix_alzado, matrix_perfil)
         figura_3d = figura_3d.astype(np.int8)
@@ -258,10 +244,10 @@ class FigureMakerActionServer(object):
             return
             
     
-        # --- PASO 5: Enviar el resultado ---
+        # --- PASO 4: Enviar el resultado ---
         self.action_server.set_succeeded(resultado_final)
 
-        # --- PASO 6: Esperar union del hilo ---
+        # --- PASO 5: Esperar union del hilo ---
         self.running = False
         feedback_thread.join()
 

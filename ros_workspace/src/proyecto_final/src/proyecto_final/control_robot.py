@@ -32,6 +32,9 @@ class ControlRobot:
         self.get_gripper_effort = False
         self.name = "ControlRobot"
 
+        self.move_group.set_max_velocity_scaling_factor(1)
+        self.move_group.set_max_acceleration_scaling_factor(1)
+
         self.train_env = train_env
         if train_env:
             self.move_group.set_planning_time(2)
@@ -173,32 +176,5 @@ class ControlRobot:
 if __name__ == '__main__':
     control = ControlRobot('robot')
     file_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
-    
-    #control.move_jointstates(control.read_from_yaml(f'{file_path}/data/trayectorias/master_points', 'P_MATRIX_ORIGIN'))
-    control.save_in_yaml(f'{file_path}/data/trayectorias/master_positions', 'J_DISCARD_ORIGIN', control.get_jointstates())
-    
-    #trayectoria=[]
-    #punto = control.get_pose()
-    #print('Punto inicial de la trayectoria')
-    #print(punto)
-    #trayectoria.append(copy.deepcopy(punto))
-    #punto.position.x -= 0.01
-    #trayectoria.append(copy.deepcopy(punto))
-    #punto.position.y -= 0.1
-    #trayectoria.append(copy.deepcopy(punto))
-    #print('Punto final de la trayectoria')
-    #print(punto)
-    ##control.set_pose_trajectory(trayectoria_pose)
-    ##control.set_joint_trajectory(trayectoria_joint)
-    #if not control.set_carthesian_path(trayectoria, eef_step=0.01):
-    #    pass
-    #else:
-    #    punto = control.get_pose()
-    #    print('Posición Alcanzada')
-    #    print(punto)
-    
 
-# Funcion que cree un array de Poses
-# Terminar funcion de trayectoria cartesiana
-# Funcion que cree un JointTarget
-# ,,.
+    control.save_in_yaml(f'{file_path}/data/trayectorias/master_positions', 'J_HAND_ORIGIN', control.get_jointstates())

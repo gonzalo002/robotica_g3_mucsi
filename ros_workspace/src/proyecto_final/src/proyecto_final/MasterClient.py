@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 import rospy, actionlib
+
 # Importación de mensajes ROS
 import numpy as np
 from proyecto_final.msg import FigurasAction, FigurasGoal, FigurasResult
 from proyecto_final.msg import CubosAction, CubosGoal, CubosResult
 from proyecto_final.msg import RLAction, RLGoal, RLResult
 from proyecto_final.funciones_auxiliares import crear_mensaje
-from proyecto_final.vision.grupo_2.generacion_figura import FigureGenerator
+from proyecto_final.vision.generacion_figura import FigureGenerator
 
 
 
@@ -33,10 +34,10 @@ class MasterClient:
         
         return self._secuencia_action_client(action_client, name, goal_msg)
 
-    def obtain_cube_order(self, goal:int=1):
+    def obtain_cube_order(self, goal:tuple):
         name = "RLActionServer"
         action_client = actionlib.SimpleActionClient(name, RLAction)
-        goal_msg = RLGoal(order=goal)
+        goal_msg = RLGoal(cubes_position=goal[0], cubes_order=goal[1])
         
         return self._secuencia_action_client(action_client, name, goal_msg)
 

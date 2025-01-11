@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2, sys, os
-from proyecto_final.vision.grupo_2.cube_tracker import CubeTracker
+from proyecto_final.vision.cube_tracker import CubeTracker
+from proyecto_final.msg import IdCubos
+from tf.transformations import euler_from_quaternion
 
 class Geometry2D:
     def __init__(self, square_size: int = 3):
@@ -36,14 +38,18 @@ class Geometry2D:
         new_cube_data_min = None
         new_cube_data_max = None
         # Representar los cubos
+        cube:IdCubos
         for cube in cube_data:
-            position = cube['Position']
-            angle = cube['Angle']
-            color = colors.get(cube['Color'], 'gray')
+            position = cube.pose.position
+            angle = euler_from_quaternion([cube.pose.orientation.x, 
+                                          cube.pose.orientation.y,
+                                          cube.pose.orientation.z,
+                                          cube.pose.orientation.w])[2]
+            color = colors.get(cube.color, 'gray')
 
             # Convertir posición a centímetros
-            x_center = position[0] * 100  # metros a centímetros
-            y_center = position[1] * 100
+            x_center = position.x * 100  # metros a centímetros
+            y_center = position.y * 100
 
             # Crear las esquinas del cuadrado antes de la rotación
             half_size = self.square_size / 2
@@ -79,7 +85,7 @@ class Geometry2D:
             square_rotated = np.dot(square - [x_center, y_center], rotation_matrix) + [x_center, y_center]
 
             # Dibujar el cuadrado
-            ax.add_patch(plt.Polygon(square_rotated, color=color, edgecolor='black', label=f'Cubo {cube["Color"]}'))
+            ax.add_patch(plt.Polygon(square_rotated, color=color, edgecolor='black', label=f'Cubo {cube.color}'))
 
         # Ajustar los límites del gráfico
         if new_cube_data_max is not None and new_cube_data_min is not None:
