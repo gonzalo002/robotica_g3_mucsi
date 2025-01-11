@@ -50,7 +50,7 @@ class SecuenceCommander:
     '''
     def __init__(self, simulation:bool = False) -> None:
         '''
-        çInicializa la clase.
+        Inicializa la clase.
             @param simulation (bool) - Indica si el robot está en modo simulación.
             @return None
         '''
