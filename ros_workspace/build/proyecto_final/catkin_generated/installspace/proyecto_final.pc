@@ -1,8 +1,0 @@
-prefix=/home/laboratorio/ros_workspace/install
-
-Name: proyecto_final
-Description: Description of proyecto_final
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: actionlib_msgs message_runtime
