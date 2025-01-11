@@ -15,8 +15,21 @@ from proyecto_final.msg import FigurasAction, FigurasFeedback, FigurasGoal, Figu
 
 
 class FigureMakerActionServer(object):
-    
+    """
+    Clase que implementa el servidor de acción para la generación de figuras 3D.
+        @method __init__ - Método constructor
+        @method cb_image_alzado - Callback del subscriptor de la cámara
+        @method cb_image_perfil - Callback del subscriptor de la cámara
+        @method cb_image_planta - Callback del subscriptor de la cámara
+        @method execute_cb_on - Callback del action server del CubeTracker
+        @method execute_cb_off - Callback del action server del CubeTracker
+        @method _matriz_frecuente - Función que obtiene la matriz más frecuente
+        @method send_feedback - Función que envía el feedback al cliente
+    """
     def __init__(self):
+        """
+        Método constructor de la clase FigureMakerActionServer.
+        """
         # Inicializar nodo
         rospy.init_node('figure_maker_node')
         self.name = "FigureMakerActionServer"
@@ -61,12 +74,13 @@ class FigureMakerActionServer(object):
         else:
             self.file_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
             self.action_server = actionlib.SimpleActionServer('FigureMakerActionServer', FigurasAction, execute_cb=self.execute_cb_off, auto_start=False)
+        
         # Action Server
         self.action_server.start()
 
         rospy.spin()
     
-    def cb_image_alzado(self, image:Image)->None:
+    def cb_image_alzado(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -80,7 +94,7 @@ class FigureMakerActionServer(object):
                 self.obtain_img_alzado = False
         
     
-    def cb_image_perfil(self, image2:Image)->None:
+    def cb_image_perfil(self, image2:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -93,7 +107,7 @@ class FigureMakerActionServer(object):
             else:
                 self.obtain_img_perfil = False
     
-    def cb_image_planta(self, image1:Image)->None:
+    def cb_image_planta(self, image1:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -106,7 +120,7 @@ class FigureMakerActionServer(object):
             else:
                 self.obtain_img_planta = False
 
-    def execute_cb_on(self, goal:FigurasGoal)->None:
+    def execute_cb_on(self, goal:FigurasGoal) -> None:
         ''' 
         Callback del action server del CubeTracker
             @param goal (numpy array) - Goal recibido por el cliente
@@ -192,7 +206,7 @@ class FigureMakerActionServer(object):
         self.cv_img_planta = deepcopy([])
     
 
-    def execute_cb_off(self, goal:FigurasGoal)->None:
+    def execute_cb_off(self, goal:FigurasGoal) -> None:
         ''' 
         Callback del action server del CubeTracker
             @param goal (numpy array) - Goal recibido por el cliente
@@ -254,6 +268,11 @@ class FigureMakerActionServer(object):
 
 
     def _matriz_frecuente(self, lista_matrices:list)->np.ndarray:
+        """
+        Función que obtiene la matriz más frecuente de una lista de matrices.
+            @param lista_matrices (list) - Lista de matrices
+            @return (np.ndarray) - Matriz más frecuente
+        """
         matrices_tuple = [tuple(map(tuple, matrix.tolist())) for matrix in lista_matrices]
 
         # Contamos las ocurrencias de cada matriz
@@ -274,8 +293,3 @@ class FigureMakerActionServer(object):
             feedback.feedback = 1
             self.action_server.publish_feedback(feedback)
             rospy.sleep(0.1)
-
-            
-            
-if __name__ == "__main__":
-    FigureMakerActionServer()

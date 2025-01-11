@@ -15,14 +15,26 @@ from proyecto_final.funciones_auxiliares import crear_mensaje
 
 
 class CubeTrackerActionServer(object):
-    
+    """
+    Clase que implementa el servidor de acción de CubeTracker.
+        @method __init__ - Método constructor
+        @method cb_image - Callback del subscriptor de la cámara
+        @method execute_cb_off - Callback del action server del CubeTracker sin cámara
+        @method execute_cb_on - Callback del action server del CubeTracker con cámara
+        @method lista_mas_frecuente - Función que obtiene la lista más frecuente
+        @method send_feedback - Función que envía el feedback al cliente
+        @method _dict_to_cube - Función que convierte la lista recibida por el procesador de cubos a IDCubos
+    """
     def __init__(self):
+        """
+        Método constructor de la clase CubeTrackerActionServer.
+        """
         # Inicializar nodo
-        rospy.init_node('cube_tracker_node')
+        rospy.init_node('cube_tracker_node') # Inicializa el nodo de ROS
         self.name = "CubeTrackerActionServer"
 
         # Obtenemos parámetro camara
-        cam_on = rospy.get_param("~cam_on", False)
+        cam_on = rospy.get_param("~cam_on", False) # Parámetro que indica si se debe usar la cámara o no
         if cam_on not in [True, False]:
             crear_mensaje("El parámetro 'cam_on' debe ser True o False. Se usará el valor predeterminado 'True'.", "WARN", self.name)
             rospy.logwarn("")
@@ -43,10 +55,10 @@ class CubeTrackerActionServer(object):
         else:
             self.action_server = actionlib.SimpleActionServer('CubeTrackerActionServer', CubosAction, execute_cb=self.execute_cb_off, auto_start=False)
         
-        self.action_server.start()
-        rospy.spin()
+        self.action_server.start() # Iniciar el action server
+        rospy.spin() # Mantener el nodo en ejecución
     
-    def cb_image(self, image:Image)->None:
+    def cb_image(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -60,16 +72,24 @@ class CubeTrackerActionServer(object):
                 self.obtain_img = False
 
 
-    def execute_cb_off(self, goal:CubosGoal)->None:
-        self.color_counter = [0,0,0,0]
+    def execute_cb_off(self, goal:CubosGoal) -> None:
+        """
+        Callback del action server del CubeTracker sin cámara.
+            @param goal (numpy array) - Goal recibido por el cliente
+        """
+        self.color_counter = [0,0,0,0] # Contador de colores
+        feedback = CubosFeedback() # Crear un objeto de feedback
+        resultado_final = CubosResult() # Crear un objeto de resultado
+        self.running = True # Indicar que el servidor está corriendo
+
         # Crear y ejecutar el hilo de feedback
-        feedback = CubosFeedback()
-        self.running = True
         feedback_thread = Thread(target=self.send_feedback, args=(feedback,))
         feedback_thread.start()
 
+        # Paso 1: Obtener la imagen
         img = cv2.imread(f"{self.file_path}/data/example_img/cubos_exparcidos/Cubos_Exparcidos_{goal.order}.png")
-        if img is None:
+
+        if img is None: # Si no se encuentra la imagen
             crear_mensaje("No se ha podido encontrar la imagen", "ERROR", self.name)
             feedback.feedback = -1
             self.action_server.publish_feedback(feedback)
@@ -78,9 +98,11 @@ class CubeTrackerActionServer(object):
             self.action_server.set_aborted()
             return
         
-        resultado_final = CubosResult()
+        # Paso 2: Procesar la imagen
         img_process, resultado = self.CubeTracker.process_image(img)
+
         cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/CubeTracker.png", img_process)
+
         resultado_final.cubes_position = self._dict_to_cube(resultado)
         resultado_final.color_counter = self.color_counter
 
@@ -92,7 +114,7 @@ class CubeTrackerActionServer(object):
         feedback_thread.join()
 
 
-    def execute_cb_on(self, goal:CubosGoal)->None:
+    def execute_cb_on(self, goal:CubosGoal) -> None:
         ''' 
         Callback del action server del CubeTracker
             @param goal (numpy array) - Goal recibido por el cliente
@@ -100,9 +122,10 @@ class CubeTrackerActionServer(object):
         self.color_counter = [0,0,0,0]
         self.obtain_img = True
         feedback = CubosFeedback()  # Crear un objeto de feedback
+        resultado_final = CubosResult() # Crear un objeto de resultado
+        self.running = True
 
         # Crear y ejecutar el hilo de feedback
-        self.running = True
         feedback_thread = Thread(target=self.send_feedback, args=(feedback,))
         feedback_thread.start()
 
@@ -130,7 +153,6 @@ class CubeTrackerActionServer(object):
             img_process, resultado = self.CubeTracker.process_image(L_img[i])
             L_resultado.append(resultado)
 
-        resultado_final = CubosResult()
         cv2.imwrite("/home/laboratorio/ros_workspace/src/proyecto_final/data/result_img/CubeTracker.png", img_process)
         resultado_final.cubes_position = self._dict_to_cube(resultado)
         resultado_final.color_counter = self.color_counter
@@ -143,7 +165,12 @@ class CubeTrackerActionServer(object):
         feedback_thread.join()
         self.cv_img = []
 
-    def lista_mas_frecuente(lista_de_listas):
+    def lista_mas_frecuente(lista_de_listas) -> list:
+        '''
+        Función que obtiene la lista más frecuente de una lista de listas.
+            @param lista_de_listas (list) - Lista de listas
+            @return (list) - Lista más frecuente
+        '''
         # Convertir cada lista de diccionarios en una tupla de colores
         listas_colores = [tuple(sorted([item["color"] for item in lista])) for lista in lista_de_listas]
 
@@ -156,7 +183,7 @@ class CubeTrackerActionServer(object):
         # Convertir la tupla más común de vuelta al formato original
         return list(lista_mas_comun)
 
-    def send_feedback(self, feedback:CubosFeedback):
+    def send_feedback(self, feedback:CubosFeedback) -> None:
         ''' 
         Función que utiliza el hilo para enviar el feedback al cliente
             @param feedback (CubosActionFeedback) - Feedback
@@ -194,8 +221,4 @@ class CubeTrackerActionServer(object):
             cubos.append(deepcopy(cubo))
             id += 1
 
-        return cubos
-            
-            
-if __name__ == "__main__":
-    CubeTrackerActionServer()
+        return cubos # Devolvemos la lista de cubos

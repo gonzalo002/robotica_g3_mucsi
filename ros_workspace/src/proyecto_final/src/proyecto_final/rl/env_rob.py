@@ -30,7 +30,7 @@ class ROSEnv(gym.Env):
             @param verbose: bool, indica si se desea mostrar mensajes en consola.
         """
         super(ROSEnv, self).__init__()
-        # self.control_robot = ControlRobot("robot", train_env=True)
+        self.control_robot = ControlRobot("robot", train_env=True)
 
         self.abs_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
 
@@ -51,7 +51,6 @@ class ROSEnv(gym.Env):
         # self.j_link_1:JointState = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_LINK_1')
         # self.j_home:JointState = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_HOME')
 
-        self.needed_cubes = {}
         self.available_cubes = [0]*5
         self.cubos_recogidos = 0
         
@@ -151,36 +150,37 @@ class ROSEnv(gym.Env):
             
             selected_cube = cube
         
-            # cube_pose:Pose = selected_cube.pose # Obtiene la pose del cubo seleccionado
+            cube_pose:Pose = selected_cube.pose # Obtiene la pose del cubo seleccionado
 
-            # prev_pose:Pose = deepcopy(cube_pose) # Copia la pose del cubo seleccionado
-            # prev_pose.position.z = 0.28 # Ajusta la altura del cubo para recogerlo
+            prev_pose:Pose = deepcopy(cube_pose) # Copia la pose del cubo seleccionado
+            prev_pose.position.z = 0.28 # Ajusta la altura del cubo para recogerlo
 
-            # trayectory_tuple:Tuple[bool, RobotTrajectory, float, bool] = self.control_robot.move_group.plan(prev_pose)
 
-            # if trayectory_tuple[0] != True: 
-            #     self.truncated = True
-            #     self.reward -= (self.cubos_recogidos-self.n_cubos)*-5.0
-            #     return self.observation, self.reward, self.done, self.truncated, self.info
-            
-            # trajectory = []
-            # trajectory.append(trayectory_tuple[1].joint_trajectory) 
+            trayectory_tuple:Tuple[bool, RobotTrajectory, float, bool] = self.control_robot.move_group.plan(prev_pose)
 
-            # start_state = RobotState()
-            # start_state.joint_state.position = trajectory[-1].points[-1].positions
+            if trayectory_tuple[0] != True: 
+                self.truncated = True
+                self.reward -= (self.cubos_recogidos-self.n_cubos)*-5.0
+                return self.observation, self.reward, self.done, self.truncated, self.info
             
-            # self.control_robot.move_group.set_start_state(start_state)
-            # plan, fraction = self.control_robot.move_group.compute_cartesian_path([self.control_robot.get_pose(), cube_pose], 0.01, True)
-            # self.control_robot.move_group.set_start_state_to_current_state()
+            trajectory = []
+            trajectory.append(trayectory_tuple[1].joint_trajectory) 
+
+            start_state = RobotState()
+            start_state.joint_state.position = trajectory[-1].points[-1].positions
             
-            # if fraction != 1.0: 
-            #     self.truncated = True
-            #     self.reward -= (self.cubos_recogidos-self.n_cubos)*-5.0
-            #     return self.observation, self.reward, self.done, self.truncated, self.info
+            self.control_robot.move_group.set_start_state(start_state)
+            plan, fraction = self.control_robot.move_group.compute_cartesian_path([self.control_robot.get_pose(), cube_pose], 0.01, True)
+            self.control_robot.move_group.set_start_state_to_current_state()
             
-            # trajectory.append(plan.joint_trajectory)
+            if fraction != 1.0: 
+                self.truncated = True
+                self.reward -= (self.cubos_recogidos-self.n_cubos)*-5.0
+                return self.observation, self.reward, self.done, self.truncated, self.info
             
-            # self.cube_trayectories[self.cubos_recogidos-1] = trajectory
+            trajectory.append(plan.joint_trajectory)
+            
+            self.cube_trayectories[self.cubos_recogidos-1] = trajectory
             
             self.orden_cubos.append(deepcopy(cube))
             
@@ -192,14 +192,13 @@ class ROSEnv(gym.Env):
             self.cubos[cube.id].pose = Pose(Point(0.0, 0.0, 0.0),
                                             Quaternion(0.0, 0.0, 0.0, 0.0))
             
-            if self.cubos_recogidos == self.n_cubos:
+            if self.cubos_recogidos >= self.n_cubos:
                 self.done=True
             
             if self.done:
                 self.reward = 20  # La recompensa aumenta cuando el tiempo promedio es cercano a 4 segundos
                 return self.observation, self.reward, self.done, self.truncated, self.info
                 
-            
             self._get_obs()
             self._get_info()
             
@@ -219,7 +218,6 @@ class ROSEnv(gym.Env):
         self.cube_trayectories = [0]*self.n_cubos
         self.cubos_recogidos = 0 # Cubos cogidos
         self.available_cubes = [0]*5
-        self.cubos_restantes = []
         self.reward = 0.0
         self.terminated = False
         self.truncated = False
@@ -228,24 +226,22 @@ class ROSEnv(gym.Env):
         
         self._get_obs()
         self._get_info()
-
-        # for cubo in self.cubos:
-        #     cube_copia = deepcopy(cubo)
-        #     cube_copia.pose.position.z = 0.0125
-            # self.control_robot.add_box_obstacle(f"cubo{cube_copia.id}", cube_copia.pose, (0.02, 0.02, 0.02))
         
         return self.observation, self.info
 
 if __name__ == '__main__':
     # Probamos a ejecutar con 2 cubos
-    n_cubos_max = 10
-    cubo = IdCubos()
-    cubo.color = 0
-    env = ROSEnv(cubos=[cubo], orden_figura=[0])
-    env.reset()
-    terminated = False
-    truncated = False
-    while not terminated and not truncated:
-        accion = env.action_space.sample()
-        observation, reward, terminated, truncated, info = env.step(accion)
-        print(info)
+    # n_cubos_max = 10
+    # cubo = IdCubos()
+    # cubo.color = 0
+    # env = ROSEnv(cubos=[cubo], orden_figura=[0])
+    # env.reset()
+    # terminated = False
+    # truncated = False
+    # while not terminated and not truncated:
+    #     accion = env.action_space.sample()
+    #     observation, reward, terminated, truncated, info = env.step(accion)
+    #     print(info)
+
+    for i in range(20):
+        print(np.random.random())

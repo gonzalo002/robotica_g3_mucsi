@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Importación de Librerias
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +15,7 @@ class FigureGenerator:
         self.message:str = None
         self.message_type:int = 0 # 1=Info, 2=Warn, 3=Error
 
-    def generate_figure_from_matrix(self, matriz_planta:list, matriz_alzado:list, matriz_perfil:list, figsize:tuple=(3,3), paint:bool = False, tkinter:bool=True):
+    def generate_figure_from_matrix(self, matriz_planta:list, matriz_alzado:list, matriz_perfil:list, figsize:tuple=(3,3), paint:bool = False, tkinter:bool=False):
         """
         Función principal de la clase, toma como entrada las tres matrices, analiza la anchura, profundidad y altura de la figura
         y compara los datos de las diferentes matrices hasta obtener la figura tridimensional resultante.
@@ -38,10 +40,13 @@ class FigureGenerator:
         altura2, profundidad2, matriz_perfil_recortada = self._cut_matrix_finding_shape(matriz_perfil)
         
         # Comprobación del estado de las matrices adquiridas
-        if (altura is None) or (altura2 is None) or (anchura is None) or (anchura2 is None) or (profundidad is None) or (profundidad2 is None): # Matrices Vacias
-            print('Matrices Invalidas')
+        if (altura is None) and (anchura is None) and (profundidad is None): # Caso para tkinter
+            return self._paint_matrix(np.array([[[]]]), figsize, tkinter)
+        
+        if altura is None or anchura is None or profundidad is None: # Matrices Vacias
             self.message = "Las matrices introduccidas son inválidas, no se puede realizar figura 3D."
             self.message_type = 3
+            print('Matrices Invalidas')
             return self._paint_matrix(np.array([[[]]]), figsize, tkinter)
         
         if anchura != anchura2 or profundidad != profundidad2 or altura != altura2: # Discrepancia entre matrices
@@ -180,7 +185,7 @@ class FigureGenerator:
 
         return None, None, matrix # Si no hay valores diferentes a -1, retornar None
 
-    def _paint_matrix(self, matriz3D, figsize:tuple=(3,3), tkinter:bool=True):
+    def _paint_matrix(self, matriz3D, figsize:tuple=(3,3), tkinter:bool=False):
         """
         Plotea la matriz para visualizarla en un grafico 3D
             @param matriz3D (list) - Matriz 3D con los datos de la figura

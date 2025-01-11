@@ -10,16 +10,28 @@ from numpy import ndarray
 from proyecto_final.msg import HandData
 
 class HandDetector:
+    """
+    Clase para detectar manos en una imagen y extraer información de las mismas.
+        @method detect_gesture: Detecta el gesto realizado por la mano.
+        @method define_hands: Define los detectores de manos.
+        @method detect_hand: Detecta la mano en una imagen.
+    """
     def __init__(self):
-        self.landmarks = []
-        self.hands1 = None
-        self.hands2 = None
+        """
+        Inicializa las variables de la clase.
+        """
+        self.landmarks = [] # Lista de landmarks de la mano
+        self.hands1 = None # Detector de manos de la cámara 1
+        self.hands2 = None  # Detector de manos de la cámara 2
 
-        self.hand_data = HandData()
+        self.hand_data = HandData() # Información de la mano
 
-        self.define_hands()
+        self.define_hands() # Definir detectores de manos
       
     def detect_gesture(self) -> None:
+        """
+        Detecta el gesto realizado por la mano.
+        """
         try:
             indice_extendido = self.landmarks[8].y < self.landmarks[6].y
             medio_extendido = self.landmarks[12].y < self.landmarks[10].y
@@ -31,25 +43,32 @@ class HandDetector:
         except:
             return None
         
+        # Mano abierta
         if indice_extendido and medio_extendido and anular_extendido \
             and menique_extendido and pulgar_extendido:
             self.hand_data.is_open = True
         
+        # Mano en Dino
         elif indice_extendido and not medio_extendido and not anular_extendido \
             and not menique_extendido and not pulgar_extendido:
             self.hand_data.is_dino = True
         
+        # Mano en Paz
         elif indice_extendido and medio_extendido and not anular_extendido \
             and not menique_extendido and not pulgar_extendido:
             self.hand_data.is_peace = True
         
+        # Mano en Disike
         elif not indice_extendido and not medio_extendido and not anular_extendido \
             and not menique_extendido and pulgar_abajo:
             self.hand_data.is_dislike = True
         
         
     def define_hands(self) -> None:
-        mp_hands = mp.solutions.hands
+        """
+        Define los detectores de manos.
+        """
+        mp_hands = mp.solutions.hands # Importar MediaPipe Hands
 
         # Configurar MediaPipe con mayor confianza de detección
         self.hands1 = mp_hands.Hands(
@@ -66,11 +85,16 @@ class HandDetector:
         )
 
     def detect_hand(self, img_top:ndarray, img_lateral:ndarray) -> None:   
-            img_top = deepcopy(img_top)
-            img_lateral = deepcopy(img_lateral)
+            """
+            Detecta la mano en una imagen.
+                @param img_top: Imagen superior.
+                @param img_lateral: Imagen lateral.
+            """
+            i_top = deepcopy(img_top) # Copiar imagen
+            i_lateral = deepcopy(img_lateral) # Copiar imagen
 
-            frame1_flip1 = cv2.flip(img_top, 1)
-            frame2_flip2 = cv2.flip(img_lateral, 1)
+            frame1_flip1 = cv2.flip(i_top, 1) # Voltear imagen
+            frame2_flip2 = cv2.flip(i_lateral, 1) # Voltear imagen
 
             # Mejorar la visualización
             frame1 = cv2.resize(frame1_flip1, (640, 480))

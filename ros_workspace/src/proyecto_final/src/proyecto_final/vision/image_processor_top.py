@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import cv2, os, yaml
 import numpy as np
 from copy import deepcopy

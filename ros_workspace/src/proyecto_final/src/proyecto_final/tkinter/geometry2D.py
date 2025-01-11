@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2, sys, os
@@ -6,7 +8,15 @@ from proyecto_final.msg import IdCubos
 from tf.transformations import euler_from_quaternion
 
 class Geometry2D:
+    """
+    Clase que permite dibujar un espacio 2D con cubos representados como cuadrados.
+        @method draw_2d_space: Dibuja un espacio 2D con cubos representados como cuadrados.
+    """
     def __init__(self, square_size: int = 3):
+        """
+        Constructor de la clase Geometry2D.
+            @param square_size (int): Tamaño de los cuadrados en centímetros.
+        """
         self.square_size = square_size  # Tamaño de los cuadrados en centímetros
 
     def draw_2d_space(self, cube_data:list, tkinter: bool = False, figsize:tuple=(8, 3.5)):
@@ -103,26 +113,3 @@ class Geometry2D:
         else:
             plt.show()
             return None
-            
-if __name__ == "__main__":
-
-    use_cam = False
-    cube_tracker = CubeTracker(cam_calib_path="data/camera_data/ost.yaml")
-
-    if use_cam:
-        cam = cv2.VideoCapture(0)
-        if cam.isOpened():
-            _, frame = cam.read()
-            cv2.imshow("hola", frame)
-    else:
-        num = 3
-        ruta = f'data/cubos_exparcidos/Cubos_Exparcidos_{num}.png'
-        frame = cv2.imread(ruta)
-
-    _, resultado = cube_tracker.process_image(frame, area_size=1000, mostrar=False, debug=False)
-    cv2.imwrite("prueba.png", _)
-    print(resultado)
-    if use_cam:
-        cam.release()
-    geomtria = Geometry2D()
-    geomtria.draw_2d_space(resultado)

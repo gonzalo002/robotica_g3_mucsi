@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 import rospy, actionlib, cv2, os
 import numpy as np
-from time import time
-from copy import deepcopy
 from threading import Thread
-from proyecto_final.funciones_auxiliares import crear_mensaje
 from stable_baselines3 import PPO
 from proyecto_final.rl.env_rob import ROSEnv
 from proyecto_final.msg import RLAction, RLFeedback, RLGoal, RLResult
@@ -12,8 +9,16 @@ from trajectory_msgs.msg import JointTrajectory
 
 
 class CubeOrderActionServer(object):
-    
+    """
+    Clase que implementa el servidor de acción de CubeOrder.
+        @method __init__ - Método constructor
+        @method execute_cb - Callback del action server del CubeOrder
+        @method send_feedback - Función que envía el feedback al cliente
+    """
     def __init__(self):
+        """
+        Método constructor de la clase CubeOrderActionServer.
+        """
         # Inicializar nodo
         rospy.init_node('rl_action_server_node')
         self.name = "RLActionServer"
@@ -55,8 +60,7 @@ class CubeOrderActionServer(object):
         self.env = ROSEnv(cubos=cubos, orden_figura=figure_order)
 
         # --- PASO 2: Cargar el Agente ---
-        # self.model = PPO.load(f'{self.file_path}/data/trained_agents/agente_robot.zip', self.env)       
-        
+        self.model = PPO.load(f'{self.file_path}/data/necessary_data/rl_agent.zip', self.env)       
         
         # --- PASO 3: Obtener el Orden y Trayectorias ---
         done = False
@@ -64,8 +68,8 @@ class CubeOrderActionServer(object):
         obs, info = self.env.reset()
 
         while not done:
-            # action = self.model.predict(observation=obs)
-            _, _, done, failed, info = self.env.step(action=0)
+            action = self.model.predict(observation=obs)
+            _, _, done, failed, info = self.env.step(action=action)
 
             if failed:
                 obs, info = self.env.reset()
@@ -93,8 +97,3 @@ class CubeOrderActionServer(object):
             feedback.feedback = 1
             self.action_server.publish_feedback(feedback)
             rospy.sleep(0.1)
-
-            
-            
-if __name__ == "__main__":
-    CubeOrderActionServer()

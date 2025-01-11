@@ -24,30 +24,34 @@ import numpy as np
 
 class SecuenceCommander:
     ''' 
-    Clase que ejecuta las secuencias de movimiento del robot para la generación de la figura.
-    
-    Esta clase implementa varios métodos para:
-        - Liberar el espacio de trabajo del robot.
-        - Almacenar cubos en la zona de descarte.
-        - Calibrar la posición del robot respecto a un marcador Aruco.
-        - Transformar posiciones de la cámara en referencia al robot.
-        - Generar la figura descrita en una matriz 3D con los cubos encontrados en el espacio de trabajo.
-        - Mostrar todo el proceso en RViz (representación visual).
-    
-    Métodos:
-        - __init__() - Inicializa el objeto y configura el espacio de trabajo.
-        - _moveJoint() - Mueve las articulaciones del robot a una posición especificada.
-        - _movePose() - Mueve el robot a una posición específica.
-        - empty_workspace() - Vacía el espacio de trabajo del robot, descartando los cubos.
-        - create_figure() - Crea una figura basada en los cubos encontrados.
-        - _pick_cube() - Agarra un cubo en una posición determinada.
-        - _drop_cube() - Deja un cubo en una nueva posición.
-        - track_cubes() - Detecta y localiza cubos mediante visión computacional.
+    Clase que controla las secuencias de comandos del robot.
+        @method __init__ - Inicializa la clase y configura los parámetros de Aruco.
+        @method _moveJoint - Mueve las articulaciones del robot a una posición especificada usando un JointState.
+        @method _movePose - Mueve el robot a una posición específica (pose).
+        @method _empty_workspace - Libera el espacio de trabajo del robot, moviendo y descartando los cubos encontrados.
+        @method _test_figure - Comprueba que la figura que el usuario quiere crear se puede realizar, es decir, si se disponen de suficientes cubos.
+        @method create_figure - Genera la figura a partir de los cubos disponibles en el espacio de trabajo.
+        @method _pick_cube - Mueve el robot para agarrar un cubo y lo adjunta a la pinza.
+        @method _pick_rl_secuence - Mueve el robot para agarrar un cubo y lo adjunta a la pinza.
+        @method _drop_cube - Suelta el cubo en la posición deseada.
+        @method detect_figure - Rastrea la posición de los cubos utilizando la cámara superior.
+        @method track_cubes - Rastrea la posición de los cubos utilizando la cámara superior.
+        @method _cube_to_aruco - Convierte las posiciones de los cubos a coordenadas ArUco.
+        @method rob_camera_calibration - Realiza la calibración de la cámara del robot y guarda la pose de ArUco.
+        @method _move_to_calibration - Mueve el robot a la posición de calibración.
+        @method _put_calibration_pin - Coloca el puntero de calibración en la posición deseada.
+        @method _leave_calibration_space - Deja el espacio de calibración y guarda la pose de ArUco.
+        @method _drop_calibration_pin - Suelta el puntero de calibración.
+        @method _free_camera_space - Libera el espacio de la cámara moviendo el robot a una posición fuera del área de visión.
+        @method _hand_control_active - Activa el control del robot por medio de la mano.
+        @method _hand_control_deactivate - Desactiva el control del robot por medio de la mano.
+        @method _control_robot_by_hand - Controla el robot por medio de la mano.
+        @method hand_data_callback - Callback para recibir los datos de la mano.
     '''
     def __init__(self, simulation:bool = False) -> None:
         '''
-        Inicializa la clase y configura los parámetros de Aruco.
-            @param simulation (bool) - Indica si es un modo de simulación (por defecto, False).
+        çInicializa la clase.
+            @param simulation (bool) - Indica si el robot está en modo simulación.
             @return None
         '''
         # --- VARIABLES GENERALES ---
@@ -55,36 +59,36 @@ class SecuenceCommander:
         self.simulation = simulation
         self.message = None
         self.message_type = None
-        self.name = "RobotMain"
+        self.name = "RobotMain" # Nombre del nodo
 
         # --- VARIABLES AUTO ---
         self.discarded_cubes = [0, 0, 0, 0] # RGBY
-        self.matriz3D = np.full((5, 5, 5), -1, dtype=int)
-        self.cubes:List[IdCubos] = []
-        self.cube_size = 0.025
-        self.cube_separation = 0.02
-        self.altura_z = 0.237
-        self.available_cubes = []
-        self.figure_cubes = [0, 0, 0, 0, 0]
-        self.color_name = ["rojo", "verde", "azul", "amarillo", "gris"]
-        self.workspace_range = {}
+        self.matriz3D = np.full((5, 5, 5), -1, dtype=int) # Matriz 3D de la figura
+        self.cubes:List[IdCubos] = [] # Lista de cubos
+        self.cube_size = 0.025 # Tamaño de los cubos
+        self.cube_separation = 0.02 # Separación entre cubos
+        self.altura_z = 0.237 # Altura de agarre de los cubos
+        self.available_cubes = [] # Cubos disponibles
+        self.figure_cubes = [0, 0, 0, 0, 0] # Cubos de la figura
+        self.color_name = ["rojo", "verde", "azul", "amarillo", "gris"] # Nombres de los colores
+        self.workspace_range = {} # Rango de trabajo
 
         # --- VARIABLES MANUAL ---
         self.hand_control = False
         self.hand_detected = False
-        self.hand_range = {'x_min' : -0.19061986164757674, 'x_max' : 0.23207591013811013,
+        self.hand_range = {'x_min' : -0.19061986164757674, 'x_max' : 0.23207591013811013, 
                             'y_min' : 0.23159845770381593, 'y_max' : 0.44488890481150184,
-                            'z_min' : 0.2, 'z_max' : 0.398362}
+                            'z_min' : 0.2, 'z_max' : 0.398362} # Rango de la mano
         self.hand_pose = [0.0, 0.0, 0.0] # x, y, z
         self.hand_gesture = {'is_open' : False, 'is_peace' : False, 'is_dino' : False} # Tipos de Gestos
 
-        # Clases
-        self.robot = ControlRobot('robot')
-        self.action_client = MasterClient()
-        self.generator = FigureGenerator()
-        rospy.Subscriber('/hand_data', HandData, self.hand_data_callback)
+        # --- Clases ---
+        self.robot = ControlRobot('robot') # Control del Robot
+        self.action_client = MasterClient() # Cliente del Servidor Maestro
+        self.generator = FigureGenerator() # Generador de Figuras
+        rospy.Subscriber('/hand_data', HandData, self.hand_data_callback) # Suscripción a los datos de la mano
 
-        # Posiciones Maestras
+        # --- Posiciones Maestras ---
         # Poses
         self.p_figure_origin:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_MATRIX_ORIGIN')
         self.p_discard_origin:Pose = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_ORIGIN')
@@ -100,13 +104,16 @@ class SecuenceCommander:
         self.j_discard_origin_2:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_DISCARD_2_ORIGIN')
         self.j_hand_origin:JointState = self.robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_HAND_ORIGIN')
         
-        self._moveJoint(self.j_home)
+        # --- Inicialización ---
+        self.robot.reset_planning_scene() # Resetea el espacio de trabajo
+        self._moveJoint(self.j_home) # Mueve el robot a la posición de inicio
+        self.robot.move_gripper(35.0, 40.0) # Abre la pinza del robot
         
         
-    def _moveJoint(self, jointstate:JointState) -> bool:   
+    def _moveJoint(self, jointstate:list) -> bool:   
         ''' 
         Mueve las articulaciones del robot a una posición especificada usando un JointState.
-            @param jointstate (JointState) - Estado de las articulaciones a alcanzar.
+            @param jointstate (list) - Posición de las articulaciones.
             @return success (bool) - Indica si el movimiento fue exitoso.
         '''      
         success = self.robot.move_jointstates(jointstate)
@@ -119,10 +126,10 @@ class SecuenceCommander:
             self.message =  crear_mensaje("JointState inalcanzable", self.message_type, self.name)
         return success
     
-    def _movePose(self, pose:Pose, wait:bool = True) -> bool:    
+    def _movePose(self, pose:list, wait:bool = True) -> bool:    
         ''' 
         Mueve el robot a una posición específica (pose).
-            @param pose (Pose) - Posición a alcanzar.
+            @param pose (list) - Posición a alcanzar.
             @return success (bool) - Indica si el movimiento fue exitoso.
         '''          
         success = self.robot.move_pose(pose, wait=wait)
@@ -155,11 +162,11 @@ class SecuenceCommander:
         
         self._moveJoint(self.j_link_1)     
                 
-        for cube in self.cubes:
+        for cube in self.cubes: # Recorremos los cubos
             pose:Pose = deepcopy(cube.pose)
             color = cube.color
-            if pose.position.x > x_min and pose.position.x < x_max:
-                if pose.position.y > y_min and pose.position.y < y_max:
+            if pose.position.x > x_min and pose.position.x < x_max: # Si el cubo está en el rango de trabajo
+                if pose.position.y > y_min and pose.position.y < y_max: 
                     if self._pick_cube(pose, cube.id):
                         if color < 2:
                             discard_joint = self.j_discard_origin
@@ -228,31 +235,31 @@ class SecuenceCommander:
         Genera la figura a partir de los cubos disponibles en el espacio de trabajo.
             @return None
         '''
-        self._empty_workspace()
+        self._empty_workspace() # Limpia el espacio de trabajo antes de crear la figura.
         
         self.message_type = "INFO"
         self.message =  crear_mensaje("Empezando a crear la figura...", self.message_type, self.name)
+
         self._moveJoint(self.j_link_1)
 
         x, z, y = self.matriz3D.shape
-        
         figure_order = []
+
         # Recorremos la matriz para ir creando la figura.
         for j in range(z):
             for k in range(y):
                 for i in range(x):
                     figure_order.append(self.matriz3D[i,j,k])
         
-        # cube_order, trayectory_cubes = self.action_client.obtain_cube_order([self.cubes, figure_order]) 
         result:RLResult = self.action_client.obtain_cube_order((self.cubes, figure_order))
         
         cube_order = result.cubes_correct_order
-        # trajectory_cubes = result.cubes_trajectories 
+        trajectory_cubes = result.cubes_trajectories 
 
         num_order = []
         self.message_type = "SUCCESS"
 
-        for cube in cube_order:
+        for cube in cube_order: # Recorremos los cubos
             num_order.append(cube.id)
         self.message = crear_mensaje(f'Orden de los Cubos Seleccionado: {num_order}', self.message_type, self.name)
 
@@ -260,10 +267,10 @@ class SecuenceCommander:
         for j in range(z):
             for k in range(y):
                 for i in range(x):
-                    cube:IdCubos = cube_order[cont_cubos_dejados]
+                    cube:IdCubos = cube_order[cont_cubos_dejados] # Cubo a mover
                     cont_cubos_dejados += 1
 
-                    if not self._pick_cube(cube.pose, cube.id):
+                    if not self._pick_cube(cube.pose, cube.id): # Si no se puede coger el cubo, se para la secuencia.
                         self.message_type = "ERROR"
                         self.message =  crear_mensaje('El robot no ha podido coger el cubo.', self.message_type, 'RobotMain')
                         break
@@ -273,7 +280,8 @@ class SecuenceCommander:
                         self.message =  crear_mensaje('El robot no ha podido dejar el cubo.', self.message_type, 'RobotMain')
                         break
         
-        self._moveJoint(self.j_home)
+        self._moveJoint(self.j_home) # Movemos el robot a la posición de inicio.
+
 
     def _pick_cube(self, pose:Pose, cube_id:int) -> bool:
         ''' 
@@ -283,7 +291,7 @@ class SecuenceCommander:
             @return success (bool) - Indica si el movimiento fue exitoso.
         '''
         if not self.simulation:
-            gripper, _ = self.robot.get_pinza_state()
+            gripper, _ = self.robot.get_pinza_state(sleep_before=0.2)
             if gripper < 20.0:  # Si la pinza no está abierta, se abre.
                 self.robot.move_gripper(50.0, 5.0, sleep_after=0.8)
         
@@ -295,10 +303,11 @@ class SecuenceCommander:
         # Si el movimiento al cubo es exitoso, se adjunta el cubo a la pinza.
         self.robot.scene.remove_world_object(f'Cubo_{cube_id}')
         if self.robot.move_carthesian_trayectory([pose_previa, pose]):
-            #self.robot.scene.attach_box(link='onrobot_rg2_base_link', name=f'Cubo_{cube_id}')
+
             if not self.simulation:
                 self.robot.move_gripper(0.0, 10.0, sleep_after=1.5)  # Abre la pinza para tomar el cubo
-                gripper, effort = self.robot.get_pinza_state()
+                gripper, effort = self.robot.get_pinza_state(sleep_before=0.2)
+
                 if not effort and gripper < 5:
                     self.message_type = "ERROR"
                     self.message =  crear_mensaje(f"El cubo {cube_id} NO ha sido agarrado.", self.message_type, self.name)
@@ -309,42 +318,10 @@ class SecuenceCommander:
 
             # Si el movimiento de vuelta es exitoso, vuelve a la posición inicial.
             if self.robot.move_carthesian_trayectory([pose, pose_previa]):
-                #self._moveJoint(self.j_link_1)
 
                 return True # Secuencia Completada
         return False # Secuencia Fallida
 
-    def _pick_rl_secuence(self, trajectory:list, cube_id:int) -> bool:
-        ''' 
-        Mueve el robot para agarrar un cubo y lo adjunta a la pinza.
-            @param pose (Pose) - Posición objetivo del cubo.
-            @param cube_id (int) - Identificador único del cubo.
-            @return success (bool) - Indica si el movimiento fue exitoso.
-        '''
-        self.robot.move_jointstates_trayectory(trajectory)
-        
-        self.robot.move_gripper(0.0, 10.0, sleep_after=1.5)  # Abre la pinza para tomar el cubo
-        gripper, effort = self.robot.get_pinza_state()
-        
-        if not effort and gripper < 5:
-            self.message_type = "ERROR"
-            self.message =  crear_mensaje(f"El cubo {cube_id} NO ha sido agarrado.", self.message_type, self.name)
-            return False
-        
-        self.message_type = "SUCCESS"
-        self.message =  crear_mensaje(f"El cubo {cube_id} ha sido agarrado.", self.message_type, self.name)    
-        
-        pose = self.robot.get_pose()
-        pose_previa = deepcopy(pose)
-        pose_previa.position.z = 0.3  # Eleva la posición del cubo antes de moverlo
-
-        # Si el movimiento al cubo es exitoso, se adjunta el cubo a la pinza.
-        self.robot.scene.remove_world_object(f'Cubo_{cube_id}')
-        
-        if not self.robot.move_carthesian_trayectory([pose, pose_previa]):
-            return False # Secuencia Fallida
-        
-        return True # Secuencia Completada
 
     def _drop_cube(self, make_figure:bool = True, cube_id:int = None, matrix_position:list = [0,0,0]) -> bool:
         ''' 
@@ -355,7 +332,8 @@ class SecuenceCommander:
             @return success (bool) - Indica si el movimiento fue exitoso.
         '''
         if not self.simulation:
-            gripper, effort = self.robot.get_pinza_state()
+            gripper, effort = self.robot.get_pinza_state(sleep_before=0.2)
+
             if not effort and gripper > 30:  # Si no hay esfuerzo en la pinza, significa que no se tiene cubo.
                 self.message_type = "ERROR"
                 self.message = crear_mensaje(f"El cubo {cube_id} NO ha sido agarrado.", self.message_type, self.name)  
@@ -367,9 +345,11 @@ class SecuenceCommander:
         # Se determina la pose inicial dependiendo si el cubo forma parte de una figura.
         if make_figure:
             pose: Pose = deepcopy(self.p_figure_origin)  # Pose inicial para formar una figura.
+
         else:
             if matrix_position[1] < 2:
                 pose: Pose = deepcopy(self.p_discard_origin)  # Pose inicial para desechar el cubo.
+
             elif matrix_position[1] < 4:
                 matrix_position[1] -= 2
                 pose: Pose = deepcopy(self.p_discard_origin_2)  # Pose inicial para desechar el cubo.
@@ -478,21 +458,33 @@ class SecuenceCommander:
         # Solicita al usuario confirmación para soltar el boli
         self._drop_calibration_pin()  # Abre nuevamente la pinza.
 
+
     def _move_to_calibration(self):
+        """
+        Mueve el robot a la posición de calibración.
+        """
         self.robot.move_gripper(20, 40)  # Cierra parcialmente la pinza para la calibración.
         self._moveJoint(self.j_prev_aruco)  # Mueve el robot a la posición previa de ArUco.
 
         self.message_type = "INPUT"
         self.message =  crear_mensaje("¿Está el puntero de calibración posicionado?", self.message_type, self.name)
 
+
     def _put_calibration_pin(self):
-        self.robot.move_gripper(0, 20)  # Abre la pinza ligeramente para manipular el boli.
+        """
+        Coloca el puntero de calibración en la posición deseada.
+        """
+        self.robot.move_gripper(0, 20)  # Cierra la pinza para agarrar el puntero de calibración.
         rospy.sleep(2)  # Espera para estabilizar el movimiento.
 
         self.message_type = "INPUT"
         self.message =  crear_mensaje("¿Está el robot en la esquina del ArUco?", self.message_type, self.name)
     
+
     def _leave_calibration_space(self):
+        """
+        Deja el espacio de calibración y guarda la pose de ArUco.
+        """
         # Obtiene y guarda la pose de ArUco del robot.
         self.p_aruco = self.robot.get_pose()
         self.robot.save_in_yaml(f'{self.abs_path}/data/trayectorias/pose_aruco', 'P_ARUCO', self.p_aruco, True)
@@ -505,10 +497,12 @@ class SecuenceCommander:
         self.message_type = "INPUT"
         self.message =  crear_mensaje("¿Se puede soltar el puntero de calibración?:", self.message_type, self.name)
     
+
     def _drop_calibration_pin(self):
         self.robot.move_gripper(30, 10)  # Abre nuevamente la pinza.
         self.message_type = "SUCCESS"
         self.message =  crear_mensaje("Calibración realizada con éxito", self.message_type, self.name)
+
 
     def _free_camera_space(self):
         ''' 
@@ -519,10 +513,14 @@ class SecuenceCommander:
             self.robot.move_gripper(35.0, 5.0, sleep_after=0.8)
         self._moveJoint(self.j_off_camera)  # Mueve el robot a una posición predeterminada fuera del área de la cámara.
     
-    def _hand_control_active(self) -> bool:
-        self.robot.reset_planning_scene()
 
-        res = self._moveJoint(self.j_hand_origin)
+    def _hand_control_active(self) -> bool:
+        """
+        Activa el control del robot por medio de la mano
+        """
+        self.robot.reset_planning_scene() # Resetea el espacio de trabajo
+
+        res = self._moveJoint(self.j_hand_origin) # Mueve el robot a la posición de la mano
         if res:
             self.message_type = "SUCCESS"
             self.message =  crear_mensaje(f"El control por mano ha sido activado", self.message_type, self.name)
@@ -535,18 +533,23 @@ class SecuenceCommander:
 
 
     def _hand_control_deactivate(self) -> None:
+        """
+        Desactiva el control del robot por medio de la mano
+        """
         self.message_type = "INFO"
         self.message =  crear_mensaje(f"El control por mano ha sido desactivado", self.message_type, self.name)
         self.hand_control = False
         self._moveJoint(self.j_home)
-        
 
 
     def _control_robot_by_hand(self) -> bool:
+        '''
+        Controla el robot por medio de la mano.
+        '''
         rate = rospy.Rate(10)
         while self.hand_control: 
             rate.sleep()
-            if self.hand_gesture['is_open']:
+            if self.hand_gesture['is_open']: # Si la mano está abierta, se mueve el robot.
                 rango_cam = [640, 480, 480]
                 rango_x_robot = self.hand_range['x_max'] - self.hand_range['x_min']
                 rango_y_robot = self.hand_range['y_max'] - self.hand_range['y_min']
@@ -579,67 +582,52 @@ class SecuenceCommander:
                     self.message = crear_mensaje(f"Posición Z fuera de límites: {target_pose.position.z}", self.message_type, self.name)
                     continue
                 
-                if not self._movePose(target_pose, wait=False):
+                if not self._movePose(target_pose, wait=False): # Mover el robot a la nueva posición
                     self.message_type = "ERROR"
                     self.message = crear_mensaje("No se pudo ejecutar el movimiento", self.message_type, self.name)
                         
             # Verificar el estado de la pinza
-            elif self.hand_gesture['is_peace']:
+            elif self.hand_gesture['is_peace']: # Cerrar la pinza
                 self.robot.move_gripper(0.0, 10.0, sleep_after=1.5)
                 self.message_type = "INFO"
                 self.message = crear_mensaje("Pinza cerrada - Intentando agarrar objeto", self.message_type, self.name)
 
-            elif self.hand_gesture['is_dino']:
+            elif self.hand_gesture['is_dino']: # Soltar el objeto
                 self.robot.move_gripper(50.0, 30.0, sleep_after=0.5)
                 self.message_type = "INFO"
                 self.message = crear_mensaje("Pinza abierta - Soltando objeto", self.message_type, self.name) 
 
-            elif self.hand_gesture['is_dislike']:
+            elif self.hand_gesture['is_dislike']: # Volver a la posición inicial
                 self._moveJoint(self.j_hand_origin)
                 self.message_type = "INFO"
                 self.message = crear_mensaje("Moviendo robot a pose inicial", self.message_type, self.name) 
 
 
     def hand_data_callback(self, msg:HandData) -> None:
+        '''
+        Callback para recibir los datos de la mano.
+            @param msg (HandData) - Mensaje con los datos de la mano.
+            @return None
+        '''
         self.hand_detected = msg.hand_detected
         self.hand_pose = [msg.x, msg.y, msg.z]
         self.hand_gesture['is_open'] = msg.is_open
         self.hand_gesture['is_peace'] = msg.is_peace
         self.hand_gesture['is_dino'] = msg.is_dino
         self.hand_gesture['is_dislike'] = msg.is_dislike
-
-if __name__ == '__main__':
-    robot = SecuenceCommander(simulation=False)
-
-    robot._control_robot_by_hand()
-    # self.message =  crear_mensaje("¿Quieres detectar figura?", "INPUT", robot.name)
-    robot.detect_figure()
-    # figure_generator = FigureGenerator()
-    # # robot.matriz3D = np.array(
-    # #                 [[[-1, -1, -1, -1, -1]],
-    # #                   [[-1, -1, -1, -1, -1]],
-    # #                   [[-1, -1, -1, -1, -1]],
-    # #                   [[1, -1, -1, -1, -1]],
-    # #                   [[0,  4,  -1,  -1,  -1]]]
-    # #                 )
-    robot.matriz3D = np.array([[[ 1,  3],
-        [ 2, -1]],
-
-       [[ 3,  4],
-        [ 0,  0]]])
-    # robot.generator._paint_matrix(robot.matriz3D)
-
-    # crear_mensaje("La forma está capturada.", "INFO", robot.name, tkinter=False)
-    # crear_mensaje("¿Quieres localizar los cubos?", "INPUT", robot.name, tkinter=False)
-    robot.track_cubes(0)
-    print(robot.cubes)
     
-    crear_mensaje(f"Se han capturado: {len(robot.cubes)}", "INFO", "RobotMain")
-    calibracion = crear_mensaje("¿Quieres calibrar el robot? (s/n)", "INPUT", robot.name, tkinter=False)
-    if calibracion == "s":
-       robot.rob_camera_calibration()
-    
-    if robot._test_figure():
-        robot.create_figure()
-    
-    robot._free_camera_space()
+
+    def reset_robot(self) -> None:
+        '''
+        Resetea el robot a la posición inicial.
+        '''
+        self.robot.reset_planning_scene()
+
+        # Mover el robot fuera del espacio de trabajo
+        link_pose = self.robot.get_pose()
+        link_pose.position.z = 0.3
+        self._movePose(link_pose)
+
+        # Mover el robot a la posición de inicio
+        self._moveJoint(self.j_home)
+        self.robot.move_gripper(35.0, 20.0)

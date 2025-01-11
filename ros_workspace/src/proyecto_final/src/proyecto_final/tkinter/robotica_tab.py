@@ -22,7 +22,13 @@ from proyecto_final.vision.generacion_figura import FigureGenerator
 
 
 class RoboticaTkinter:
+    """
+    Clase que representa la pestaña de Robótica en la interfaz gráfica.
+    """
     def __init__(self) -> None:
+        """
+        Constructor de la clase RoboticaTkinter.
+        """
         # --- ROOT ---
         self.root = ttk.Window(title="Robótica", themename="vision")
         self.root.resizable(True, True)
@@ -47,7 +53,7 @@ class RoboticaTkinter:
         self.subs_cam_hand_lateral = rospy.Subscriber('/lateral_hand_cam/image_raw', sensor_msgs.msg.Image, self.cb_hand_lateral)
         self.subs_cam_hand_top = rospy.Subscriber('/top_hand_cam/image_raw', sensor_msgs.msg.Image, self.cb_hand_top)
 
-
+        # --- VARIABLES ---
         self.LF_rviz = None
         self.LF_quinta_fila = None
         self.img_aspect_ratio = 0.4
@@ -56,6 +62,7 @@ class RoboticaTkinter:
         self.Logic_Calibrate = True
         self.Contador_Calibrate = 0
 
+        # --- INICIALIZACIÖN ---
         self.estilo()
         self.start_robot_tab()
         self._rviz_launch()
@@ -63,6 +70,9 @@ class RoboticaTkinter:
         
     
     def start_robot_tab(self):
+        """
+        Inicializa la pestaña de Robótica.
+        """
         self.frame_rob = ttk.Frame(self.root, borderwidth=0)
         self.frame_rob.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
@@ -74,23 +84,31 @@ class RoboticaTkinter:
         self.frame_rob.grid_rowconfigure(3, weight=1)
         self.frame_rob.grid_rowconfigure(4, weight=1)
 
-
-
         self._fila_terminal()
         self._primera_fila()
 
+
     def stop_robot_tab(self):
+        """
+        Detiene la pestaña de Robótica.
+        """
         self.close_rviz()
     
+
     def manual_tab(self):
+        """
+        Crea la pestaña de Robótica en modo manual.
+        """
         self._clear_tab()
         self._fila_camaras_manual()
         self._fila_geometria_manual()
         self._fila_acciones_man()
 
 
-
     def auto_tab(self):
+        """
+        Crea la pestaña de Robótica en modo automático.
+        """
         self._clear_tab()
         self._fila_camaras_auto()
         self._fila_geometria_auto()
@@ -98,6 +116,9 @@ class RoboticaTkinter:
 
     
     def _clear_tab(self):
+        """
+        Limpia la pestaña de Robótica.
+        """
         for child in self.frame_rob.winfo_children():
             if child not in {self.F_primera_fila, self.LF_quinta_fila}:
                 child.destroy()
@@ -106,6 +127,9 @@ class RoboticaTkinter:
         
 
     def _primera_fila(self):
+        """
+        Crea la primera fila de la pestaña de Robótica.
+        """
         # --- FRAME: Primera fila ---
         self.F_primera_fila = ttk.Frame(self.frame_rob)
         self.F_primera_fila.grid(row=0, column=0, sticky="nsew",padx=10, pady=5)
@@ -163,6 +187,9 @@ class RoboticaTkinter:
 
 
     def cambio_funcionamiento(self):
+        """
+        Cambia el modo de funcionamiento de la interfaz gráfica.
+        """
         # --- MANUAL ---
         if self.V_modo.get() == 1: 
             self.L_manual.config(font=("Montserrat", 10, "bold"), foreground="#8c85f7")
@@ -176,6 +203,9 @@ class RoboticaTkinter:
             self.auto_tab()
 
     def _fila_camaras_auto(self):
+        """
+        Crea la fila de cámaras en modo automático.
+        """
         # --- FRAME ---
         # Label Frame
         self.LF_segunda_fila = ttk.LabelFrame(self.frame_rob, text="  Visualización Cámaras  ")
@@ -237,6 +267,9 @@ class RoboticaTkinter:
         self._update_images()
     
     def _fila_camaras_manual(self):
+        """
+        Crea la fila de cámaras en modo manual.
+        """
         # --- FRAME ---
         # Label Frame
         self.LF_segunda_fila = ttk.LabelFrame(self.frame_rob, text="  Visualización Cámaras  ")
@@ -283,6 +316,9 @@ class RoboticaTkinter:
         self._update_images()
     
     def _fila_geometria_auto(self):
+        """
+        Crea la fila de geometría en modo automático.
+        """
         # --- FRAME: Primera fila ---
         self.LF_tercera_fila = ttk.LabelFrame(self.frame_rob, text="  Representación Gráfica  ")
         self.LF_tercera_fila.grid(row=2, column=0, sticky="nsew", padx=10, pady=5)
@@ -332,6 +368,9 @@ class RoboticaTkinter:
         self.canvas_2d.get_tk_widget().grid(row=1, column=0)
     
     def _fila_geometria_manual(self):
+        """
+        Crea la fila de geometría en modo manual.
+        """
         # --- FRAME: Tercera fila ---
         self.F_tercera_fila = ttk.Frame(self.frame_rob)
         self.F_tercera_fila.grid(row=2, column=0, sticky="nsew",padx=10, pady=10)
@@ -380,6 +419,9 @@ class RoboticaTkinter:
 
 
     def _fila_acciones_auto(self):
+        """
+        Crea la fila de acciones en modo automático.
+        """
         # --- FRAME: Primera fila ---
         self.LF_cuarta_fila = ttk.LabelFrame(self.frame_rob, text="  Acciones  ")
         self.LF_cuarta_fila.grid(row=3, column=0, sticky="nsew", padx=10, pady=5)
@@ -405,6 +447,9 @@ class RoboticaTkinter:
         self.B_RemakeFigure.grid(row=0, column=2, sticky="nsew",padx=10, pady=0)
     
     def _fila_acciones_man(self):
+        """
+        Crea la fila de acciones en modo manual.
+        """
         # --- FRAME: Primera fila ---
         self.LF_cuarta_fila = ttk.LabelFrame(self.frame_rob, text="  Acciones  ")
         self.LF_cuarta_fila.grid(row=3, column=0, sticky="nsew", padx=10, pady=5)
@@ -429,6 +474,9 @@ class RoboticaTkinter:
 
 
     def _fila_terminal(self):
+        """
+        Crea la fila de terminal en la interfaz gráfica.
+        """
         self.LF_quinta_fila = ttk.LabelFrame(self.frame_rob, text="  Terminal  ")
         self.LF_quinta_fila.grid(row=4, column=0, sticky="nsew", padx=10, pady=5)
         self.LF_quinta_fila.grid_rowconfigure(0, weight=1)
@@ -459,6 +507,9 @@ class RoboticaTkinter:
         self._update_terminal()
         
     def _rviz_launch(self):
+        """
+        Inicializa RVIZ
+        """
         try:
             # Lanzar RViz en un proceso separado y dar tiempo a que aparezca
             self.rviz_process = subprocess.Popen(
@@ -485,6 +536,9 @@ class RoboticaTkinter:
 
 
     def reparent_rviz(self, rviz_window_id):
+        """
+        Ajusta la ventana de RViz para que se muestre en la interfaz gráfica.
+        """
                 # Tamaño de la pantalla
         window_width = self.root.winfo_screenwidth()//2
         window_height = self.root.winfo_screenheight()
@@ -503,6 +557,9 @@ class RoboticaTkinter:
             messagebox.showerror("Error", f"Error al ajustar la ventana: {e}")
 
     def close_rviz(self):
+        """
+        Cierra la ventana de RViz.
+        """
         try:
            
             # Envía la señal de cierre a la ventana de RViz
@@ -514,6 +571,9 @@ class RoboticaTkinter:
     
 
     def _update_images(self):
+        """
+        Actualiza las imágenes de las cámaras en la interfaz gráfica.
+        """
         aspect_ratio = 0.55
         if not hasattr(self, "V_modo"):
             return
@@ -540,6 +600,12 @@ class RoboticaTkinter:
 
 
     def _create_image_with_text(self, text:str, aspect_ratio=0.6):
+        """
+        Crea una imagen con un texto centrado.
+            @param text (str) - Texto a mostrar en la imagen
+            @param aspect_ratio (float) - Relación de aspecto de la imagen
+            @return (PhotoImage) - Imagen con el texto
+        """
         img_size = (int(640 * aspect_ratio), int(480 * aspect_ratio))
 
         image = Image.new('RGB', img_size, color='black')
@@ -581,8 +647,12 @@ class RoboticaTkinter:
         
         return tk_image
     
-    def update_image(self, img: np.ndarray, label:ttk.Label):
-        ''' Actualiza la imagen en el widget Tkinter '''
+    def update_image(self, img: np.ndarray, label:ttk.Label) -> None:
+        """
+        Actualiza la imagen en el widget Tkinter.
+            @param img (np.ndarray) - Imagen a mostrar
+            @param label (ttk.Label) - Widget donde se mostrará la imagen
+        """
         # Convertir la imagen PIL a PhotoImage para Tkinter
         if label.winfo_exists():
             # Convertir de nuevo a PIL
@@ -601,7 +671,7 @@ class RoboticaTkinter:
             label.config(image=tk_image)
             label.image = tk_image
 
-    def cb_image_top(self, image:Image)->None:
+    def cb_image_top(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -617,7 +687,7 @@ class RoboticaTkinter:
                 self.root.after(0, self.update_image, img, self.L_img_top)
         
     
-    def cb_image_alzado(self, image:Image)->None:
+    def cb_image_alzado(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -634,7 +704,7 @@ class RoboticaTkinter:
                 self.root.after(0, self.update_image, img, self.L_img_alzado)
 
 
-    def cb_image_lateral(self, image:Image)->None:
+    def cb_image_lateral(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -649,7 +719,8 @@ class RoboticaTkinter:
             if self.L_img_lateral.winfo_exists():
                 self.root.after(0, self.update_image, img, self.L_img_lateral)
 
-    def cb_hand_lateral(self, image:Image)->None:
+
+    def cb_hand_lateral(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -662,7 +733,8 @@ class RoboticaTkinter:
             if self.L_img_lateral.winfo_exists():
                 self.root.after(0, self.update_image, img, self.L_img_lateral)
     
-    def cb_hand_top(self, image:Image)->None:
+
+    def cb_hand_top(self, image:Image) -> None:
         ''' 
         Callback del subscriptor de la cámara.
             @param image (Image) - Imagen de la camara
@@ -677,11 +749,18 @@ class RoboticaTkinter:
             if self.L_img_top.winfo_exists():
                 self.root.after(0, self.update_image, img, self.L_img_top)
 
-    def command_detect_figure(self):
+
+    def command_detect_figure(self) -> None:
+        """
+        Comando para detectar la figura en la interfaz gráfica.
+        """
         Thread(target=self.detect_figure_thread, daemon=True).start()
 
 
-    def detect_figure_thread(self):
+    def detect_figure_thread(self) -> None:
+        """
+        Hilo para detectar la figura en la interfaz gráfica.
+        """
         self.B_MakeFigure.state([ttk.DISABLED])
         self.B_Calibrate.state([ttk.DISABLED])
         self.B_RemakeFigure.state([ttk.DISABLED])
@@ -705,10 +784,18 @@ class RoboticaTkinter:
         self.B_Calibrate.state(["!disabled"])
         self.CB_modo.state(["!disabled"])
 
-    def command_calibrate_aruco(self):
+
+    def command_calibrate_aruco(self) -> None:
+        """
+        Comando para calibrar el ArUco en la interfaz gráfica.
+        """
         Thread(target=self.calibrate_aruco_thread, daemon=True).start()
 
-    def calibrate_aruco_thread(self):
+
+    def calibrate_aruco_thread(self) -> None:
+        """
+        Hilo para calibrar el ArUco en la interfaz gráfica.
+        """
         # --- DESABILITAR BOTONES ---
         self.B_MakeFigure.state([ttk.DISABLED])
         self.B_RemakeFigure.state([ttk.DISABLED])
@@ -728,8 +815,6 @@ class RoboticaTkinter:
         else:
             self.RobMain._drop_calibration_pin()  # Abre nuevamente la pinza.
 
-
-
         # --- DISEÑO Y HABILITAR BOTONES ---
         if self.Contador_Calibrate == 3:
             self.B_Calibrate.config(bootstyle="primary", text="CALIBRAR ARUCO")
@@ -743,11 +828,14 @@ class RoboticaTkinter:
             self.B_Calibrate.config(bootstyle="warning", text="Siguiente")
             self.Contador_Calibrate += 1
 
-
         self.CB_modo.state(["!disabled"])
         self.B_Calibrate.state(["!disabled"])
 
-    def command_hand_control(self):
+
+    def command_hand_control(self) -> None:
+        """
+        Comando para activar/desactivar el control por mano en la interfaz gráfica.
+        """
         if self.V_HandControl.get() == 1:
             if self.RobMain._hand_control_active():
                 self.B_HandControl.config(bootstyle="toolbutton-danger", text="PARAR CONTROL POR MANO")
@@ -761,10 +849,16 @@ class RoboticaTkinter:
             self.B_HandControl.config(bootstyle="toolbutton-primary", text="EMPEZAR CONTROL POR MANO")
             self.cv_img = []
 
-    def command_remake_figure(self):
+    def command_remake_figure(self) -> None:
+        """
+        Comando para reconstruir la figura en la interfaz gráfica.
+        """
         Thread(target=self.remake_figure_thread, daemon=True).start()
 
-    def remake_figure_thread(self):
+    def remake_figure_thread(self) -> None:
+        """
+        Hilo para reconstruir la figura en la interfaz gráfica.
+        """
         self.CB_modo.state([ttk.DISABLED])
         self.RobMain.track_cubes()
 
@@ -780,7 +874,10 @@ class RoboticaTkinter:
             self.RobMain.create_figure()
         self.CB_modo.state(["!disabled"])
 
-    def _update_hand_status(self):
+    def _update_hand_status(self) -> None:
+        """
+        Actualiza el estado de la mano en la interfaz gráfica.
+        """
         path = "/home/laboratorio/ros_workspace/src/proyecto_final/data/tkinter_img/"
         if self.RobMain.hand_detected:
             if self.RobMain.hand_gesture['is_dino']:
@@ -826,11 +923,10 @@ class RoboticaTkinter:
             self.L_img_mano.image = None
 
 
-    def setup_figure(self):
-        """Configura la figura inicial y el scatter point."""
-        # self.ax.set_xlim(self.RobMain.hand_range["x_min"], self.RobMain.hand_range["x_max"])
-        # self.ax.set_ylim(self.RobMain.hand_range["y_min"], self.RobMain.hand_range["y_max"])
-        # self.ax.set_zlim(self.RobMain.hand_range["z_min"], self.RobMain.hand_range["z_max"])
+    def setup_figure(self) -> None:
+        """
+        Configura la figura inicial y el scatter point.
+        """
         self.ax.set_xlim(-300, 300)
         self.ax.set_ylim(-300, 300)
         self.ax.set_zlim(-300, 300)
@@ -846,7 +942,10 @@ class RoboticaTkinter:
         )
         self.ax.legend()
 
-    def _update_terminal(self):
+    def _update_terminal(self) -> None:
+        """
+        Actualiza el terminal en la interfaz gráfica.
+        """
         if self.RobMain.message is not None and self.RobMain.message_type is not None:
             self.terminal.config(state=ttk.NORMAL)
             self.terminal.insert(ttk.END, f"{self.RobMain.message}\n", self.RobMain.message_type)
@@ -858,8 +957,10 @@ class RoboticaTkinter:
         self.root.after(49, self._update_terminal)
         
 
-
-    def estilo(self):
+    def estilo(self) -> None:
+        """
+        Establece el estilo de la interfaz gráfica.
+        """
         style = ttk.Style()
         style.configure("Custom.TNotebook.Tab",
             font= ("Montserrat Medium", 12), 
@@ -920,7 +1021,7 @@ class RoboticaTkinter:
             font=("Montserrat", 10),
         )
     
-    def _on_closing(self):
+    def _on_closing(self) -> None:
         """Esta función se ejecuta cuando la ventana se cierra."""
         self.stop_robot_tab()
         
