@@ -1,4 +1,4 @@
-# Robótica MUCSI Grupo 7
+# Robótica MUCSI Grupo 3
 ## Instalación
 
 ### 1. Clonar este repositorio
