@@ -38,13 +38,10 @@ class FigureGenerator:
         altura2, profundidad2, matriz_perfil_recortada = self._cut_matrix_finding_shape(matriz_perfil)
         
         # Comprobación del estado de las matrices adquiridas
-        if (altura is None) and (anchura is None) and (profundidad is None): # Caso para tkinter
-            return self._paint_matrix(np.array([[[]]]), figsize, tkinter)
-        
-        if altura is None or anchura is None or profundidad is None: # Matrices Vacias
+        if (altura is None) or (altura2 is None) or (anchura is None) or (anchura2 is None) or (profundidad is None) or (profundidad2 is None): # Matrices Vacias
+            print('Matrices Invalidas')
             self.message = "Las matrices introduccidas son inválidas, no se puede realizar figura 3D."
             self.message_type = 3
-            print('Matrices Invalidas')
             return self._paint_matrix(np.array([[[]]]), figsize, tkinter)
         
         if anchura != anchura2 or profundidad != profundidad2 or altura != altura2: # Discrepancia entre matrices
@@ -183,7 +180,7 @@ class FigureGenerator:
 
         return None, None, matrix # Si no hay valores diferentes a -1, retornar None
 
-    def _paint_matrix(self, matriz3D, figsize:tuple=(3,3), tkinter:bool=False):
+    def _paint_matrix(self, matriz3D, figsize:tuple=(3,3), tkinter:bool=True):
         """
         Plotea la matriz para visualizarla en un grafico 3D
             @param matriz3D (list) - Matriz 3D con los datos de la figura
