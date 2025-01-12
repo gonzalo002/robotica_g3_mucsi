@@ -17,7 +17,7 @@ from sensor_msgs.msg import JointState
 from moveit_msgs.msg import RobotState
 
 # Importaciones locales 
-from control_robot import ControlRobot
+from proyecto_final.control_robot import ControlRobot
 
 
 class ROSEnv(gym.Env):
@@ -36,20 +36,21 @@ class ROSEnv(gym.Env):
         self.abs_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
 
         self.cube_limit = 25 # Se pone un limite de 25 cubos, de esta forma un mismo agente puede funcionar con hasta 25 cubos
-        self.num_cubos_max = num_cubos_max
+        self.n_cubos = num_cubos_max
         self.seed = seed
         self.visualization = visualization
         self.verbose = verbose
 
-        self.action_space = gym.spaces.Discrete(self.num_cubos_max)
+        self.action_space = gym.spaces.Discrete(self.n_cubos)
 
         self.observation_space = gym.spaces.Box(
-            low=np.array([-1] * 8 * (self.num_cubos_max+1)),
-            high=np.array([1] * 8 * (self.num_cubos_max+1)),
+            low=np.array([[-1]* 8]  * (self.cube_limit+1)),
+            high=np.array([[-1]* 8] * (self.cube_limit+1)),
             dtype=np.float64
         )
 
-
+        self.cube_size = 0.025
+        self.cube_separation = 0.02 # Separación entre cubos
         self.robot_workspace_values = {"max_x": 0.25, "min_x": -0.25, "max_y": 0.4, "min_y": 0.17, "max_alpha": pi/4, "min_alpha": -pi/4}
 
         self.j_link_1:JointState = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_LINK_1')
@@ -80,7 +81,7 @@ class ROSEnv(gym.Env):
         self.total_time = 0  # Total time taken for all actions
         self.colors_found = False
 
-        self.observation = np.array([-1.0] * 8 * (self.num_cubos_max+1))
+        self.observation = np.array([[-1]* 8]  * (self.n_cubos+1))
         self.reward = 0.0
         self.info = {}
         self.terminated = False
@@ -90,37 +91,36 @@ class ROSEnv(gym.Env):
         self.control_robot.move_group.set_joint_value_target(self.j_home)
 
     def _get_obs(self):
-        """
-        Obtiene la observación actual del entorno.
-            @return: np.ndarray, observación actual del entorno.
-        """
-        
         pose:IdCubos
         for i, cubo in enumerate(self.cubos):
+            observation = np.array([-1.0] * 8)
             pose:Pose = cubo.pose
-            self.observation[0 + i] = pose.position.x
-            self.observation[1 + i] = pose.position.y
-            self.observation[2 + i] = pose.position.z
-            self.observation[3 + i] = pose.orientation.x
-            self.observation[4 + i] = pose.orientation.y
-            self.observation[5 + i] = pose.orientation.z
-            self.observation[6 + i] = pose.orientation.w
-            self.observation[7 + i] = cubo.color
-        
-        self.observation[-1]
+            observation[0] = pose.position.x
+            observation[1] = pose.position.y
+            observation[2] = pose.position.z
+            observation[3] = pose.orientation.x
+            observation[4] = pose.orientation.y
+            observation[5] = pose.orientation.z
+            observation[6] = pose.orientation.w
+            observation[7] = cubo.color
+
+            self.observation[i] = observation
+
+        if self.cubos_recogidos < self.n_cubos:
+            self.observation[-1, -1] = self.figure_order[self.cubos_recogidos]
     
     def _get_info(self):
         self.info = {}
         if self.terminated:
             self.info = {"orden_cubos": self.orden_cubos}
             return self.info
-        self.info = {'orden_cubos': range(self.num_cubos_max)}
+        self.info = {'orden_cubos': range(self.n_cubos)}
         
     def _sample_new_figure(self):
         """
         Sample a new figure to be built by cubes.
         """
-        for _ in range(self.num_cubos_max+1):
+        for _ in range(self.n_cubos+1):
             self.figure_order.append(np.random.randint(0,4))
             if np.random.random() > 0.85:
                 self.figure_order[-1] = 4
@@ -272,9 +272,10 @@ class ROSEnv(gym.Env):
             self.n_steps += 1 # Incrementa el número de pasos
             self.reward -= 5.0 # Penaliza la acción con -5
             return self.observation, self.reward, self.terminated, self.truncated, self.info 
-
+        
+        figure_color = self.observation[-1,-1]
         selected_cube:IdCubos = deepcopy(self.cubos[action]) # Selecciona el cubo a recoger
-        if selected_cube.color != self.figure_order[self.cubos_recogidos]: # Si el color del cubo no coincide con el color de la figura
+        if selected_cube.color != figure_color: # Si el color del cubo no coincide con el color de la figura
             self.reward -= 5.0 # Penaliza la acción con -5
             self.n_steps += 1 # Incrementa el número de pasos
             return self.observation, self.reward, self.terminated, self.truncated, self.info 
@@ -293,7 +294,7 @@ class ROSEnv(gym.Env):
         if trayectory_tuple[0] != True: 
             if self.visualization:
                 self.control_robot.add_box_obstacle(f'Cubo_{selected_cube.id}', selected_cube.pose, [0.025]*3)
-            if trayectory_tuple[3].value == -1:
+            if trayectory_tuple[3].val == -1:
                 self.n_steps += 1
                 self.reward -= 10.0
                 if self.verbose:
@@ -305,14 +306,14 @@ class ROSEnv(gym.Env):
                 self.n_steps += 1
                 if self.verbose:
                     print(f'\nStep {self.n_steps} - Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}')
-                    self.reward -= (self.num_cubos_max-self.cubos_recogidos)*-10.0
+                    self.reward -= (self.n_cubos-self.cubos_recogidos)*-10.0
                 return self.observation, self.reward, self.terminated, self.truncated, self.info
         
         # Suma del tiempo necesario para alcanzar el cubo
         tiempo = trayectory_tuple[1].joint_trajectory.points[-1].time_from_start
         tiempo_seg = tiempo.to_sec()
         
-        self.control_robot.move_group.set_position_target(prev_pose) # Se mueve a la posición deseada
+        self.control_robot.move_group.set_pose_target(prev_pose) # Se mueve a la posición deseada
         trayectory_tuple = self.control_robot.plan_pose(cube_pose)
 
         if trayectory_tuple[0] != True: 
@@ -330,7 +331,7 @@ class ROSEnv(gym.Env):
                 self.n_steps += 1
                 if self.verbose:
                     print(f'\nStep {self.n_steps} - Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}')
-                    self.reward -= (self.num_cubos_max-self.cubos_recogidos)*-10.0
+                    self.reward -= (self.n_cubos-self.cubos_recogidos)*-10.0
                 return self.observation, self.reward, self.terminated, self.truncated, self.info
 
         # Suma del tiempo necesario para alcanzar el cubo
@@ -356,7 +357,7 @@ class ROSEnv(gym.Env):
         self.cubos[selected_cube.id].pose = Pose(Point(0.0, 0.0, 0.0),
                                         Quaternion(0.0, 0.0, 0.0, 0.0))
 
-        if self.cubos_recogidos == self.num_cubos_max:
+        if self.cubos_recogidos == self.n_cubos:
             self.terminated=True
             self.n_steps += 1
         
@@ -390,32 +391,16 @@ class ROSEnv(gym.Env):
         if self.visualization == True:
             self.control_robot.reset_planning_scene()
         
-        j_start = 
-        start_state = RobotState()
-        RobotState.joint_state
-        self.control_robot.move_group.set_start_state(self.j_link_1)
+        self.control_robot.move_group.set_joint_value_target(self.j_link_1)
 
         self._sample_new_figure()
 
-        for _ in range(self.num_cubos_max):
+        for _ in range(self.n_cubos):
             variables_cubos.append(self.__sample_new_cube_value(**self.robot_workspace_values))
 
         self._añadir_cubos_a_planificacion(variables_cubos)
         self._empty_workspace()
 
-        self.observation['cubos'] = self._get_obs()
-        self.observation['figure_order'] = self.figure_order
+        self._get_obs()
 
         return self.observation, self.info
-
-if __name__ == '__main__':
-    # Probamos a ejecutar con 2 cubos
-    n_cubos_max = 10
-    env = ROSEnv(num_cubos_max=n_cubos_max, visualization=True)
-    env.reset()
-    terminated = False
-    truncated = False
-    while not terminated and not truncated:
-        accion = env.action_space.sample()
-        print(accion)
-        observation, reward, terminated, truncated, info = env.step(accion)
