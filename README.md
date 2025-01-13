@@ -6,24 +6,24 @@
 Clona este repositorio en tu máquina local:
 
 ```bash
-git clone https://github.com/gonzalo002/robotica_g7_mucsi
+git clone https://github.com/gonzalo002/robotica_g3_mucsi
 ```
 ```bash
 cd robotica_g7_mucsi
 ```
 
 ### 2. Construir la imagen de los contenedores
-Actualmente tienes opción de **grupo_7_desktop** y **grupo_7_local_gpu**, el primero funcionando en cualquier sistema operativo con interfaz en web, y el segundo trabajando unicamente en Linux haciendo uso de GPU.
+Actualmente tienes opción de **grupo_3_desktop** y **grupo_3_local_gpu**, el primero funcionando en cualquier sistema operativo con interfaz en web, y el segundo trabajando unicamente en Linux haciendo uso de GPU.
 
 **Desktop:**
 ```bash
-docker compose --profile grupo_7_desktop build
+docker compose --profile grupo_3_desktop build
 ```
 
 
 **Local GPU:**
 ```bash
-docker compose --profile grupo_7_local_gpu build
+docker compose --profile grupo_3_local_gpu build
 ```
 Cuando acabe el proceso ya se dispondrá de la imagen construida en el sistema.
 ### 3. Lanzar el contenedor
