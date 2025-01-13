@@ -22,7 +22,7 @@ RUN apt update && apt install -y rviz \
     wget \
     fontconfig \
     unzip \
-    python3-tk \  # Aquí se instala tkinter
+    python3-tk \
     x11-utils \
     xdotool
 
