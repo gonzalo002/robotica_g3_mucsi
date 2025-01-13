@@ -23,6 +23,8 @@ RUN apt update && apt install -y rviz \
     fontconfig \
     unzip \
     python3-tk  # Aquí se instala tkinter
+    x11-utils
+    xdotool
 
 # Copiar el archivo local de Montserrat desde el repositorio al contenedor
 COPY fonts/montserrat.zip /tmp/montserrat.zip
