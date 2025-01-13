@@ -57,7 +57,6 @@ RUN apt-get install --no-install-recommends -y \
         xkb-data \
         x11-xkb-utils \
         x11-xserver-utils \
-        x11-utils \
         x11-apps \
         xauth \
         xbitmaps \
@@ -65,8 +64,6 @@ RUN apt-get install --no-install-recommends -y \
         xfonts-base \
         libxrandr-dev \
         xvfb \
-	fontconfig \
-	unzip
 
 ENV XDG_CURRENT_DESKTOP=KDE
 ENV KWIN_COMPOSE=N
@@ -113,31 +110,39 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     git clone "https://github.com/novnc/websockify.git" /opt/noVNC/utils/websockify
 
 RUN apt update && apt install -y rviz \
-         ros-noetic-moveit \
-         curl \
-         apt-utils \
-         python3-pip \
-         python-is-python3 \
-         net-tools \
-         nmap \
-         xauth \
-         ros-noetic-rqt \
-         ros-noetic-robot-state-publisher \
-         ros-noetic-joint-state-publisher \
-	 ros-noetic-tf-conversions \
-         git \
-         ros-noetic-camera-calibration \
-         ros-noetic-usb-cam \
-         htop \
-         libxmlrpc-core-c3-dev \
+	x11-utils \
+	xdotool \
+	ros-noetic-moveit \
+	curl \
+	apt-utils \
+	python3-pip \
+	python-is-python3 \
+	net-tools \
+	nmap \
+	xauth \
+	ros-noetic-rqt \
+	ros-noetic-robot-state-publisher \
+	ros-noetic-joint-state-publisher \
+	ros-noetic-tf-conversions \
+	git \
+	ros-noetic-camera-calibration \
+	ros-noetic-usb-cam \
+	htop \
+	libxmlrpc-core-c3-dev \
+	fontconfig \
+	unzip \
 	python3-tk
 
 # Copiar el archivo local de Montserrat desde el repositorio al contenedor
 COPY fonts/montserrat.zip /tmp/montserrat.zip
+COPY fonts/Roboto_Mono.zip /tmp/Roboto_Mono.zip
 
 # Descomprimir y configurar las fuentes
 RUN unzip /tmp/montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
     rm /tmp/montserrat.zip && \
+    fc-cache -f -v
+RUN unzip /tmp/Roboto_Mono.zip -d /usr/share/fonts/truetype/Roboto_Mono/ && \
+    rm /tmp/Roboto_Mono.zip && \
     fc-cache -f -v
 
 RUN pip install --upgrade pip \
