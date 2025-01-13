@@ -4,7 +4,7 @@ import rospy, actionlib, os
 from proyecto_final.funciones_auxiliares import crear_mensaje
 from threading import Thread
 from stable_baselines3 import PPO
-from proyecto_final.rl.env_rob_demo import ROSEnv
+from proyecto_final.rl.env_rob import ROSEnv
 from proyecto_final.msg import RLAction, RLFeedback, RLGoal, RLResult
 from trajectory_msgs.msg import JointTrajectory
 
