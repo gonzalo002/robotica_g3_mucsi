@@ -9,7 +9,7 @@ Clona este repositorio en tu máquina local:
 git clone https://github.com/gonzalo002/robotica_g3_mucsi
 ```
 ```bash
-cd robotica_g7_mucsi
+cd robotica_g3_mucsi
 ```
 
 ### 2. Construir la imagen de los contenedores
