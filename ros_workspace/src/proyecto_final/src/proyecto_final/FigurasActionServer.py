@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import rospy, actionlib, cv2, os
 import numpy as np
 from time import time
@@ -183,9 +184,6 @@ class FigureMakerActionServer(object):
         # --- PASO 4: Obtener la figura 3D ---
         resultado_final = FigurasResult()
         figura_3d = self.FigureGenerator.generate_figure_from_matrix(matrix_planta, matrix_alzado, matrix_perfil)
-        figura_3d = figura_3d.astype(np.int8)
-        resultado_final.shape_3d = figura_3d.shape
-        resultado_final.figure_3d = figura_3d.flatten().tolist()
         
         if resultado_final.figure_3d == []:
             crear_mensaje("La figura no ha podido ser creada correctamente.", "WARN", self.name)
@@ -194,6 +192,9 @@ class FigureMakerActionServer(object):
             feedback_thread.join()
             return
             
+        figura_3d = figura_3d.astype(np.int8)
+        resultado_final.shape_3d = figura_3d.shape
+        resultado_final.figure_3d = figura_3d.flatten().tolist()
     
         # --- PASO 5: Enviar el resultado ---
         self.action_server.set_succeeded(resultado_final)
@@ -293,3 +294,6 @@ class FigureMakerActionServer(object):
             feedback.feedback = 1
             self.action_server.publish_feedback(feedback)
             rospy.sleep(0.1)
+
+if __name__ == '__main__':
+    FigureMakerActionServer()
