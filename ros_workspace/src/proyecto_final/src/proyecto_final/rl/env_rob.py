@@ -38,7 +38,7 @@ class ROSEnv(gym.Env):
             @param orden_figura: list, orden de la figura
         """
         super(ROSEnv, self).__init__()
-        self.control_robot = ControlRobot("robot", train_env=True)
+        self.control_robot = ControlRobot("robot", test_env=True)
 
         self.abs_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
 
