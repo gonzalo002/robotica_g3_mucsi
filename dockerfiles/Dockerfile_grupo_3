@@ -28,7 +28,7 @@ RUN apt update && apt install -y rviz \
 
 # Copiar el archivo local de Montserrat desde el repositorio al contenedor
 COPY fonts/montserrat.zip /tmp/montserrat.zip
-COPY fonts/Roboto_Mono.zip.zip /tmp/Roboto_Mono.zip.zip
+COPY fonts/Roboto_Mono.zip /tmp/Roboto_Mono.zip
 
 # Descomprimir y configurar las fuentes
 RUN unzip /tmp/montserrat.zip -d /usr/share/fonts/truetype/montserrat/ && \
