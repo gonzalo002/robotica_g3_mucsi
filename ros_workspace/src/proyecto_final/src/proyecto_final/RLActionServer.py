@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-import rospy, actionlib, cv2, os
-import numpy as np
+
+import rospy, actionlib, os
+from proyecto_final.funciones_auxiliares import crear_mensaje
 from threading import Thread
 from stable_baselines3 import PPO
-from proyecto_final.rl.env_rob import ROSEnv
+from proyecto_final.rl.env_rob_demo import ROSEnv
 from proyecto_final.msg import RLAction, RLFeedback, RLGoal, RLResult
 from trajectory_msgs.msg import JointTrajectory
 
@@ -25,6 +26,8 @@ class CubeOrderActionServer(object):
         
         # Definicion de variables de Python
         self.file_path = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:os.path.dirname(os.path.abspath(__file__)).split('/').index('proyecto_final')+1])
+        self.message = None
+        self.message_type = None
 
         # Definicion de las variables del Entorno
         self.agent:PPO = None
@@ -71,14 +74,17 @@ class CubeOrderActionServer(object):
             action = self.model.predict(observation=obs)
             _, _, done, failed, info = self.env.step(action=action)
 
-            if failed:
-                obs, info = self.env.reset()
-                failed = False
-                done = False
+            if failed: # Cuando falle una trayectoria de forma continuada
+                self.message_type = "ERROR"
+                self.message =  crear_mensaje("Trayectoria Fallida - \
+                                              Imposible Calcular el Orden de los Cubos", self.message_type, self.name)
+                info['orden_cubos'] = []
+                info['trayectorias'] = JointTrajectory()
+                break
         
         resultado_final = RLResult()
         resultado_final.cubes_correct_order = info['orden_cubos']
-        resultado_final.cubes_trajectories = [JointTrajectory()]
+        resultado_final.cubes_trajectories = info['trayectorias']
     
         # --- PASO 4: Enviar el resultado ---
         self.action_server.set_succeeded(resultado_final)
@@ -97,3 +103,6 @@ class CubeOrderActionServer(object):
             feedback.feedback = 1
             self.action_server.publish_feedback(feedback)
             rospy.sleep(0.1)
+
+if __name__ == "__main__":
+    CubeOrderActionServer()
