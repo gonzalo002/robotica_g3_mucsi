@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Librerías estándar de Python
 import os
 from copy import deepcopy
@@ -21,14 +23,25 @@ from proyecto_final.control_robot import ControlRobot
 
 
 class ROSEnv(gym.Env):
-    def __init__(self, num_cubos_max: int, seed: int = None, visualization:bool = False, save_data:bool = False, verbose:bool = False):
+    """
+    Clase que define el entorno de entrenamiento para el robot.
+        @method __init__ - Método constructor
+        @method _get_obs - Método para obtener la observación
+        @method _get_info - Método para obtener la información adicional
+        @method _sample_new_figure - Método para muestrear una nueva figura
+        @method _sample_new_cube_value - Método para muestrear un nuevo valor de cubo
+        @method _añadir_cubos_a_planificacion - Método para añadir cubos a la planificación
+        @method _replace_unknow_colors - Método para reemplazar los colores desconocidos
+        @method _empty_workspace - Método para vaciar el espacio de trabajo
+        @method _discard_cube - Método para descartar un cubo
+        @method step - Método para realizar un paso en el entorno de entrenamiento
+        @method reset - Método para reiniciar el entorno de entrenamiento
+    """
+    def __init__(self, num_cubos_max: int, verbose:bool = True) -> None:
         """
-        Constructor de la clase ROSEnv.
-            @param num_cubos_max: int, número máximo de cubos a colocar.
-            @param seed: int, semilla para la generación de números aleatorios.
-            @param visualization: bool, indica si se desea visualizar el entorno.
-            @param save_data: bool, indica si se desea guardar los datos.
-            @param verbose: bool, indica si se desea mostrar mensajes en consola.
+        Método constructor de la clase ROSEnv.
+            @param num_cubos_max (int) - Número máximo de cubos
+            @param verbose (bool) - Indica si se desea mostrar información en pantalla
         """
         super(ROSEnv, self).__init__()
         self.control_robot = ControlRobot("robot", train_env=True)
@@ -37,60 +50,68 @@ class ROSEnv(gym.Env):
 
         self.cube_limit = 25 # Se pone un limite de 25 cubos, de esta forma un mismo agente puede funcionar con hasta 25 cubos
         self.n_cubos = num_cubos_max
-        self.seed = seed
-        self.visualization = visualization
         self.verbose = verbose
 
-        self.action_space = gym.spaces.Discrete(self.n_cubos)
+        self.action_space = gym.spaces.Discrete(self.cube_limit)
 
-        self.observation_space = gym.spaces.Box(
+        self.observation_space = gym.spaces.Box( # Espacio de observación (25 cubos + color a buscar)
             low=np.array([[-1]* 8]  * (self.cube_limit+1)),
             high=np.array([[-1]* 8] * (self.cube_limit+1)),
             dtype=np.float64
         )
 
-        self.cube_size = 0.025
+        # Variables de Simulación
+        self.cube_size = 0.025 # Tamaño del cubo
         self.cube_separation = 0.02 # Separación entre cubos
+        self.needed_cubes = {i: 0 for i in range(4)} # Cubos necesarios
+        self.available_cubes = [0]*4 # Cubos disponibles
+        self.all_colors_found = False # Indica si se han encontrado todos los colores   
         self.robot_workspace_values = {"max_x": 0.25, "min_x": -0.25, "max_y": 0.4, "min_y": 0.17, "max_alpha": pi/4, "min_alpha": -pi/4}
 
         self.j_link_1:JointState = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_LINK_1')
         self.j_home:JointState = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'J_HOME')
         self.p_discard_origin:Pose = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_ORIGIN')
+        self.p_discard_origin_2:Pose = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_DISCARD_2_ORIGIN')       
         self.p_figure_origin:Pose = self.control_robot.read_from_yaml(f'{self.abs_path}/data/trayectorias/master_positions', 'P_MATRIX_ORIGIN')
-
-        self.workspace_range = {'x_max': self.p_figure_origin.position.x+((self.cube_size + self.cube_separation)*5.5), 
-                                'x_min': self.p_figure_origin.position.x-((self.cube_size + self.cube_separation)*0.5), 
-                                'y_max': self.p_figure_origin.position.y+((self.cube_size + self.cube_separation)*5.5), 
-                                'y_min': self.p_figure_origin.position.y-((self.cube_size + self.cube_separation)*0.5)} 
-
-        self.cubos:List[IdCubos] = []
-        self.rejected_cubes:List[IdCubos] = []
-        self.pseudo_rands_cubos = []
-        self.figure_order = []
-        self.needed_cubes = {}
-        self.cubos_recogidos = 0
-        self.discarded_cubes:list = [0, 0, 0, 0] # RGBY
-        self.cube_size = 0.025
-        self.cube_separation = 0.015
         
-        self.flag_save_data = save_data
-        self.verbose = verbose
-        self.n_steps = 0
+        margen = 1.8
+        # Suponemos que la base de la figura es de 2x2 de maxima
+        self.workspace_range = {'x_max': self.p_figure_origin.position.x+((self.cube_size + self.cube_separation)*(2+margen)), 
+                                'x_min': self.p_figure_origin.position.x-((self.cube_size + self.cube_separation)*margen), 
+                                'y_max': self.p_figure_origin.position.y+((self.cube_size + self.cube_separation)*(2+margen)), 
+                                'y_min': self.p_figure_origin.position.y-((self.cube_size + self.cube_separation)*margen)}
+
+        # Variables de Entorno
+        self.cubos:List[IdCubos] = [] # Lista de cubos
+        self.pseudo_rands_cubos = [] # Lista de valores pseudo-aleatorios para los cubos
+        self.colors_found = False # Indica si se han encontrado todos los colores
+        self.figure_order = [] # Orden de los colores de la figura
+        self.cubos_recogidos = 0 # Número de cubos recogidos
+        self.discarded_cubes:list = [0, 0, 0, 0] # RGBY
         self.action_buffer = set() # Set para las acciones realizadas
-        self.orden_cubos = []
+        self.orden_cubos = [] # Orden de los cubos recogidos
         self.total_time = 0  # Total time taken for all actions
-        self.colors_found = False
+        self.failed_attempts = 0  # Number of failed attempts
 
-        self.observation = np.array([[-1]* 8]  * (self.n_cubos+1))
-        self.reward = 0.0
-        self.info = {}
-        self.terminated = False
-        self.truncated = False
+        # Variables de Mensajes
+        self.n_steps = 0 # Número de pasos
+        self.n_trials = 0 # Número de intentos
 
+        # Variables de Control
+        self.observation = np.array([[-1]* 8]  * (self.cube_limit+1)) # Cubos + Color de la Figura a coger
+        self.reward = 0.0 # Recompensa
+        self.info = {} # Información adicional
+        self.done = False # Indica si el episodio ha terminado
+        self.failed = False # Indica si ha fallado
+
+        # Condiciones Iniciales
         self.control_robot.reset_planning_scene()
         self.control_robot.move_group.set_joint_value_target(self.j_home)
 
     def _get_obs(self):
+        """
+        Obtener la observación del entorno.
+        """
         pose:IdCubos
         for i, cubo in enumerate(self.cubos):
             observation = np.array([-1.0] * 8)
@@ -110,49 +131,44 @@ class ROSEnv(gym.Env):
             self.observation[-1, -1] = self.figure_order[self.cubos_recogidos]
     
     def _get_info(self):
-        self.info = {}
-        if self.terminated:
-            self.info = {"orden_cubos": self.orden_cubos}
-            return self.info
-        self.info = {'orden_cubos': range(self.n_cubos)}
+        """
+        Obtener la información adicional del entorno.
+        """
+        self.info = {"orden_cubos": self.orden_cubos}
         
     def _sample_new_figure(self):
         """
-        Sample a new figure to be built by cubes.
+        Generar una nueva figura.
         """
-        for _ in range(self.n_cubos+1):
+        for _ in range(self.n_cubos):
             self.figure_order.append(np.random.randint(0,4))
             if np.random.random() > 0.85:
                 self.figure_order[-1] = 4
 
         # self.figure_order = np.random.randint(0, 4, size=self.num_cubos_max)
         unique, counts = np.unique(self.figure_order, return_counts=True)
-        # Crear un diccionario con las claves del 0 al 3 e inicializarlas a 0
-        self.needed_cubes = {i: 0 for i in range(4)}
         
         # Actualizar el diccionario con los valores presentes en figure_order
         self.needed_cubes.update(dict(zip(unique, counts)))
 
-    def __sample_new_cube_value(self, max_x: float, min_x: float, 
+    def _sample_new_cube_value(self, max_x: float, min_x: float, 
                             max_y: float, min_y: float, 
-                            max_alpha: float, min_alpha: float) -> np.ndarray:
+                            max_alpha: float, min_alpha: float) -> None:
         """
-        Sample a new cube value for x, y and alpha.
-        Input:
-            max_x: float, maximum value for x.
-            min_x: float, minimum value for x.
-            max_y: float, maximum value for y.
-            min_y: float, minimum value for y.
-            max_alpha: float, maximum value for alpha.
-            min_alpha: float, minimum value for alpha.
-        Output:
-            np.ndarray, new cube value for x, y and alpha.
+        Genera un nuevo valor pseudo-aleatorio para un cubo.
+            @param max_x (float) - Máximo valor en X
+            @param min_x (float) - Mínimo valor en X
+            @param max_y (float) - Máximo valor en Y
+            @param min_y (float) - Mínimo valor en Y
+            @param max_alpha (float) - Máximo valor en Alpha
+            @param min_alpha (float) - Mínimo valor en Alpha
         """
         
+        # Verificar que los valores máximos sean mayores que los mínimos
         if max_x < min_x or max_y < min_y or max_alpha < min_alpha:
             raise ValueError("max values must be greater than min values")
         
-        success = False
+        success = False # Indica si se ha generado un valor válido
         
         while not success:
             # x y oz
@@ -172,36 +188,38 @@ class ROSEnv(gym.Env):
                 else:
                     success = True  
         
-        pseudo_rands[2] = np.interp(pseudo_rands[2], [0, 1], [min_alpha, max_alpha])
-        pseudo_rands[3] = np.random.randint(0, 4)
-
+        pseudo_rands[2] = np.interp(pseudo_rands[2], [0, 1], [min_alpha, max_alpha]) # Oz
+        pseudo_rands[3] = np.random.randint(0, 4) # Color
         
-        if self.needed_cubes[int(pseudo_rands[3])] <= 0 and not self.colors_found:
-            checked_values = set()
-            pseudo_rands[3] = np.random.randint(0, 4)
-            while self.needed_cubes[int(pseudo_rands[3])] <= 0:
-                checked_values.add(pseudo_rands[3])    
-                if len(checked_values) == 4:
-                    self.colors_found = True
-                    break
-                pseudo_rands[3] = np.random.randint(0, 4)
-        
-        self.needed_cubes[int(pseudo_rands[3])] -= 1
-
-        if self.colors_found:
-            for i, figure_cube in enumerate(self.figure_order):
-                if figure_cube == 4:
-                    self.figure_order[i] = int(pseudo_rands[3])
-                    break
-
+        # Actualizar los valores de los cubos necesarios y disponibles
+        cube_color = int(pseudo_rands[3])
+        if not self.all_colors_found: 
+            if self.needed_cubes[cube_color] == self.available_cubes[cube_color]:
+                cube_found = False
+                for i in range(4):
+                    if self.needed_cubes[i] > self.available_cubes[i]:
+                        pseudo_rands[3] = i
+                        self.available_cubes[i] += 1
+                        cube_found = True
+                        break
+                if not cube_found:
+                    self.available_cubes[cube_color] += 1
+                    self.all_colors_found = True
+            else:
+                self.available_cubes[cube_color] += 1
+        else:
+            self.available_cubes[cube_color] += 1
+                
         if pseudo_rands[0] > 0:
             pseudo_rands[2] -= pi/2
         
         self.pseudo_rands_cubos.append(deepcopy(pseudo_rands))
 
-        return pseudo_rands
-
     def _añadir_cubos_a_planificacion(self, cubos: List[IdCubos]) -> None:
+        """
+        Añadir cubos a la planificación.
+            @param cubos: List[IdCubos], lista de cubos.
+        """
         for i, pseudo_rands in enumerate(cubos):
             cubo:IdCubos = IdCubos()
             cubo.pose = Pose(position=Point(x=pseudo_rands[0], y=pseudo_rands[1], z=0.0125), 
@@ -211,17 +229,23 @@ class ROSEnv(gym.Env):
 
             self.cubos.append(cubo)
 
-            if self.visualization == True:
-                self.control_robot.add_box_obstacle(f"Cubo_{cubo.id}", cubo.pose, (0.025, 0.025, 0.025))
+            self.control_robot.add_box_obstacle(f"Cubo_{cubo.id}", cubo.pose, (0.025, 0.025, 0.025))
     
-    def _empty_workspace(self):
+    def _replace_unknow_colors(self) -> None:
         """
-        Empty the workspace of the robot.
+        Reeplazar los colores desconocidos.
         """
-        ''' 
-        Libera el espacio de trabajo del robot, moviendo y descartando los cubos encontrados.
-            @return None
-        '''
+        for i, color in enumerate(self.figure_order):
+            if color == 4:
+                for j in range(4):
+                    if self.needed_cubes[j] < self.available_cubes[j]:
+                        self.figure_order[i]
+                        self.needed_cubes[j] += 1
+    
+    def _empty_workspace(self) -> None:
+        """
+        Libera el espacio de trabajo del robot.
+        """
         x_min = self.workspace_range['x_min']
         y_min = self.workspace_range['y_min']        
         x_max = self.workspace_range['x_max']        
@@ -230,28 +254,31 @@ class ROSEnv(gym.Env):
         self.control_robot.move_jointstates(self.j_link_1)     
                 
         cube:IdCubos
-        for cube in self.cubos:
+        for cube in self.cubos: # Se recorren los cubos
             pose:Pose = deepcopy(cube.pose)
             color = cube.color
-            if pose.position.x > x_min and pose.position.x < x_max:
-                if pose.position.y > y_min and pose.position.y < y_max:
+            if pose.position.x > x_min and pose.position.x < x_max: # Si la posición X está en el rango
+                if pose.position.y > y_min and pose.position.y < y_max: # Si la posición Y está en el rango
                     self._discard_cube(cube_id=cube.id, matrix_position=[0, color, self.discarded_cubes[color]])
                     self.discarded_cubes[color] += 1
         
 
-    def _discard_cube(self, cube_id:int = None, matrix_position:list = [0,0,0]) -> bool:
+    def _discard_cube(self, cube_id:int = None, matrix_position:list = [0,0,0]) -> None:
         ''' 
-        Suelta el cubo en la posición deseada.
-            @param make_figure (bool) - Determina si el cubo forma parte de una figura o es un descarte.
-            @param cube_id (int) - Identificador único del cubo.
-            @param matrix_position (list) - Posición 3D para colocar el cubo en una matriz.
-            @return success (bool) - Indica si el movimiento fue exitoso.
+        Método para llevar un cubo a la zona de descartes.
+            @param cube_id: int, identificador del cubo.
+            @param matrix_position: list, posición en la matriz.
         '''
+
         self.control_robot.scene.remove_world_object(f'Cubo_{cube_id}')
 
-
         # Se determina la pose inicial dependiendo si el cubo forma parte de una figura.
-        pose: Pose = deepcopy(self.p_discard_origin)  # Pose inicial para desechar el cubo.
+        if matrix_position[1] < 2:
+                pose: Pose = deepcopy(self.p_discard_origin)  # Pose inicial para desechar el cubo.
+
+        elif matrix_position[1] < 4:
+            matrix_position[1] -= 2
+            pose: Pose = deepcopy(self.p_discard_origin_2)  # Pose inicial para desechar el cubo.
 
         # Ajuste en la posición X, Y y Z basados en la matriz de posición.
         pose.position.x += ((self.cube_size + self.cube_separation*2) * matrix_position[0])
@@ -268,17 +295,34 @@ class ROSEnv(gym.Env):
             @return: Tuple[np.ndarray, float, bool, bool, dict], observación, recompensa, si el episodio ha terminado, si la acción ha sido truncada y la información adicional.
         """
 
+        if self.failed_attempts >= 10:
+            self.failed = True
+            print(f'\033[31m\nTrial {self.n_trials} - Step {self.n_steps} - \
+                          Fallado con Accion {self.orden_cubos}\033[0m')
+            self.reward -= (self.n_cubos-self.cubos_recogidos)*-10.0
+            return self.observation, self.reward, self.done, self.failed, self.info
+
+        if action >= len(self.cubos): # Si la acción no es válida
+            self.n_steps += 1 # Incrementa el número de pasos
+            self.reward -= 20.0 # Penaliza la acción con -5
+            return self.observation, self.reward, self.done, self.failed, self.info 
+
         if action in self.taken_actions: # Si la acción ya ha sido tomada
             self.n_steps += 1 # Incrementa el número de pasos
-            self.reward -= 5.0 # Penaliza la acción con -5
-            return self.observation, self.reward, self.terminated, self.truncated, self.info 
+            self.reward -= 20.0 # Penaliza la acción con -5
+            return self.observation, self.reward, self.done, self.failed, self.info 
         
         figure_color = self.observation[-1,-1]
         selected_cube:IdCubos = deepcopy(self.cubos[action]) # Selecciona el cubo a recoger
+
+        if figure_color == -1: # Si no hay color de figura
+            self.cubos_recogidos += 1
+            return self.observation, self.reward, self.done, self.failed, self.info
+
         if selected_cube.color != figure_color: # Si el color del cubo no coincide con el color de la figura
-            self.reward -= 5.0 # Penaliza la acción con -5
+            self.reward -= 10.0 # Penaliza la acción con -5
             self.n_steps += 1 # Incrementa el número de pasos
-            return self.observation, self.reward, self.terminated, self.truncated, self.info 
+            return self.observation, self.reward, self.done, self.failed, self.info 
 
         cube_pose:Pose = selected_cube.pose # Obtiene la pose del cubo seleccionado
         cube_pose.position.z = 0.237
@@ -286,28 +330,30 @@ class ROSEnv(gym.Env):
         prev_pose:Pose = deepcopy(cube_pose) # Copia la pose del cubo seleccionado
         prev_pose.position.z = 0.237 # Ajusta la altura del cubo para recogerlo
 
-        if self.visualization:
-            self.control_robot.scene.remove_world_object(f'Cubo_{selected_cube.id}')
+        self.control_robot.scene.remove_world_object(f'Cubo_{selected_cube.id}')
+        
+        self.control_robot.move_group.set_joint_value_target(self.j_link_1) # Se mueve a la posición deseada
 
         trayectory_tuple = self.control_robot.plan_pose(prev_pose)
 
-        if trayectory_tuple[0] != True: 
-            if self.visualization:
-                self.control_robot.add_box_obstacle(f'Cubo_{selected_cube.id}', selected_cube.pose, [0.025]*3)
-            if trayectory_tuple[3].val == -1:
+        if trayectory_tuple[0] != True:  # Si la trayectoria no es válida
+            self.control_robot.add_box_obstacle(f'Cubo_{selected_cube.id}', selected_cube.pose, [0.025]*3)
+            if trayectory_tuple[3].val == -1: # Si la colisión es con el robot
+                self.failed_attempts += 1
                 self.n_steps += 1
                 self.reward -= 10.0
                 if self.verbose:
-                    print('Colisión con Escena')
-                return self.observation, self.reward, self.terminated, self.truncated, self.info
+                    print('\033[31mColisión con Escena\033[0m')
+                return self.observation, self.reward, self.done, self.failed, self.info
             
             else:
-                self.truncated = True
+                self.failed = True
                 self.n_steps += 1
                 if self.verbose:
-                    print(f'\nStep {self.n_steps} - Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}')
+                    print(f'\033[31m\nTrial {self.n_trials} - Step {self.n_steps} - \
+                          Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}\033[0m')
                     self.reward -= (self.n_cubos-self.cubos_recogidos)*-10.0
-                return self.observation, self.reward, self.terminated, self.truncated, self.info
+                return self.observation, self.reward, self.done, self.failed, self.info
         
         # Suma del tiempo necesario para alcanzar el cubo
         tiempo = trayectory_tuple[1].joint_trajectory.points[-1].time_from_start
@@ -316,23 +362,24 @@ class ROSEnv(gym.Env):
         self.control_robot.move_group.set_pose_target(prev_pose) # Se mueve a la posición deseada
         trayectory_tuple = self.control_robot.plan_pose(cube_pose)
 
-        if trayectory_tuple[0] != True: 
-            if self.visualization:
-                self.control_robot.add_box_obstacle(f'Cubo_{selected_cube.id}', selected_cube.pose, [0.025]*3)
-            if trayectory_tuple[3].value == -1:
+        if trayectory_tuple[0] != True:  # Si la trayectoria no es válida
+            self.control_robot.add_box_obstacle(f'Cubo_{selected_cube.id}', selected_cube.pose, [0.025]*3)
+            if trayectory_tuple[3].val == -1:  # Si la colisión es con el robot
+                self.failed_attempts += 1
                 self.n_steps += 1
                 self.reward -= 10.0
                 if self.verbose:
-                    print('Colisión con Escena')
-                return self.observation, self.reward, self.terminated, self.truncated, self.info
+                    print('\033[31mColisión con Escena\033[0m')
+                return self.observation, self.reward, self.done, self.failed, self.info
             
             else:
-                self.truncated = True
+                self.failed = True
                 self.n_steps += 1
                 if self.verbose:
-                    print(f'\nStep {self.n_steps} - Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}')
+                    print(f'\033[31m\nTrial {self.n_trials} - Step {self.n_steps} - \
+                          Fallado con Accion {self.orden_cubos} - Cubo Fallado {selected_cube.id}\033[0m')
                     self.reward -= (self.n_cubos-self.cubos_recogidos)*-10.0
-                return self.observation, self.reward, self.terminated, self.truncated, self.info
+                return self.observation, self.reward, self.done, self.failed, self.info
 
         # Suma del tiempo necesario para alcanzar el cubo
         tiempo = trayectory_tuple[1].joint_trajectory.points[-1].time_from_start
@@ -351,56 +398,76 @@ class ROSEnv(gym.Env):
         self.taken_actions.add(action)
         self.orden_cubos.append(action)
 
+        self.needed_cubes[selected_cube.color] -= 1
+        self.available_cubes[selected_cube.color] -= 1
         self.cubos[selected_cube.id].color = -1
         self.cubos_recogidos += 1
         
         self.cubos[selected_cube.id].pose = Pose(Point(0.0, 0.0, 0.0),
                                         Quaternion(0.0, 0.0, 0.0, 0.0))
 
-        if self.cubos_recogidos == self.n_cubos:
-            self.terminated=True
+        if self.cubos_recogidos == self.n_cubos: # Si se han recogido todos los cubos
+            self.done=True
             self.n_steps += 1
         
-        if self.terminated:
+        if self.done: # Si el episodio ha terminado
             avg_time = self.total_time / len(self.taken_actions)
             self.reward += (4 - avg_time) * self.cubos_recogidos  # La recompensa aumenta cuando el tiempo promedio es cercano a 4 segundos
 
-        if self.verbose and self.terminated:
-            print(f'\nStep {self.n_steps} - Completado con Recompensa {self.reward} - Accion {str(self.orden_cubos)}')
+        if self.verbose and self.done: # Si se desea mostrar información en pantalla
+            print(f'\033[32m\nTrial {self.n_trials} - Step {self.n_steps} - \
+                  Completado con Recompensa {self.reward} - Accion {str(self.orden_cubos)}\033[0m')
         
-        return self.observation, self.reward, self.terminated, self.truncated, self.info
+        return self.observation, self.reward, self.done, self.failed, self.info
 
     def reset(self, *, seed: Union[int, None] = None, options: Union[Dict[str, Any], None] = None) -> Tuple[np.ndarray, Dict[str, Any]]:
-        super(ROSEnv, self).reset(seed=seed, options=options)
+        """
+        Reinicia el entorno.
+            @param seed: Union[int, None], semilla para la generación de números pseudo-aleatorios.
+            @param options: Union[Dict[str, Any], None], opciones adicionales.
+            @return: Tuple[np.ndarray, Dict[str, Any]], observación e información adicional.
+        """
         if not seed is None:
-            self.seed = seed
-        if not self.seed is None:
-            set_random_seed(self.seed)
+            set_random_seed(seed)
 
-        variables_cubos = []
-        self.pose_cubos = []
-        self.taken_actions = set()
-        self.orden_cubos = []
-        self.pseudo_rands_cubos = []
-        self.cubos_recogidos = 0
+        super(ROSEnv, self).reset(seed=seed, options=options)
+
+        self.observation = np.array([[-1]* 8]  * (self.cube_limit+1))
+        self.done = False
+        self.failed = False
+        self.info = {}
         self.reward = 0.0
-        self.total_time = 0  # Total time taken for all actions
-        self.terminated = False
-        self.truncated = False
+        self.n_steps = 0
+        self.n_trials += 1
 
-        if self.visualization == True:
-            self.control_robot.reset_planning_scene()
+        self.pseudo_rands_cubos = []
+        self.cubos = []
+        self.all_colors_found = False
+        self.figure_order = []
+        self.cubos_recogidos = 0
+        self.discarded_cubes = [0, 0, 0, 0]
+        self.orden_cubos = []
+        self.total_time = 0
+        self.taken_actions = set()
+        self.needed_cubes = {i: 0 for i in range(4)}
+        self.available_cubes = [0]*4
+        self.colors_found = False
+
+        self.control_robot.reset_planning_scene()
         
-        self.control_robot.move_group.set_joint_value_target(self.j_link_1)
+        self.control_robot.move_group.set_joint_value_target(self.j_home)
 
         self._sample_new_figure()
 
         for _ in range(self.n_cubos):
-            variables_cubos.append(self.__sample_new_cube_value(**self.robot_workspace_values))
+            self._sample_new_cube_value(**self.robot_workspace_values)
 
-        self._añadir_cubos_a_planificacion(variables_cubos)
+        self._replace_unknow_colors()
+
+        self._añadir_cubos_a_planificacion(self.pseudo_rands_cubos)
         self._empty_workspace()
 
         self._get_obs()
+        self._get_info()
 
         return self.observation, self.info
