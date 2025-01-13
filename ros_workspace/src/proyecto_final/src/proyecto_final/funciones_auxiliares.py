@@ -1,4 +1,12 @@
 def crear_mensaje(mensaje:str, tipo:str='ERROR', nombre_clase:str="", tkinter:bool=True):
+    """
+    Función que crea un mensaje con colores para mostrar en consola.
+        @param mensaje: Mensaje a mostrar.
+        @param tipo: Tipo de mensaje. Puede ser ERROR, SUCCESS, WARN, INFO, INPUT.
+        @param nombre_clase: Nombre de la clase que llama a la función.
+        @param tkinter: Indica si se está ejecutando en un entorno de tkinter.
+        @return: Mensaje con colores.
+    """
     # --- CÓDIGO COLORES ---
     c = {
         "ERROR":   "\033[31m",  # Rojo
