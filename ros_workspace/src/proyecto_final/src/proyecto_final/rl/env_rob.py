@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Librerías estándar de Python
 import sys, os
 from copy import deepcopy
@@ -20,14 +22,20 @@ from proyecto_final.control_robot import ControlRobot
 
 
 class ROSEnv(gym.Env):
-    def __init__(self, cubos:List[IdCubos], orden_figura:list):
+    """
+    Clase que implementa el entorno de Reinforcement Learning para el robot.
+        @method __init__ - Método constructor
+        @method _get_obs - Método que obtiene la observación
+        @method _get_info - Método que obtiene la información
+        @method _test_figure - Método que comprueba si la figura se puede realizar
+        @method step - Método que realiza un paso en el entorno
+        @method reset - Método que reinicia el ent
+    """
+    def __init__(self, cubos:List[IdCubos], orden_figura:list) -> None:
         """
         Constructor de la clase ROSEnv.
-            @param num_cubos_max: int, número máximo de cubos a colocar.
-            @param seed: int, semilla para la generación de números aleatorios.
-            @param visualization: bool, indica si se desea visualizar el entorno.
-            @param save_data: bool, indica si se desea guardar los datos.
-            @param verbose: bool, indica si se desea mostrar mensajes en consola.
+            @param cubos: List[IdCubos], lista de cubos
+            @param orden_figura: list, orden de la figura
         """
         super(ROSEnv, self).__init__()
         self.control_robot = ControlRobot("robot", train_env=True)
@@ -37,9 +45,9 @@ class ROSEnv(gym.Env):
         self.cube_limit = 25 # Se pone un limite de 25 cubos, de esta forma un mismo agente puede funcionar con hasta 25 cubos
         self.cubos = cubos
         self.figure_order = orden_figura
-        self.n_cubos = len(orden_figura)
+        self.n_cubos = len(self.figure_order)
 
-        self.action_space = gym.spaces.Discrete(len(self.cubos))
+        self.action_space = gym.spaces.Discrete(self.cube_limit)
 
         self.observation_space = gym.spaces.Box(
             low=np.array([[-1]* 8] * (self.cube_limit+1)),
@@ -65,6 +73,9 @@ class ROSEnv(gym.Env):
         self.truncated = False
 
     def _get_obs(self):
+        """
+        Método que obtiene la observación.
+        """
         pose:IdCubos
         for i, cubo in enumerate(self.cubos):
             observation = np.array([-1.0] * 8)
@@ -85,6 +96,9 @@ class ROSEnv(gym.Env):
 
 
     def _get_info(self):
+        """
+        Método que obtiene la información.
+        """
         self.info = {}
         if self.terminated:
             self.info = {"orden_cubos": self.orden_cubos,
@@ -141,6 +155,14 @@ class ROSEnv(gym.Env):
         figure_color = int(self.observation[-1, -1])
         cube = self.cubos[action]
         
+        if action > len(self.cubos): # Si la acción no es válida
+            self.reward -= 20.0 # Penaliza la acción con -5
+            return self.observation, self.reward, self.done, self.truncated, self.info 
+        
+        if action in self.taken_actions: # Si la acción ya ha sido tomada
+            self.reward -= 20.0 # Penaliza la acción con -5
+            return self.observation, self.reward, self.done, self.truncated, self.info 
+
         if figure_color == -1:
             self.cubos_recogidos += 1
         
@@ -206,6 +228,7 @@ class ROSEnv(gym.Env):
         self.available_cubes[figure_color] -= 1
         self.cubos_recogidos += 1
 
+        self.taken_actions.add(action)
         self.orden_cubos.append(deepcopy(cube))
         self.cube_trajectories.append(trajectory)
         
@@ -226,11 +249,18 @@ class ROSEnv(gym.Env):
         return self.observation, self.reward, self.done, self.truncated, self.info
 
     def reset(self, seed: Union[int, None] = None, options: Union[Dict[str, Any], None] = None) -> Tuple[np.ndarray, Dict[str, Any]]:
-        super(ROSEnv, self).reset(seed=seed, options=options)
+        """
+        Reinicia el entorno.
+            @param seed: int, semilla para la generación de números aleatorios.
+            @param options: Dict[str, Any], opciones para el reinicio del entorno.
+            @return: Tuple[np.ndarray, Dict[str, Any]], observación y diccionario con información adicional.
+        """
         if seed is None:
             pass
         if not seed is None:
             set_random_seed(seed)
+
+        super(ROSEnv, self).reset(seed=seed, options=options)
 
         self.taken_actions = set()
         self.orden_cubos = []
