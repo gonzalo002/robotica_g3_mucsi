@@ -2,6 +2,7 @@ FROM ros:noetic
 
 RUN apt update && apt install -y rviz \
     x11-utils \
+    xdotool \
     ros-noetic-moveit \
     curl \
     apt-utils \
@@ -23,8 +24,7 @@ RUN apt update && apt install -y rviz \
     wget \
     fontconfig \
     unzip \
-    python3-tk \
-    xdotool
+    python3-tk   # Aquí se instala tkinter
 
 # Copiar el archivo local de Montserrat desde el repositorio al contenedor
 COPY fonts/montserrat.zip /tmp/montserrat.zip
