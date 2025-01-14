@@ -100,7 +100,7 @@ class ROSEnv(gym.Env):
         Método que obtiene la información.
         """
         self.info = {}
-        if self.terminated:
+        if self.truncated:
             self.info = {"orden_cubos": self.orden_cubos,
                          'trayectorias' : self.cube_trajectories}
             return self.info
@@ -148,7 +148,7 @@ class ROSEnv(gym.Env):
             @return: Tuple[np.ndarray, float, bool, bool, dict], observación, recompensa, si el episodio ha terminado, si la acción ha sido truncada y la información adicional.
         """
         if self.failed_attempts >= 10:
-            self.terminated = True
+            self.truncated = True
             self.reward = -100.0
             return self.observation, self.reward, self.done, self.truncated, self.info
         
@@ -282,7 +282,7 @@ class ROSEnv(gym.Env):
         self.available_cubes = [0]*5
         self.failed_attempts = 0
         self.reward = 0.0
-        self.terminated = False
+        self.truncated = False
         self.truncated = False
 
         self._test_figure()
