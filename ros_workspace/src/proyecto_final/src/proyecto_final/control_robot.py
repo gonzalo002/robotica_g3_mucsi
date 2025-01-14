@@ -58,7 +58,10 @@ class ControlRobot:
         self.SubsGripEffort = rospy.Subscriber("/rg2/grip_detected", Bool, self._gripper_effort_callback) # Suscriptor del esfuerzo del gripper
         self.get_gripper_state = False # Booleano que indica si se debe obtener el estado del gripper
         self.get_gripper_effort = False # Booleano que indica si se debe obtener el esfuerzo del gripper
+
         self.name = "ControlRobot" # Nombre de la clase
+        self.message = None
+        self.message_type = None
 
         self.move_group.set_max_velocity_scaling_factor(1) # Factor de escala de la velocidad
         self.move_group.set_max_acceleration_scaling_factor(1) # Factor de escala de la aceleración
@@ -122,9 +125,15 @@ class ControlRobot:
         """
         for i in range(len(trajectory)): # Por cada punto de la trayectoria
             state = self.move_jointstates(trajectory[i]) # Mueve el robot a ese punto
-            crear_mensaje(f"Punto {i} alcanzado", "INFO", self.name)
-            if not state: crear_mensaje(f"Trayectoria fallida", "ERROR", self.name); return False
-        crear_mensaje(f"Trayectoria alzanzada", "SUCCESS", self.name)
+            self.message_type = "INFO"
+            self.message = crear_mensaje(f"Punto {i} alcanzado", self.message_type, self.name)
+            if not state: 
+                self.message_type = "ERROR"
+                self.message = crear_mensaje(f"Trayectoria fallida", self.message_type, self.name)
+                return False
+        
+        self.message = "SUCCESS"
+        self.message = crear_mensaje(f"Trayectoria alzanzada", self.message_type, self.name)
         return state
     
     def move_pose_trayectory(self, trajectory:list = []) -> bool:
@@ -135,9 +144,15 @@ class ControlRobot:
         """
         for i in range(len(trajectory)): # Por cada punto de la trayectoria
             state = self.move_pose(trajectory[i]) # Mueve el robot a ese punto
-            crear_mensaje(f"Punto {i} alcanzado", "INFO", self.name)
-            if not state: crear_mensaje(f"Trayectoria fallida", "ERROR", self.name); return False
-        crear_mensaje(f"Trayectoria alzanzada", "SUCCESS", self.name)
+            self.message_type = "INFO"
+            self.message = crear_mensaje(f"Punto {i} alcanzado", self.message_type , self.name)
+            if not state: 
+                self.message_type = "ERROR"
+                self.message = crear_mensaje(f"Trayectoria fallida", self.message_type, self.name)
+                return False
+
+        self.message = "SUCCESS"
+        self.message = crear_mensaje(f"Trayectoria alzanzada", self.message_type, self.name)
         return state
     
     def move_carthesian_trayectory(self, waypoints:list = [], eef_step:Float32 = 0.01, avoid_collisions:bool = True ,wait:bool = True) -> bool:
@@ -151,16 +166,19 @@ class ControlRobot:
         """
         if eef_step == 0.0: # Si el paso del end effector es 0
             eef_step = 0.01
-            crear_mensaje("Parámetro eef_step modificado a valor 0.01 por requisitos de funcionamiento", "INFO", self.name)
+            self.message_type = "INFO"
+            self.message = crear_mensaje("Parámetro eef_step modificado a valor 0.01 por requisitos de funcionamiento", self.message_type, self.name)
             
         waypoints.insert(0, self.get_pose()) # Añade la pose actual al principio de la lista
         (plan, fraction) = self.move_group.compute_cartesian_path(waypoints, eef_step = eef_step, avoid_collisions= avoid_collisions)
         
         if fraction != 1.0: # Si no se ha alcanzado el 100% de la trayectoria
-            crear_mensaje(f"Trayectoria Inalcanzable. Porcentaje de la trayectoria alcanzable: {fraction*100:.2f}%", "WARN", self.name)
+            self.message_type = "WARN"
+            self.message = crear_mensaje(f"Trayectoria Inalcanzable. Porcentaje de la trayectoria alcanzable: {fraction*100:.2f}%", self.message_type, self.name)
             return False
         else: 
-            crear_mensaje(f"Ejecutando Trayectoria", "INFO", self.name)
+            self.message_type = "INFO"
+            self.message = crear_mensaje(f"Ejecutando Trayectoria", self.message_type, self.name)
             return self.move_group.execute(plan, wait=wait)
         
     def add_box_obstacle(self, box_name:String, box_pose:Pose, size:tuple = (.1, .1, .1)) -> None:
@@ -311,7 +329,7 @@ class ControlRobot:
         self.get_gripper_state = True
         self.get_gripper_effort = True
 
-        rate = rospy.Rate(20) # Frecuencia de actualización
+        rate = rospy.Rate(10) # Frecuencia de actualización
         while self.get_gripper_state or self.get_gripper_effort:
             rate.sleep()
 
