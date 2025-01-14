@@ -60,6 +60,7 @@ class SecuenceCommander:
         self.message = None
         self.message_type = None
         self.name = "RobotMain" # Nombre del nodo
+        self.stop = False
 
         # --- VARIABLES AUTO ---
         self.discarded_cubes = [0, 0, 0, 0] # RGBY
@@ -80,7 +81,7 @@ class SecuenceCommander:
                             'y_min' : 0.23159845770381593, 'y_max' : 0.44488890481150184,
                             'z_min' : 0.2, 'z_max' : 0.398362} # Rango de la mano
         self.hand_pose = [0.0, 0.0, 0.0] # x, y, z
-        self.hand_gesture = {'is_open' : False, 'is_peace' : False, 'is_dino' : False} # Tipos de Gestos
+        self.hand_gesture = {'is_open' : False, 'is_peace' : False, 'is_dino' : False, 'is_dislike' : False} # Tipos de Gestos
 
         # --- Clases ---
         self.robot = ControlRobot('robot') # Control del Robot
@@ -109,7 +110,10 @@ class SecuenceCommander:
         self._moveJoint(self.j_home) # Mueve el robot a la posición de inicio
         self.robot.move_gripper(35.0, 40.0) # Abre la pinza del robot
         
-        
+    
+    def security_stop(self)->None:
+        self.robot.move_group.stop()
+
     def _moveJoint(self, jointstate:list) -> bool:   
         ''' 
         Mueve las articulaciones del robot a una posición especificada usando un JointState.
@@ -152,8 +156,7 @@ class SecuenceCommander:
             self.message =  crear_mensaje(f"Los cubos sobre la mesa no han sido definidos", "WARN", self.name)
             return
 
-        self.message_type = "INFO"
-        self.message =  crear_mensaje("Limpiando la mesa de trabajo...", self.message_type, self.name)
+        self.discarded_cubes = [0, 0, 0, 0] # RGBY
         
         x_min = self.workspace_range['x_min']
         y_min = self.workspace_range['y_min']        
@@ -161,12 +164,15 @@ class SecuenceCommander:
         y_max = self.workspace_range['y_max']   
         
         self._moveJoint(self.j_link_1)     
-                
+        limpieza = 0
         for cube in self.cubes: # Recorremos los cubos
             pose:Pose = deepcopy(cube.pose)
             color = cube.color
             if pose.position.x > x_min and pose.position.x < x_max: # Si el cubo está en el rango de trabajo
                 if pose.position.y > y_min and pose.position.y < y_max: 
+                    if limpieza == 0:
+                        self.message_type = "INFO"
+                        self.message =  crear_mensaje("Limpiando la mesa de trabajo...", self.message_type, self.name)
                     if self._pick_cube(pose, cube.id):
                         if color < 2:
                             discard_joint = self.j_discard_origin
@@ -238,7 +244,7 @@ class SecuenceCommander:
         self._empty_workspace() # Limpia el espacio de trabajo antes de crear la figura.
         
         self.message_type = "INFO"
-        self.message =  crear_mensaje("Empezando a crear la figura...", self.message_type, self.name)
+        self.message = crear_mensaje("Empezando a crear la figura...", self.message_type, self.name)
 
         self._moveJoint(self.j_link_1)
 
@@ -251,15 +257,22 @@ class SecuenceCommander:
                 for i in range(x):
                     figure_order.append(self.matriz3D[i,j,k])
         
+        self.message_type = "INFO"
+        self.message =  crear_mensaje("Obteniendo el orden de cogida...", self.message_type, self.name)
         result:RLResult = self.action_client.obtain_cube_order((self.cubes, figure_order))
         
         cube_order = result.cubes_correct_order
         trajectory_cubes = result.cubes_trajectories 
 
+        if len(cube_order) == 0:
+            self.message_type = 'ERROR'
+            self.message = crear_mensaje('Cubos Inalcanzables por el Robot', self.message_type, self.name)
+            return
+
         num_order = []
         self.message_type = "SUCCESS"
 
-        for cube in cube_order: # Recorremos los cubos
+        for cube in cube_order: # Recorremos los cubos+
             num_order.append(cube.id)
         self.message = crear_mensaje(f'Orden de los Cubos Seleccionado: {num_order}', self.message_type, self.name)
 
@@ -269,18 +282,22 @@ class SecuenceCommander:
                 for i in range(x):
                     cube:IdCubos = cube_order[cont_cubos_dejados] # Cubo a mover
                     cont_cubos_dejados += 1
+                    if not cube.color == -1:
+                        
 
-                    if not self._pick_cube(cube.pose, cube.id): # Si no se puede coger el cubo, se para la secuencia.
-                        self.message_type = "ERROR"
-                        self.message =  crear_mensaje('El robot no ha podido coger el cubo.', self.message_type, 'RobotMain')
-                        break
+                        if not self._pick_cube(cube.pose, cube.id): # Si no se puede coger el cubo, se para la secuencia.
+                            self.message_type = "ERROR"
+                            self.message =  crear_mensaje('El robot no ha podido coger el cubo.', self.message_type, 'RobotMain')
+                            break
 
-                    if not self._drop_cube(make_figure=True, cube_id=cube.id, matrix_position=[x-i, y-k, j]):
-                        self.message_type = "ERROR"
-                        self.message =  crear_mensaje('El robot no ha podido dejar el cubo.', self.message_type, 'RobotMain')
-                        break
-        
-        self._moveJoint(self.j_home) # Movemos el robot a la posición de inicio.
+                        if not self._drop_cube(make_figure=True, cube_id=cube.id, matrix_position=[x-i, y-k, j]):
+                            self.message_type = "ERROR"
+                            self.message =  crear_mensaje('El robot no ha podido dejar el cubo.', self.message_type, 'RobotMain')
+                            break
+
+        self.message_type = "SUCCESS"
+        self.message =  crear_mensaje('El robot no ha podido dejar el cubo.', self.message_type, self.name)
+        self.reset_robot()
 
 
     def _pick_cube(self, pose:Pose, cube_id:int) -> bool:
@@ -402,6 +419,10 @@ class SecuenceCommander:
         
         # Llama al Cube Tracker Action
         self.matriz3D = self.action_client.obtain_figure()
+
+        if self.matriz3D.size == 0:
+            self.message_type = "ERROR"
+            self.message = crear_mensaje(f"La figura no ha podido ser detectada correctamente...", self.message_type, self.name) 
         
         
          
@@ -539,7 +560,8 @@ class SecuenceCommander:
         self.message_type = "INFO"
         self.message =  crear_mensaje(f"El control por mano ha sido desactivado", self.message_type, self.name)
         self.hand_control = False
-        self._moveJoint(self.j_home)
+        if not self.stop:
+            self._moveJoint(self.j_home)
 
 
     def _control_robot_by_hand(self) -> bool:
