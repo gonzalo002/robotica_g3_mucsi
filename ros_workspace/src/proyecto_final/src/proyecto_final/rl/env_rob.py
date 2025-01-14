@@ -154,6 +154,19 @@ class ROSEnv(gym.Env):
         
         figure_color = int(self.observation[-1, -1])
         cube = self.cubos[action]
+
+        if figure_color == -1 and self.n_cubos >= self.cubos_recogidos:
+            self.cubos_recogidos += 1
+
+            cubo = IdCubos()
+            cubo.color = -1
+            cubo.id = -1
+            
+            trajectory = JointTrajectory()
+            self.cube_trajectories.append(trajectory)
+            self.orden_cubos.append(cubo)
+            self._get_obs()
+            return self.observation, self.reward, self.done, self.truncated, self.info
         
         if action > len(self.cubos): # Si la acción no es válida
             self.reward -= 20.0 # Penaliza la acción con -5
@@ -232,7 +245,7 @@ class ROSEnv(gym.Env):
         self.orden_cubos.append(deepcopy(cube))
         self.cube_trajectories.append(trajectory)
         
-        self.cubos[cube.id].color = -1
+        self.cubos[cube.id].color = -2
         self.cubos[cube.id].pose = Pose(Point(-1.0, -1.0, -1.0),
                                         Quaternion(-1.0, -1.0, -1.0, -1.0))
         
