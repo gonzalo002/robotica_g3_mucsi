@@ -160,7 +160,7 @@ roscore
 ### Lanzar robot, cámaras y servicios para reconstrucción de figura
 Con el fin de facilitar el lanzamiento de los servicios y las cámaras se ha creado un launch file que se puede ejecutar de la siguiente manera:
 ```bash
-roslaunch proyecto_final figure_maker.launch cam_tracker:=true cam_view:=true
+roslaunch proyecto_final figure_maker.launch cam_tracker:=true cam_view:=true rob_sim:=false
 ```
 - Este launch file sirve para el lanzamiento de las cámaras y servicios necesarios para la detección y reconstrucción de la figura a traves del robot.
 - El ordenador responsable de lanzar este launch file, debe ser el ordenador al que se conecten las cámaras asociadas a este proceso.
