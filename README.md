@@ -137,7 +137,7 @@ git push origin <Nombre de la rama>
 rosrun camera_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/usb_cam/image_raw camera:=/usb_cam
 ```
 ### Conectar al master (de ordenador a ordenador)
-Primero se asigna la IP del ordenador Master (Solo necesario en Esclavos):
+####Primero se asigna la IP del ordenador Master (Solo necesario en Esclavos):
 ```bash
 export ROS_MASTER_URI=http://<IP_PC_MASTER>:11311/
 ```
@@ -147,12 +147,12 @@ En nuestro caso:
 export ROS_MASTER_URI=http://10.172.21.30:11311/
 ```
 
-Posteriormente se asigna nuestra propia IP:
+####Posteriormente se asigna nuestra propia IP:
 ```bash
 export ROS_IP=<IP_PC_ACTUAL>
 ```
 
-Finalmente se lanzan nodos y programas necesarios para ROS (Solo en Master):
+####Finalmente se lanzan nodos y programas necesarios para ROS (Solo en Master):
 ```bash
 roscore
 ```
