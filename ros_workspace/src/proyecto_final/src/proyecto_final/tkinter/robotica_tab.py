@@ -59,8 +59,9 @@ class RoboticaTkinter:
         self.img_aspect_ratio = 0.4
         self.Logic_MakeFigure = False
         self.Logic_DetectFigure = False
-        self.Logic_Calibrate = True
+        self.Logic_Calibrate = False
         self.Contador_Calibrate = 0
+        self.STOP = False
 
         # --- INICIALIZACIÖN ---
         self.estilo()
@@ -180,7 +181,7 @@ class RoboticaTkinter:
         self.F_segunda_col.grid_rowconfigure(0, weight=1)
         self.F_segunda_col.grid_columnconfigure(0, weight=1)
 
-        self.B_Stop = ttk.Button(self.F_segunda_col, bootstyle="danger", text="STOP")
+        self.B_Stop = ttk.Button(self.F_segunda_col, bootstyle="danger", command=self.command_security_stop, text="STOP")
         self.B_Stop.grid(row=0, column=0, sticky="nsew",padx=10, pady=10)
 
         self.cambio_funcionamiento()
@@ -775,7 +776,8 @@ class RoboticaTkinter:
         self.canvas_3d = FigureCanvasTkAgg(fig_3d, self.geometry1_frame)
         self.canvas_3d.get_tk_widget().grid(row=1, column=0)
 
-        if not np.all(self.RobMain.matriz3D == -1):
+
+        if not np.all(self.RobMain.matriz3D.size == -1):
             self.Logic_DetectFigure = True
             if self.Logic_Calibrate and self.Logic_DetectFigure:
                 self.B_RemakeFigure.state(["!disabled"])
@@ -853,12 +855,39 @@ class RoboticaTkinter:
         """
         Comando para reconstruir la figura en la interfaz gráfica.
         """
+        if self.STOP: return
         Thread(target=self.remake_figure_thread, daemon=True).start()
+
+    def command_security_stop(self) -> None:
+        if self.STOP:
+            self.STOP = False
+            self.RobMain.stop = False
+            if self.V_modo.get() == 1: 
+                self.B_HandControl.state(["!disabled"])
+            else:
+                self.CB_modo.state(["!disabled"])
+                self.B_Calibrate.state(["!disabled"])
+                if self.Logic_Calibrate and self.Logic_DetectFigure:
+                    self.B_RemakeFigure.state(["!disabled"])
+        else:
+            self.RobMain.security_stop()
+            self.STOP = True
+            self.RobMain.stop = True
+            # --- MANUAL ---
+            if self.V_modo.get() == 1: 
+                self.command_hand_control()
+                self.V_HandControl = ttk.IntVar(0)
+                self.B_HandControl.state([ttk.DISABLED])
+            else:
+                self.CB_modo.state([ttk.DISABLED])
+                self.B_Calibrate.state([ttk.DISABLED])
+                self.B_RemakeFigure.state([ttk.DISABLED])
 
     def remake_figure_thread(self) -> None:
         """
         Hilo para reconstruir la figura en la interfaz gráfica.
         """
+        if self.STOP: return
         self.CB_modo.state([ttk.DISABLED])
         self.RobMain.track_cubes()
 
@@ -906,15 +935,16 @@ class RoboticaTkinter:
         self.L_img_mano.config(image=tk_image)
         self.L_img_mano.image = tk_image
 
-        self.scatter.set_sizes([100])
-        self.scatter._offsets3d = (
-            [self.RobMain.hand_pose[0]],
-            [self.RobMain.hand_pose[1]],
-            [self.RobMain.hand_pose[2]],
-        )
+        if gesture == "is_open":
+            self.scatter.set_sizes([100])
+            self.scatter._offsets3d = (
+                [self.RobMain.hand_pose[0]],
+                [self.RobMain.hand_pose[1]],
+                [self.RobMain.hand_pose[2]],
+            )
 
-        # Redibujar el canvas para reflejar los cambios
-        self.canvas_3d.draw()
+            # Redibujar el canvas para reflejar los cambios
+            self.canvas_3d.draw()
 
         if self.V_HandControl.get() == 1:
             self.root.after(100, self._update_hand_status)
@@ -953,6 +983,22 @@ class RoboticaTkinter:
             self.terminal.config(state=ttk.DISABLED)
             self.RobMain.message = None
             self.RobMain.message_type = None
+
+        if self.RobMain.robot.message is not None and self.RobMain.robot.message_type is not None:
+            self.terminal.config(state=ttk.NORMAL)
+            self.terminal.insert(ttk.END, f"{self.RobMain.robot.message}\n", self.RobMain.robot.message_type)
+            self.terminal.yview(ttk.END)
+            self.terminal.config(state=ttk.DISABLED)
+            self.RobMain.robot.message = None
+            self.RobMain.robot.message_type = None
+        
+        if self.RobMain.action_client.message is not None and self.RobMain.action_client.message_type is not None:
+            self.terminal.config(state=ttk.NORMAL)
+            self.terminal.insert(ttk.END, f"{self.RobMain.action_client.message}\n", self.RobMain.action_client.message_type)
+            self.terminal.yview(ttk.END)
+            self.terminal.config(state=ttk.DISABLED)
+            self.RobMain.action_client.message = None
+            self.RobMain.action_client.message_type = None
 
         self.root.after(49, self._update_terminal)
         
