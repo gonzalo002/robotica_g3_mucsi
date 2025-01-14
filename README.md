@@ -147,7 +147,7 @@ En nuestro caso:
 export ROS_MASTER_URI=http://10.172.21.30:11311/
 ```
 
-#### 2. Asigna nuestra propia IP:
+#### 2. Asignar nuestra propia IP:
 ```bash
 export ROS_IP=<IP_PC_ACTUAL>
 ```
