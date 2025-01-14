@@ -24,6 +24,8 @@ class MasterClient:
         Constructor de la clase
             @param node_activate: Activa el nodo de ROS
         """
+        self.message = None
+        self.message_type = None
         if node_activate:
             rospy.init_node('master_client_py')
 
@@ -74,15 +76,19 @@ class MasterClient:
             @param action_client: Cliente de acción
             @param name: Nombre del servidor de acción
         """
-        crear_mensaje(f"Waiting for {name} server", "INFO", "MasterClient")
+        self.message_type = "INFO"
+        self.message = crear_mensaje(f"Waiting for {name} server", self.message_type, "MasterClient")
         action_client.wait_for_server()
 
-        crear_mensaje(f"Sending goal to {name}", "SUCCESS", "MasterClient")
+        self.message_type = "SUCCESS"
+        self.message = crear_mensaje(f"Sending goal to {name}", self.message_type, "MasterClient")
         action_client.send_goal(goal_msg)
         
-        crear_mensaje(f"Waiting for result from {name}", "INFO", "MasterClient")
+        self.message_type = "INFO"
+        self.message = crear_mensaje(f"Waiting for result from {name}", self.message_type, "MasterClient")
         action_client.wait_for_result()
         
-        crear_mensaje(f"Getting result from {name}", "SUCCESS", "MasterClient")
+        self.message_type = "SUCCESS"
+        self.message = crear_mensaje(f"Getting result from {name}", self.message_type, "MasterClient")
 
         return action_client.get_result()
